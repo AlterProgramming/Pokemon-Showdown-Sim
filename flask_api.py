@@ -11,6 +11,11 @@ VOCAB_PATH = "move_vocab.json"
 
 # load once at startup
 model = tf.keras.models.load_model(MODEL_PATH)
+EXPECTED_INPUT_DIM = None
+if getattr(model, "input_shape", None):
+    shape = model.input_shape
+    if isinstance(shape, tuple) and len(shape) >= 2 and shape[-1] is not None:
+        EXPECTED_INPUT_DIM = int(shape[-1])
 with open(VOCAB_PATH, "r") as f:
     move_vocab = json.load(f)
 
@@ -44,6 +49,35 @@ def pick_best_move(logits: np.ndarray, legal_moves: list[str]) -> tuple[str | No
 def test():
     print("This is a test")
 
+import random
+from flask import request, jsonify
+
+# Temporary Separation of Switch behavior.. Later, predict should also account for this.
+# Or perhaps not? Will evaluate if switch model might be best as a standalone module
+@app.route("/predict/switch", methods=["POST"])
+def choose_switch():
+    data = request.json
+
+    legal_switches = data.get("legal_switches", [])
+
+    if not legal_switches:
+        return jsonify({"error": "No legal switches provided"}), 400
+
+    # Pick random legal switch
+    chosen = random.choice(legal_switches)
+
+    slot = chosen.get("slot")
+
+    if slot is None:
+        return jsonify({"error": "Malformed legal switch object"}), 400
+
+    print({"type": "switch",
+        "slot": slot
+    })
+    # Showdown format
+    return jsonify({"type": "switch",
+        "slot": slot
+    })
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -55,19 +89,19 @@ def predict():
     print('begin request')
     try:
         data = request.get_json(silent=True)
-        print(data)
-        if 'forceSwitch' in data and data['forceSwitch']:
-            legal_switches = data['side']  
-            selected_idx = np.random.choice(len(legal_switches))
-            
-            print(legal_switches[selected_idx]['p'].slot)
-            return jsonify(type= 'switch', best_switch=legal_switches[selected_idx]['p'].slot)
         if data is None:
             return jsonify(error="invalid JSON"), 400
 
         vec = data.get("state_vector")
         if vec is None:
             return jsonify(error="missing state_vector"), 400
+        if EXPECTED_INPUT_DIM is not None and len(vec) != EXPECTED_INPUT_DIM:
+            return jsonify(
+                error=(
+                    f"state_vector has length {len(vec)} but model expects {EXPECTED_INPUT_DIM}. "
+                    "Retrain or swap the saved model if the vectorizer changed."
+                )
+            ), 400
 
         legal_moves = data.get("legal_moves") or []
         legal_switches = data.get("legal_switches", []) or []
@@ -78,7 +112,6 @@ def predict():
 
         best_move, best_prob = pick_best_move(logits, legal_moves)
         print(best_move)
-        print('close to end request')
     
         if best_move is None:
             # no legal move found in vocab, signal a switch recommendation
@@ -100,4 +133,4 @@ def predict():
 
 if __name__ == "__main__":
     # simple development server
-    app.run(host="0.0.0.0", port=5000, debug=True, threaded=False)
+    app.run(host="0.0.0.0", port=5000, debug=True)

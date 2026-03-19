@@ -1,12 +1,34 @@
 from __future__ import annotations
 
-from typing import List, Dict, Any, Tuple, Optional, Iterator
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 
-from BattleStateTracker import STAT_ORDER, BattleStateTracker
-
+from BattleStateTracker import BattleStateTracker, STAT_ORDER
 from StaticDex import StaticDex
 
+
 STATUS_ORDER: List[str] = ["brn", "par", "psn", "tox", "slp", "frz"]
+WEATHER_ORDER: List[str] = ["raindance", "sunnyday", "sandstorm", "snow"]
+GLOBAL_CONDITION_ORDER: List[str] = [
+    "electricterrain",
+    "grassyterrain",
+    "mistyterrain",
+    "psychicterrain",
+    "trickroom",
+]
+SIDE_CONDITION_ORDER: List[str] = [
+    "stealthrock",
+    "stickyweb",
+    "spikes",
+    "toxicspikes",
+    "reflect",
+    "lightscreen",
+    "auroraveil",
+    "tailwind",
+]
+SIDE_CONDITION_CAPS: Dict[str, float] = {
+    "spikes": 3.0,
+    "toxicspikes": 2.0,
+}
 
 
 def one_hot(value: Optional[str], choices: List[str]) -> List[float]:
@@ -22,6 +44,24 @@ def safe_hp_frac(mon: Dict[str, Any]) -> Tuple[float, float]:
         return (0.0, 0.0)
     return (float(hf), 1.0)
 
+
+def stable_hash(s: str) -> int:
+    # Deterministic (unlike Python's built-in hash, which is salted per run)
+    h = 2166136261
+    for ch in s:
+        h ^= ord(ch)
+        h = (h * 16777619) & 0xFFFFFFFF
+    return h
+
+
+def hashed_move_bag(move_ids: List[str], dim: int = 64) -> List[float]:
+    v = [0.0] * dim
+    for move_id in move_ids:
+        j = stable_hash(move_id) % dim
+        v[j] = 1.0
+    return v
+
+
 def hashed_species(species: Optional[str], dim: int = 32) -> List[float]:
     if species is None:
         return [0.0] * dim
@@ -30,87 +70,173 @@ def hashed_species(species: Optional[str], dim: int = 32) -> List[float]:
     v[j] = 1.0
     return v
 
-# def mon_features(mon: Optional[Dict[str, Any]]) -> List[float]:
-#     """
-#     Features for an active mon.
-#     If mon is None -> all zeros with known flags = 0.
-#     Layout:
-#       [hp_frac, hp_known, fainted] +
-#       [boosts in STAT_ORDER] +
-#       [status one-hot in STATUS_ORDER]
-#     """
-#     if mon is None:
-#         return [0.0, 0.0, 0.0] + [0.0] * len(STAT_ORDER) + [0.0] * len(STATUS_ORDER)
 
-#     hp_frac_val, hp_known = safe_hp_frac(mon)
-#     fainted = 1.0 if mon.get("fainted") else 0.0
+def mon_visible_to_player(mon: Optional[Dict[str, Any]], perspective_player: str) -> bool:
+    if mon is None:
+        return False
+    return mon.get("player") == perspective_player or bool(mon.get("public_revealed"))
 
-#     boosts = mon.get("boosts", {}) or {}
-#     boost_vec = [float(boosts.get(k, 0)) for k in STAT_ORDER]
 
-#     status = mon.get("status")
-#     status_vec = one_hot(status, STATUS_ORDER)
+def visible_species(mon: Optional[Dict[str, Any]], perspective_player: str) -> Optional[str]:
+    if not mon_visible_to_player(mon, perspective_player):
+        return None
+    return mon.get("species")
 
-#     return [hp_frac_val, hp_known, fainted] + boost_vec + status_vec
-# def mon_features(mon: Optional[Dict[str, Any]], move_hash_dim: int = 64) -> List[float]:
-#     # [hp_frac, hp_known, fainted] + boosts + status + observed_moves_hash
-#     if mon is None:
-#         base = [0.0, 0.0, 0.0] + [0.0] * len(STAT_ORDER) + [0.0] * len(STATUS_ORDER)
-#         return base + [0.0] * move_hash_dim
 
-#     hp_frac_val, hp_known = safe_hp_frac(mon)
-#     fainted = 1.0 if mon.get("fainted") else 0.0
+def visible_status(mon: Optional[Dict[str, Any]], perspective_player: str) -> Optional[str]:
+    if not mon_visible_to_player(mon, perspective_player):
+        return None
+    return mon.get("status")
 
-#     boosts = mon.get("boosts", {}) or {}
-#     boost_vec = [float(boosts.get(k, 0)) for k in STAT_ORDER]
 
-#     status = mon.get("status")
-#     status_vec = one_hot(status, STATUS_ORDER)
+def visible_observed_moves(mon: Optional[Dict[str, Any]], perspective_player: str) -> List[str]:
+    if not mon_visible_to_player(mon, perspective_player):
+        return []
+    return mon.get("observed_moves", []) or []
 
-#     obs = mon.get("observed_moves", []) or []
-#     obs_vec = hashed_move_bag(obs, dim=move_hash_dim)
-
-#     return [hp_frac_val, hp_known, fainted] + boost_vec + status_vec + obs_vec
 
 def mon_features(
     mon: Optional[Dict[str, Any]],
+    perspective_player: str,
     move_hash_dim: int = 64,
     species_hash_dim: int = 32,
 ) -> List[float]:
     if mon is None:
-        base = [0.0, 0.0, 0.0] \
-             + [0.0] * len(STAT_ORDER) \
-             + [0.0] * len(STATUS_ORDER)
+        base = [0.0] * 7 + [0.0] * len(STAT_ORDER) + [0.0] * len(STATUS_ORDER)
         return base + [0.0] * move_hash_dim + [0.0] * species_hash_dim
 
     hp_frac_val, hp_known = safe_hp_frac(mon)
     fainted = 1.0 if mon.get("fainted") else 0.0
+    visible_flag = 1.0 if mon_visible_to_player(mon, perspective_player) else 0.0
+    terastallized = 1.0 if mon.get("terastallized") else 0.0
+    ability_known = 1.0 if mon.get("ability") else 0.0
+    item_known = 1.0 if mon.get("item") else 0.0
 
     boosts = mon.get("boosts", {}) or {}
     boost_vec = [float(boosts.get(k, 0)) for k in STAT_ORDER]
 
-    status_vec = one_hot(mon.get("status"), STATUS_ORDER)
-
-    obs_vec = hashed_move_bag(mon.get("observed_moves", []), move_hash_dim)
-    species_vec = hashed_species(mon.get("species"), species_hash_dim)
+    status_vec = one_hot(visible_status(mon, perspective_player), STATUS_ORDER)
+    obs_vec = hashed_move_bag(visible_observed_moves(mon, perspective_player), move_hash_dim)
+    species_vec = hashed_species(visible_species(mon, perspective_player), species_hash_dim)
 
     return (
-        [hp_frac_val, hp_known, fainted]
+        [
+            hp_frac_val,
+            hp_known,
+            fainted,
+            visible_flag,
+            terastallized,
+            ability_known,
+            item_known,
+        ]
         + boost_vec
         + status_vec
         + obs_vec
         + species_vec
     )
 
-def bench_slot_features(mon: Optional[Dict[str, Any]]) -> List[float]:
+
+def bench_slot_features(
+    mon: Optional[Dict[str, Any]],
+    perspective_player: str,
+    species_hash_dim: int = 16,
+) -> List[float]:
     """
-    Tiny bench representation: [fainted, hp_known, hp_frac]
+    Bench representation:
+      [revealed, fainted, hp_known, hp_frac, terastallized] +
+      [status one-hot] +
+      [species hash if visible]
     """
     if mon is None:
-        return [0.0, 0.0, 0.0]
+        return [0.0] * (5 + len(STATUS_ORDER) + species_hash_dim)
+
     hp_frac_val, hp_known = safe_hp_frac(mon)
+    revealed = 1.0 if mon_visible_to_player(mon, perspective_player) else 0.0
     fainted = 1.0 if mon.get("fainted") else 0.0
-    return [fainted, hp_known, hp_frac_val]
+    terastallized = 1.0 if mon.get("terastallized") else 0.0
+    status_vec = one_hot(visible_status(mon, perspective_player), STATUS_ORDER)
+    species_vec = hashed_species(visible_species(mon, perspective_player), species_hash_dim)
+    return [revealed, fainted, hp_known, hp_frac_val, terastallized] + status_vec + species_vec
+
+
+def field_features(state: Dict[str, Any]) -> List[float]:
+    field = state.get("field", {}) or {}
+    weather_vec = one_hot(field.get("weather"), WEATHER_ORDER)
+    global_conditions = set(field.get("global_conditions", []) or [])
+    global_vec = [1.0 if cond in global_conditions else 0.0 for cond in GLOBAL_CONDITION_ORDER]
+    return weather_vec + global_vec
+
+
+def side_condition_features(side_state: Dict[str, Any]) -> List[float]:
+    conditions = side_state.get("side_conditions", {}) or {}
+    feats: List[float] = []
+    for cond in SIDE_CONDITION_ORDER:
+        cap = SIDE_CONDITION_CAPS.get(cond, 1.0)
+        feats.append(min(float(conditions.get(cond, 0)), cap) / cap)
+    return feats
+
+
+def active_feature_dim(move_hash_dim: int = 64, species_hash_dim: int = 32) -> int:
+    return 7 + len(STAT_ORDER) + len(STATUS_ORDER) + move_hash_dim + species_hash_dim
+
+
+def bench_feature_dim(species_hash_dim: int = 16) -> int:
+    return 5 + len(STATUS_ORDER) + species_hash_dim
+
+
+def field_feature_dim() -> int:
+    return len(WEATHER_ORDER) + len(GLOBAL_CONDITION_ORDER)
+
+
+def state_vector_layout() -> List[Dict[str, Any]]:
+    active_dim = active_feature_dim()
+    bench_dim = bench_feature_dim()
+    return [
+        {
+            "name": "my_active",
+            "size": active_dim,
+            "description": "My active mon: hp, knowledge flags, boosts, status, tera/item/ability flags, revealed moves hash, visible species hash.",
+        },
+        {
+            "name": "opponent_active",
+            "size": active_dim,
+            "description": "Opponent active mon with the same feature template, masked to public information.",
+        },
+        {
+            "name": "my_bench",
+            "size": 6 * bench_dim,
+            "description": "Six bench slots: revealed flag, hp/fainted/tera, bench status, visible species hash.",
+        },
+        {
+            "name": "opponent_bench",
+            "size": 6 * bench_dim,
+            "description": "Opponent bench slots with the same bench template, masked to public information.",
+        },
+        {
+            "name": "field",
+            "size": field_feature_dim(),
+            "description": "Weather plus global field conditions such as terrain or Trick Room.",
+        },
+        {
+            "name": "my_side_conditions",
+            "size": len(SIDE_CONDITION_ORDER),
+            "description": "My side's public side conditions such as rocks, spikes, screens, veil, and Tailwind.",
+        },
+        {
+            "name": "opponent_side_conditions",
+            "size": len(SIDE_CONDITION_ORDER),
+            "description": "Opponent side's public side conditions.",
+        },
+        {
+            "name": "turn_index",
+            "size": 1,
+            "description": "Normalized capped turn number.",
+        },
+    ]
+
+
+def state_vector_dim() -> int:
+    return sum(int(block["size"]) for block in state_vector_layout())
 
 
 def encode_state_v0(state: Dict[str, Any], perspective_player: str) -> List[float]:
@@ -130,24 +256,27 @@ def encode_state_v0(state: Dict[str, Any], perspective_player: str) -> List[floa
     opp_active = mons.get(opp_active_uid) if opp_active_uid else None
 
     vec: List[float] = []
-    vec += mon_features(my_active)
-    vec += mon_features(opp_active)
+    vec += mon_features(my_active, perspective_player)
+    vec += mon_features(opp_active, perspective_player)
 
-    # Bench slots (6) for each side based on stable slot list
     my_slots = state[perspective_player]["slots"]
     opp_slots = state[other]["slots"]
 
     for uid in my_slots:
-        vec += bench_slot_features(mons.get(uid) if uid else None)
+        vec += bench_slot_features(mons.get(uid) if uid else None, perspective_player)
 
     for uid in opp_slots:
-        vec += bench_slot_features(mons.get(uid) if uid else None)
+        vec += bench_slot_features(mons.get(uid) if uid else None, perspective_player)
 
-    # Simple capped turn signal
+    vec += field_features(state)
+    vec += side_condition_features(state[perspective_player])
+    vec += side_condition_features(state[other])
+
     t = float(state.get("turn_index", 0))
     vec.append(min(t, 50.0) / 50.0)
 
     return vec
+
 
 def encode_state_with_static(
     state: Dict[str, Any],
@@ -159,7 +288,7 @@ def encode_state_with_static(
       x_num: numeric vector (encode_state_v0 + base stats for both actives)
       cats: (my_species, op_species, my_t1, my_t2, op_t1, op_t2)
     """
-    x_num = encode_state_v0(state, perspective_player)  # your existing numeric vector
+    x_num = encode_state_v0(state, perspective_player)
 
     other = "p2" if perspective_player == "p1" else "p1"
     mons = state["mons"]
@@ -167,17 +296,20 @@ def encode_state_with_static(
     my_uid = state[perspective_player]["active_uid"]
     op_uid = state[other]["active_uid"]
 
-    my_species_name = mons.get(my_uid, {}).get("species") if my_uid else None
-    op_species_name = mons.get(op_uid, {}).get("species") if op_uid else None
+    my_mon = mons.get(my_uid) if my_uid else None
+    op_mon = mons.get(op_uid) if op_uid else None
+
+    my_species_name = visible_species(my_mon, perspective_player)
+    op_species_name = visible_species(op_mon, perspective_player)
 
     my_sp, my_t1, my_t2, my_stats = dex.lookup(my_species_name)
     op_sp, op_t1, op_t2, op_stats = dex.lookup(op_species_name)
 
-    # Append base stats to numeric vector (simple + effective)
     x_num = x_num + my_stats + op_stats
 
     cats = (my_sp, op_sp, my_t1, my_t2, op_t1, op_t2)
     return x_num, cats
+
 
 def vectorize_dataset_static(
     examples: List[Dict[str, Any]],
@@ -244,7 +376,7 @@ def iter_turn_examples_both_players(
                 "turn_number": ex["turn_number"],
                 "player": player,
                 "state": ex["state"],
-                "action": ex["action"],  # ("move", move_id)
+                "action": ex["action"],
             }
 
 
@@ -262,30 +394,16 @@ def build_move_vocab(examples: List[Dict[str, Any]], min_count: int = 1) -> Dict
         counts[move_id] = counts.get(move_id, 0) + 1
 
     vocab: Dict[str, int] = {"<UNK>": 0}
-    for move_id, c in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):
-        if c >= min_count:
+    for move_id, count in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):
+        if count >= min_count:
             vocab[move_id] = len(vocab)
     return vocab
-
-def stable_hash(s: str) -> int:
-    # Deterministic (unlike Python's built-in hash, which is salted per run)
-    h = 2166136261
-    for ch in s:
-        h ^= ord(ch)
-        h = (h * 16777619) & 0xFFFFFFFF
-    return h
-
-def hashed_move_bag(move_ids: List[str], dim: int = 64) -> List[float]:
-    v = [0.0] * dim
-    for m in move_ids:
-        j = stable_hash(m) % dim
-        v[j] = 1.0
-    return v
 
 
 def vectorize_dataset(
     examples: List[Dict[str, Any]],
     move_vocab: Dict[str, int],
+    state_encoder: Callable[[Dict[str, Any], str], List[float]] = encode_state_v0,
 ) -> Tuple[List[List[float]], List[int]]:
     X: List[List[float]] = []
     y: List[int] = []
@@ -293,10 +411,9 @@ def vectorize_dataset(
     unk = move_vocab.get("<UNK>", 0)
     for ex in examples:
         player = ex["player"]
-        vec = encode_state_v0(ex["state"], perspective_player=player)
+        vec = state_encoder(ex["state"], perspective_player=player)
         _, move_id = ex["action"]
         label = move_vocab.get(move_id, unk)
         X.append(vec)
         y.append(label)
-
     return X, y
