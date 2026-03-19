@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from BattleStateTracker import BattleStateTracker
+from StateVectorization import build_action_vocab, iter_turn_examples_both_players, vectorize_action_dataset
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +31,13 @@ class BattleStateTrackerTests(unittest.TestCase):
 
         self.assertEqual(turn_three["state"]["p1"]["active_uid"], "p1-2")
         self.assertEqual(turn_three["state"]["p2"]["active_uid"], "p2-0")
+
+    def test_switch_actions_are_labeled_by_stable_slot(self) -> None:
+        examples = list(self.tracker.iter_turn_examples(self.sample_battle, player="p2", include_switches=True))
+        turn_three = next(ex for ex in examples if ex["turn_number"] == 3)
+
+        self.assertEqual(turn_three["action"], ("switch", "p2-1"))
+        self.assertEqual(turn_three["action_token"], "switch:2")
 
     def test_effects_status_end_and_tera_are_tracked(self) -> None:
         synthetic_battle = {
@@ -169,6 +177,22 @@ class BattleStateTrackerTests(unittest.TestCase):
         self.assertNotIn("electricterrain", after_turn_two["field"]["global_conditions"])
         self.assertNotIn("spikes", after_turn_two["p1"]["side_conditions"])
         self.assertIsNone(p1_after["item"])
+
+    def test_action_vocab_and_joint_vectorization_include_switches(self) -> None:
+        examples = list(
+            iter_turn_examples_both_players(
+                self.tracker,
+                self.sample_battle,
+                include_switches=True,
+            )
+        )
+        action_vocab = build_action_vocab(examples, include_switches=True)
+        X, y = vectorize_action_dataset(examples, action_vocab, include_switches=True)
+
+        self.assertIn("switch:2", action_vocab)
+        self.assertIn("move:double-edge", action_vocab)
+        self.assertEqual(len(X), len(y))
+        self.assertGreater(len(y), 37)
 
 
 if __name__ == "__main__":

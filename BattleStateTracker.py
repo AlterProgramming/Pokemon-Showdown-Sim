@@ -315,6 +315,35 @@ class BattleStateTracker:
                     return ("switch", into_uid)
         return None
 
+    def _resolve_switch_slot(self, player: str, into_uid: str) -> Optional[int]:
+        slot = self.uid_slot.get(into_uid)
+        if slot is not None:
+            return slot
+
+        ms = self.mons.get(into_uid)
+        if ms is None:
+            ms = self._ensure_mon(into_uid, player)
+        self._fill_mon_from_roster(ms)
+
+        if ms.species:
+            return self.species_slot.get((player, ms.species))
+        return None
+
+    def action_token_for_player(
+        self,
+        player: str,
+        action: Tuple[str, str],
+    ) -> Optional[str]:
+        kind, value = action
+        if kind == "move":
+            return f"move:{value}"
+        if kind == "switch":
+            slot = self._resolve_switch_slot(player, value)
+            if slot is None:
+                return None
+            return f"switch:{slot + 1}"
+        return None
+
     # ---------- Event application ----------
     def apply_turn(self, turn_obj: Dict[str, Any]) -> None:
         self.turn_index = int(turn_obj.get("turn_number", self.turn_index + 1))
@@ -616,9 +645,14 @@ class BattleStateTracker:
             if (not include_switches) and action[0] != "move":
                 continue
 
+            action_token = self.action_token_for_player(player, action)
+            if action_token is None:
+                continue
+
             yield {
                 "battle_id": self.battle_id,
                 "turn_number": int(turn.get("turn_number")),
                 "state": state_before,
                 "action": action,
+                "action_token": action_token,
             }

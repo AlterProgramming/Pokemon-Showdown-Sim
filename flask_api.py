@@ -2,12 +2,18 @@ from flask import Flask, request, jsonify
 import numpy as np
 import tensorflow as tf
 import json
+from pathlib import Path
 
 app = Flask(__name__)
 
 # paths to the serialized artifacts created by the notebook
-MODEL_PATH = "model.h5"
-VOCAB_PATH = "move_vocab.json"
+MODEL_PATH = "artifacts/model.keras"
+VOCAB_CANDIDATES = [
+    Path("artifacts/action_vocab.json"),
+    Path("artifacts/move_vocab.json"),
+    Path("action_vocab.json"),
+    Path("move_vocab.json"),
+]
 
 # load once at startup
 model = tf.keras.models.load_model(MODEL_PATH)
@@ -16,34 +22,72 @@ if getattr(model, "input_shape", None):
     shape = model.input_shape
     if isinstance(shape, tuple) and len(shape) >= 2 and shape[-1] is not None:
         EXPECTED_INPUT_DIM = int(shape[-1])
+
+VOCAB_PATH = next((path for path in VOCAB_CANDIDATES if path.exists()), VOCAB_CANDIDATES[-1])
 with open(VOCAB_PATH, "r") as f:
-    move_vocab = json.load(f)
+    action_vocab = json.load(f)
 
 # invert vocab for convenience
-idx_to_move = {v: k for k, v in move_vocab.items()}
+idx_to_action = {v: k for k, v in action_vocab.items()}
+
+def vocab_uses_action_tokens() -> bool:
+    return any(
+        token.startswith(("move:", "switch:"))
+        for token in action_vocab
+        if token != "<UNK>"
+    )
 
 
-def pick_best_move(logits: np.ndarray, legal_moves: list[str]) -> tuple[str | None, float]:
-    """Return (move, probability). If no legal move is in the vocab we return (None,0)."""
+def move_vocab_tokens(move_name: str) -> list[str]:
+    normalized = move_name.lower().replace(" ", "")
+    if vocab_uses_action_tokens():
+        return [f"move:{normalized}"]
+    return [normalized]
+
+
+def switch_vocab_tokens(slot: int) -> list[str]:
+    if vocab_uses_action_tokens():
+        return [f"switch:{slot}"]
+    return []
+
+
+def pick_best_action(
+    logits: np.ndarray,
+    legal_moves: list[dict],
+    legal_switches: list[dict],
+) -> tuple[dict | None, float]:
+    """Return the highest-probability legal action supported by the current vocab."""
     probs = tf.nn.softmax(logits).numpy()
-    best_move = None
+    best_action = None
     best_prob = -1.0
-    # print(legal_moves)
+
     for mv in legal_moves:
         print('Move is : ', mv)
-        move_name = mv['move'].lower().replace(' ', '')
-        idx = move_vocab.get(move_name)
-        print(idx)
-        if idx is None:
-            continue
-        print("Found move in trained vocab")
-        p = float(probs[idx])
+        move_name = mv.get("move", "")
+        for token in move_vocab_tokens(move_name):
+            idx = action_vocab.get(token)
+            print(idx)
+            if idx is None:
+                continue
+            p = float(probs[idx])
+            if p > best_prob:
+                best_prob = p
+                best_action = {"type": "move", "payload": mv, "token": token}
 
-        if p > best_prob:
-            best_prob = p
-            best_move = mv
-        print("best move is ", best_move, " probability: ", best_prob)
-    return best_move, best_prob
+    for sw in legal_switches:
+        slot = sw.get("slot")
+        if slot is None:
+            continue
+        for token in switch_vocab_tokens(int(slot)):
+            idx = action_vocab.get(token)
+            if idx is None:
+                continue
+            p = float(probs[idx])
+            if p > best_prob:
+                best_prob = p
+                best_action = {"type": "switch", "payload": sw, "token": token}
+
+    return best_action, best_prob
 
 @app.route("/test", methods=["GET"])
 def test():
@@ -110,19 +154,33 @@ def predict():
         arr = np.asarray([vec], dtype=np.float32)
         logits = model.predict(arr, verbose=0)[0]
 
-        best_move, best_prob = pick_best_move(logits, legal_moves)
-        print(best_move)
+        best_action, best_prob = pick_best_action(logits, legal_moves, legal_switches)
+        print(best_action)
     
-        if best_move is None:
-            # no legal move found in vocab, signal a switch recommendation
+        if best_action is None:
             return jsonify(
-                best_move=None,
-                type= 'move',
-                note="no legal moves found in vocabulary; consider switching",
+                best_action=None,
+                type='none',
+                note="no legal actions found in vocabulary",
+                legal_moves=legal_moves,
                 legal_switches=legal_switches,
             )
 
-        return jsonify(best_move=best_move, type='move', probability=best_prob)
+        if best_action["type"] == "move":
+            return jsonify(
+                best_move=best_action["payload"],
+                type='move',
+                probability=best_prob,
+                action_token=best_action["token"],
+            )
+
+        return jsonify(
+            best_switch=best_action["payload"],
+            slot=best_action["payload"].get("slot"),
+            type='switch',
+            probability=best_prob,
+            action_token=best_action["token"],
+        )
     
     except Exception as e:
         print(f"Error in /predict: {str(e)}")

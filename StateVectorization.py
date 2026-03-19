@@ -364,19 +364,25 @@ def vectorize_dataset_static(
 def iter_turn_examples_both_players(
     tracker: BattleStateTracker,
     battle: Dict[str, Any],
+    include_switches: bool = False,
 ) -> Iterator[Dict[str, Any]]:
     """
-    Yields move-only examples for BOTH p1 and p2.
+    Yields examples for BOTH p1 and p2.
     Each example has a 'player' field indicating perspective.
     """
     for player in ("p1", "p2"):
-        for ex in tracker.iter_turn_examples(battle, player=player, include_switches=False):
+        for ex in tracker.iter_turn_examples(
+            battle,
+            player=player,
+            include_switches=include_switches,
+        ):
             yield {
                 "battle_id": ex["battle_id"],
                 "turn_number": ex["turn_number"],
                 "player": player,
                 "state": ex["state"],
                 "action": ex["action"],
+                "action_token": ex["action_token"],
             }
 
 
@@ -400,6 +406,34 @@ def build_move_vocab(examples: List[Dict[str, Any]], min_count: int = 1) -> Dict
     return vocab
 
 
+def build_action_vocab(
+    examples: List[Dict[str, Any]],
+    min_count: int = 1,
+    include_switches: bool = True,
+) -> Dict[str, int]:
+    counts: Dict[str, int] = {}
+    for ex in examples:
+        action_token = ex.get("action_token")
+        if not action_token:
+            continue
+        if not include_switches and action_token.startswith("switch:"):
+            continue
+        counts[action_token] = counts.get(action_token, 0) + 1
+
+    vocab: Dict[str, int] = {"<UNK>": 0}
+    if include_switches:
+        for slot in range(1, 7):
+            token = f"switch:{slot}"
+            vocab[token] = len(vocab)
+
+    for action_token, count in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):
+        if count < min_count:
+            continue
+        if action_token not in vocab:
+            vocab[action_token] = len(vocab)
+    return vocab
+
+
 def vectorize_dataset(
     examples: List[Dict[str, Any]],
     move_vocab: Dict[str, int],
@@ -414,6 +448,31 @@ def vectorize_dataset(
         vec = state_encoder(ex["state"], perspective_player=player)
         _, move_id = ex["action"]
         label = move_vocab.get(move_id, unk)
+        X.append(vec)
+        y.append(label)
+    return X, y
+
+
+def vectorize_action_dataset(
+    examples: List[Dict[str, Any]],
+    action_vocab: Dict[str, int],
+    include_switches: bool = True,
+    state_encoder: Callable[[Dict[str, Any], str], List[float]] = encode_state_v0,
+) -> Tuple[List[List[float]], List[int]]:
+    X: List[List[float]] = []
+    y: List[int] = []
+
+    unk = action_vocab.get("<UNK>", 0)
+    for ex in examples:
+        action_token = ex.get("action_token")
+        if not action_token:
+            continue
+        if not include_switches and action_token.startswith("switch:"):
+            continue
+
+        player = ex["player"]
+        vec = state_encoder(ex["state"], perspective_player=player)
+        label = action_vocab.get(action_token, unk)
         X.append(vec)
         y.append(label)
     return X, y

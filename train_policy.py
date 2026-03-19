@@ -9,8 +9,10 @@ import numpy as np
 
 from BattleStateTracker import BattleStateTracker
 from StateVectorization import (
+    build_action_vocab,
     build_move_vocab,
     state_vector_layout,
+    vectorize_action_dataset,
     vectorize_dataset,
 )
 from TrainingSplit import group_split_by_battle_id, ingest_battles_to_examples
@@ -66,19 +68,40 @@ def save_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
+def build_artifact_paths(output_dir: Path, include_switches: bool) -> tuple[Path, Path, Path]:
+    vocab_stem = "action_vocab" if include_switches else "move_vocab"
+    metadata_stem = "training_metadata"
+    idx = 0
+
+    while True:
+        run_suffix = "" if idx == 0 else f"_{idx}"
+        model_path = output_dir / f"model{run_suffix}.keras"
+        vocab_path = output_dir / f"{vocab_stem}{run_suffix}.json"
+        metadata_path = output_dir / f"{metadata_stem}{run_suffix}.json"
+
+        if not model_path.exists() and not vocab_path.exists() and not metadata_path.exists():
+            return model_path, vocab_path, metadata_path
+        idx += 1
+
+
 def make_training_metadata(
     args: argparse.Namespace,
     feature_dim: int,
-    move_vocab: dict,
+    action_vocab: dict,
     train_size: int,
     val_size: int,
     history,
+    model_path: Path,
+    vocab_path: Path,
 ) -> dict:
     history_dict = history.history if history is not None else {}
     return {
+        "model_path": str(model_path),
+        "vocab_path": str(vocab_path),
         "feature_dim": feature_dim,
         "feature_layout": state_vector_layout(),
-        "num_move_classes": len(move_vocab),
+        "num_action_classes": len(action_vocab),
+        "action_space": "joint" if args.include_switches else "move_only",
         "train_examples": train_size,
         "val_examples": val_size,
         "epochs_requested": args.epochs,
@@ -92,11 +115,12 @@ def make_training_metadata(
         "max_battles": args.max_battles,
         "val_ratio": args.val_ratio,
         "seed": args.seed,
+        "include_switches": args.include_switches,
     }
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Train the Pokemon Showdown move policy model.")
+    parser = argparse.ArgumentParser(description="Train the Pokemon Showdown action policy model.")
     parser.add_argument(
         "data_paths",
         nargs="+",
@@ -113,6 +137,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hidden-dim", type=int, default=256, help="Hidden width for each dense layer.")
     parser.add_argument("--depth", type=int, default=3, help="Number of hidden dense layers.")
     parser.add_argument("--dropout", type=float, default=0.1, help="Dropout between dense layers.")
+    parser.add_argument(
+        "--include-switches",
+        action="store_true",
+        help="Train a joint action model with both move and switch classes.",
+    )
     parser.add_argument(
         "--patience",
         type=int,
@@ -143,6 +172,7 @@ def main() -> None:
         json_paths,
         max_battles=args.max_battles,
         verbose_every=args.verbose_every,
+        include_switches=args.include_switches,
     )
     if not examples:
         raise SystemExit("No training examples were produced from the provided battle logs.")
@@ -150,9 +180,12 @@ def main() -> None:
     train_idx, val_idx = group_split_by_battle_id(examples, val_ratio=args.val_ratio, seed=args.seed)
     train_examples = subset_examples(examples, train_idx)
     vocab_source = train_examples if train_examples else examples
-    move_vocab = build_move_vocab(vocab_source, min_count=args.min_move_count)
-
-    X, y = vectorize_dataset(examples, move_vocab)
+    if args.include_switches:
+        action_vocab = build_action_vocab(vocab_source, min_count=args.min_move_count, include_switches=True)
+        X, y = vectorize_action_dataset(examples, action_vocab, include_switches=True)
+    else:
+        action_vocab = build_move_vocab(vocab_source, min_count=args.min_move_count)
+        X, y = vectorize_dataset(examples, action_vocab)
     X = np.asarray(X, dtype=np.float32)
     y = np.asarray(y, dtype=np.int64)
 
@@ -161,15 +194,22 @@ def main() -> None:
     X_val = X[val_idx] if len(val_idx) else None
     y_val = y[val_idx] if len(val_idx) else None
 
-    print(f"examples={len(examples)} train={len(train_idx)} val={len(val_idx)}")
-    print(f"feature_dim={X.shape[1]} num_classes={len(move_vocab)}")
+    switch_examples = sum(1 for ex in examples if ex["action"][0] == "switch")
+    print(
+        f"examples={len(examples)} train={len(train_idx)} val={len(val_idx)}"
+        f" switches={switch_examples}"
+    )
+    print(
+        f"feature_dim={X.shape[1]} num_classes={len(action_vocab)}"
+        f" action_space={'joint' if args.include_switches else 'move_only'}"
+    )
     print("feature_layout:")
     for block in state_vector_layout():
         print(f"  - {block['name']}: {block['size']} :: {block['description']}")
 
     model = build_policy_model(
         input_dim=X.shape[1],
-        num_classes=len(move_vocab),
+        num_classes=len(action_vocab),
         hidden_dim=args.hidden_dim,
         depth=args.depth,
         dropout=args.dropout,
@@ -188,7 +228,7 @@ def main() -> None:
         "verbose": 1,
     }
     if X_val is not None and y_val is not None and len(val_idx):
-        monitor_metric = "val_top3" if len(move_vocab) >= 3 else "val_top1"
+        monitor_metric = "val_top3" if len(action_vocab) >= 3 else "val_top1"
         callbacks.append(
             keras.callbacks.EarlyStopping(
                 monitor=monitor_metric,
@@ -206,21 +246,21 @@ def main() -> None:
 
     history = model.fit(**fit_kwargs)
 
-    model_path = output_dir / "model.keras"
-    vocab_path = output_dir / "move_vocab.json"
-    metadata_path = output_dir / "training_metadata.json"
+    model_path, vocab_path, metadata_path = build_artifact_paths(output_dir, args.include_switches)
 
     model.save(model_path)
-    save_json(vocab_path, move_vocab)
+    save_json(vocab_path, action_vocab)
     save_json(
         metadata_path,
         make_training_metadata(
             args,
             feature_dim=int(X.shape[1]),
-            move_vocab=move_vocab,
+            action_vocab=action_vocab,
             train_size=int(len(train_idx)),
             val_size=int(len(val_idx)),
             history=history,
+            model_path=model_path,
+            vocab_path=vocab_path,
         ),
     )
 

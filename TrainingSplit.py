@@ -40,6 +40,7 @@ def ingest_battles_to_examples(
     json_paths,
     max_battles=1000,
     verbose_every=200,
+    include_switches=False,
 ):
     examples = []
     battles_loaded = 0
@@ -53,7 +54,11 @@ def ingest_battles_to_examples(
             continue
 
         try:
-            for ex in iter_turn_examples_both_players(tracker, battle):
+            for ex in iter_turn_examples_both_players(
+                tracker,
+                battle,
+                include_switches=include_switches,
+            ):
                 examples.append(ex)
         except Exception as exc:
             skipped_errors += 1
