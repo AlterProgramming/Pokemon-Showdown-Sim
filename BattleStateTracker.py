@@ -637,8 +637,14 @@ class BattleStateTracker:
             state_before = self.snapshot()
 
             action = self.extract_action_for_player(events, player)
+            other = "p2" if player == "p1" else "p1"
+            opponent_action = self.extract_action_for_player(events, other)
+            opponent_action_token = None
+            if opponent_action is not None:
+                opponent_action_token = self.action_token_for_player(other, opponent_action)
 
             self.apply_turn(turn)
+            state_after = self.snapshot()
 
             if action is None:
                 continue
@@ -653,6 +659,9 @@ class BattleStateTracker:
                 "battle_id": self.battle_id,
                 "turn_number": int(turn.get("turn_number")),
                 "state": state_before,
+                "next_state": state_after,
                 "action": action,
                 "action_token": action_token,
+                "opponent_action": opponent_action,
+                "opponent_action_token": opponent_action_token,
             }

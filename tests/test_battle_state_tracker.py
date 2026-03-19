@@ -5,7 +5,15 @@ import unittest
 from pathlib import Path
 
 from BattleStateTracker import BattleStateTracker
-from StateVectorization import build_action_vocab, iter_turn_examples_both_players, vectorize_action_dataset
+from StateVectorization import (
+    build_action_context_vocab,
+    build_action_vocab,
+    encode_turn_outcome,
+    iter_turn_examples_both_players,
+    turn_outcome_dim,
+    vectorize_action_dataset,
+    vectorize_action_transition_dataset,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,6 +46,7 @@ class BattleStateTrackerTests(unittest.TestCase):
 
         self.assertEqual(turn_three["action"], ("switch", "p2-1"))
         self.assertEqual(turn_three["action_token"], "switch:2")
+        self.assertEqual(turn_three["opponent_action_token"], "move:double-edge")
 
     def test_effects_status_end_and_tera_are_tracked(self) -> None:
         synthetic_battle = {
@@ -193,6 +202,33 @@ class BattleStateTrackerTests(unittest.TestCase):
         self.assertIn("move:double-edge", action_vocab)
         self.assertEqual(len(X), len(y))
         self.assertGreater(len(y), 37)
+
+    def test_transition_targets_align_with_examples(self) -> None:
+        examples = list(
+            iter_turn_examples_both_players(
+                self.tracker,
+                self.sample_battle,
+                include_switches=True,
+            )
+        )
+        action_vocab = build_action_vocab(examples, include_switches=True)
+        action_context_vocab = build_action_context_vocab(examples)
+        X, y_policy, y_transition = vectorize_action_transition_dataset(
+            examples,
+            action_vocab,
+            action_context_vocab,
+            include_switches=True,
+        )
+
+        self.assertIn("<NONE>", action_context_vocab)
+        self.assertEqual(len(X["state"]), len(y_policy))
+        self.assertEqual(len(y_policy), len(y_transition))
+        self.assertEqual(len(y_transition[0]), turn_outcome_dim())
+
+        first = examples[0]
+        encoded = encode_turn_outcome(first["state"], first["next_state"], first["player"])
+        self.assertEqual(len(encoded), turn_outcome_dim())
+        self.assertEqual(encoded, y_transition[0])
 
 
 if __name__ == "__main__":

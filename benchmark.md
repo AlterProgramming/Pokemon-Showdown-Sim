@@ -16,3 +16,22 @@ Ties: 0
 Failed Games: 0
 RL Win Rate: 27.50%
 ===========================
+
+Model1 win rate against random 25.70 %
+
+===== PARTIAL RESULTS =====
+Completed Games: 1000
+RL Wins: 257
+Random Wins: 743
+Ties: 0
+Failed Games: 0
+RL Switches: 5843
+Random Switches: 3910
+Total Switches: 9753
+Forced Drag Switches: 202
+RL Win Rate: 25.70%
+Avg RL Switches/Game: 5.84
+Avg Random Switches/Game: 3.91
+Avg Total Switches/Game: 9.75
+Switch totals exclude the initial opening send-outs.
+===========================

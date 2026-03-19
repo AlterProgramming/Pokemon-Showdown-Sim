@@ -4,14 +4,15 @@ import tensorflow as tf
 import json
 from pathlib import Path
 
+from ActionLegality import filter_legal_revive_targets, filter_legal_switches
+
 app = Flask(__name__)
 
 # paths to the serialized artifacts created by the notebook
-MODEL_PATH = "artifacts/model.keras"
+MODEL_PATH = "artifacts/model_2.keras"
 VOCAB_CANDIDATES = [
-    Path("artifacts/action_vocab.json"),
+    Path("artifacts/action_vocab_2.json"),
     Path("artifacts/move_vocab.json"),
-    Path("action_vocab.json"),
     Path("move_vocab.json"),
 ]
 
@@ -49,6 +50,40 @@ def switch_vocab_tokens(slot: int) -> list[str]:
     if vocab_uses_action_tokens():
         return [f"switch:{slot}"]
     return []
+
+
+def pick_best_slot_target(
+    logits: np.ndarray,
+    slot_targets: list[dict],
+    target_type: str,
+) -> tuple[dict | None, float | None]:
+    """Score slot-indexed targets using the learned switch logits when available."""
+    probs = tf.nn.softmax(logits).numpy()
+    best_target = None
+    best_prob = -1.0
+
+    for target in slot_targets:
+        slot = target.get("slot")
+        if slot is None:
+            continue
+        for token in switch_vocab_tokens(int(slot)):
+            idx = action_vocab.get(token)
+            if idx is None:
+                continue
+            p = float(probs[idx])
+            if p > best_prob:
+                best_prob = p
+                best_target = {"type": target_type, "payload": target, "token": token}
+
+    if best_target is not None:
+        return best_target, best_prob
+
+    if not slot_targets:
+        return None, None
+
+    # Revive targeting is not yet a trained action head, so fall back to the
+    # first legal candidate if the vocab lacks slot tokens.
+    return {"type": target_type, "payload": slot_targets[0], "token": None}, None
 
 
 def pick_best_action(
@@ -102,10 +137,34 @@ from flask import request, jsonify
 def choose_switch():
     data = request.json
 
-    legal_switches = data.get("legal_switches", [])
+    revive_targets, revive_reason = filter_legal_revive_targets(
+        data or {},
+        data.get("legal_revives", []) or data.get("legal_switches", []),
+    )
+    if revive_targets:
+        arr = np.asarray([data.get("state_vector", [])], dtype=np.float32)
+        logits = model.predict(arr, verbose=0)[0] if arr.shape[1] == EXPECTED_INPUT_DIM else np.zeros(len(action_vocab), dtype=np.float32)
+        chosen, probability = pick_best_slot_target(logits, revive_targets, "revive")
+        return jsonify(
+            {
+                "type": "revive",
+                "slot": chosen["payload"].get("slot"),
+                "best_revive": chosen["payload"],
+                "probability": probability,
+                "action_token": chosen["token"],
+                "revive_reason": revive_reason,
+            }
+        )
+
+    legal_switches, switch_reason = filter_legal_switches(data or {}, data.get("legal_switches", []))
 
     if not legal_switches:
-        return jsonify({"error": "No legal switches provided"}), 400
+        return jsonify(
+            {
+                "error": "No legal switches provided or switching is currently disallowed",
+                "switch_reason": switch_reason,
+            }
+        ), 400
 
     # Pick random legal switch
     chosen = random.choice(legal_switches)
@@ -148,11 +207,32 @@ def predict():
             ), 400
 
         legal_moves = data.get("legal_moves") or []
-        legal_switches = data.get("legal_switches", []) or []
+        revive_targets, revive_reason = filter_legal_revive_targets(
+            data,
+            data.get("legal_revives", []) or data.get("legal_switches", []) or [],
+        )
+        legal_switches, switch_reason = filter_legal_switches(data, data.get("legal_switches", []) or [])
 
         # shape (1, D)
         arr = np.asarray([vec], dtype=np.float32)
         logits = model.predict(arr, verbose=0)[0]
+
+        if revive_targets:
+            best_revive, best_prob = pick_best_slot_target(logits, revive_targets, "revive")
+            if best_revive is None:
+                return jsonify(
+                    type="none",
+                    note="revive target request detected but no legal revive targets were available",
+                    revive_reason=revive_reason,
+                )
+            return jsonify(
+                best_revive=best_revive["payload"],
+                slot=best_revive["payload"].get("slot"),
+                type="revive",
+                probability=best_prob,
+                action_token=best_revive["token"],
+                revive_reason=revive_reason,
+            )
 
         best_action, best_prob = pick_best_action(logits, legal_moves, legal_switches)
         print(best_action)
@@ -164,6 +244,7 @@ def predict():
                 note="no legal actions found in vocabulary",
                 legal_moves=legal_moves,
                 legal_switches=legal_switches,
+                switch_reason=switch_reason,
             )
 
         if best_action["type"] == "move":
@@ -180,6 +261,7 @@ def predict():
             type='switch',
             probability=best_prob,
             action_token=best_action["token"],
+            switch_reason=switch_reason,
         )
     
     except Exception as e:
