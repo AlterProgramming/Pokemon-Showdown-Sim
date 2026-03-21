@@ -21,6 +21,17 @@ from StateVectorization import (
 )
 from TrainingSplit import group_split_by_battle_id, ingest_battles_to_examples
 
+MODEL_VARIANTS: Dict[str, Dict[str, Any]] = {
+    "default": {},
+    "model_2_large": {
+        "model_name": "model_2_large",
+        "hidden_dim": 480,
+        "depth": 4,
+        "transition_hidden_dim": 480,
+        "description": "Approximately 3x the parameter count of model_2.",
+    },
+}
+
 
 def discover_json_paths(inputs: List[str]) -> List[str]:
     json_paths: List[str] = []
@@ -176,6 +187,42 @@ def build_artifact_paths(
         idx += 1
 
 
+def build_named_artifact_paths(
+    output_dir: Path,
+    *,
+    model_name: str,
+    policy_vocab_stem: str,
+    save_training_model: bool,
+    save_action_context_vocab: bool,
+) -> Dict[str, Path]:
+    if not model_name:
+        raise ValueError("model_name must be non-empty")
+
+    suffix = model_name.removeprefix("model")
+    if not suffix:
+        raise ValueError(
+            "model_name must include a suffix after 'model' so related artifact names can be derived."
+        )
+
+    paths: Dict[str, Path] = {
+        "policy_model": output_dir / f"{model_name}.keras",
+        "policy_vocab": output_dir / f"{policy_vocab_stem}{suffix}.json",
+        "metadata": output_dir / f"training_metadata{suffix}.json",
+    }
+    if save_training_model:
+        paths["training_model"] = output_dir / f"training_model{suffix}.keras"
+    if save_action_context_vocab:
+        paths["action_context_vocab"] = output_dir / f"action_context_vocab{suffix}.json"
+
+    existing = [str(path) for path in paths.values() if path.exists()]
+    if existing:
+        raise SystemExit(
+            "Refusing to overwrite existing artifacts for "
+            f"{model_name}: {', '.join(existing)}"
+        )
+    return paths
+
+
 def make_training_metadata(
     args: argparse.Namespace,
     *,
@@ -186,6 +233,8 @@ def make_training_metadata(
     history,
     artifact_paths: Dict[str, Path],
     action_context_vocab: dict | None = None,
+    policy_param_count: int | None = None,
+    training_param_count: int | None = None,
 ) -> dict:
     history_dict = history.history if history is not None else {}
     payload = {
@@ -215,7 +264,14 @@ def make_training_metadata(
         "transition_weight": args.transition_weight,
         "action_embed_dim": args.action_embed_dim,
         "transition_hidden_dim": args.transition_hidden_dim,
+        "model_variant": args.model_variant,
+        "model_name": args.model_name,
     }
+
+    if policy_param_count is not None:
+        payload["policy_param_count"] = int(policy_param_count)
+    if training_param_count is not None:
+        payload["training_param_count"] = int(training_param_count)
 
     if args.predict_turn_outcome:
         payload["turn_outcome_dim"] = turn_outcome_dim()
@@ -245,6 +301,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hidden-dim", type=int, default=256, help="Hidden width for each dense layer.")
     parser.add_argument("--depth", type=int, default=3, help="Number of hidden dense layers.")
     parser.add_argument("--dropout", type=float, default=0.1, help="Dropout between dense layers.")
+    parser.add_argument(
+        "--model-variant",
+        choices=sorted(MODEL_VARIANTS.keys()),
+        default="default",
+        help="Named architecture/artifact preset. Use model_2_large for the larger joint-policy model.",
+    )
+    parser.add_argument(
+        "--model-name",
+        default=None,
+        help=(
+            "Explicit policy artifact base name (for example model_2_large). "
+            "When set, related vocab/metadata names are derived from it."
+        ),
+    )
     parser.add_argument(
         "--include-switches",
         action="store_true",
@@ -288,8 +358,24 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def apply_model_variant(args: argparse.Namespace) -> None:
+    variant = MODEL_VARIANTS.get(args.model_variant, {})
+    if not variant:
+        return
+
+    if args.hidden_dim == 256 and "hidden_dim" in variant:
+        args.hidden_dim = int(variant["hidden_dim"])
+    if args.depth == 3 and "depth" in variant:
+        args.depth = int(variant["depth"])
+    if args.transition_hidden_dim == 256 and "transition_hidden_dim" in variant:
+        args.transition_hidden_dim = int(variant["transition_hidden_dim"])
+    if args.model_name is None and variant.get("model_name"):
+        args.model_name = str(variant["model_name"])
+
+
 def main() -> None:
     args = parse_args()
+    apply_model_variant(args)
     json_paths = discover_json_paths(args.data_paths)
     if not json_paths:
         raise SystemExit("No JSON files found in the provided path(s).")
@@ -387,7 +473,13 @@ def main() -> None:
         transition_hidden_dim=args.transition_hidden_dim,
         transition_weight=args.transition_weight,
     )
+    policy_param_count = int(policy_model.count_params())
+    training_param_count = int(model.count_params())
     model.summary()
+    print(
+        f"model_variant={args.model_variant} model_name={args.model_name or '(auto)'} "
+        f"policy_params={policy_param_count} training_params={training_param_count}"
+    )
 
     from tensorflow import keras
 
@@ -436,11 +528,21 @@ def main() -> None:
 
     history = model.fit(**fit_kwargs)
 
-    artifact_paths = build_artifact_paths(
-        output_dir,
-        policy_vocab_stem="action_vocab" if use_action_vocab(args) else "move_vocab",
-        save_training_model=args.predict_turn_outcome,
-        save_action_context_vocab=args.predict_turn_outcome,
+    artifact_paths = (
+        build_named_artifact_paths(
+            output_dir,
+            model_name=args.model_name,
+            policy_vocab_stem="action_vocab" if use_action_vocab(args) else "move_vocab",
+            save_training_model=args.predict_turn_outcome,
+            save_action_context_vocab=args.predict_turn_outcome,
+        )
+        if args.model_name else
+        build_artifact_paths(
+            output_dir,
+            policy_vocab_stem="action_vocab" if use_action_vocab(args) else "move_vocab",
+            save_training_model=args.predict_turn_outcome,
+            save_action_context_vocab=args.predict_turn_outcome,
+        )
     )
 
     policy_model.save(artifact_paths["policy_model"])
@@ -461,6 +563,8 @@ def main() -> None:
             history=history,
             artifact_paths=artifact_paths,
             action_context_vocab=action_context_vocab,
+            policy_param_count=policy_param_count,
+            training_param_count=training_param_count,
         ),
     )
 

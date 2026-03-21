@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# generated local server wrappers
+.codex-flask_api_model*.py
+
+# generated training artifacts
+artifacts/model_*.keras
+artifacts/training_model_*.keras
+artifacts/action_vocab_*.json
+artifacts/action_context_vocab_*.json
+artifacts/training_metadata_*.json
