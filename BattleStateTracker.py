@@ -4,6 +4,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
 
+from RewardSignals import battle_winner, terminal_result_for_player
+
 
 # Shared ordering for boosts. Vectorization should import this from here
 # to prevent drift between modules.
@@ -629,6 +631,8 @@ class BattleStateTracker:
           }
         """
         self.load_battle(battle)
+        winner = battle_winner(battle)
+        terminal_result = terminal_result_for_player(battle, player)
 
         for turn in (battle.get("turns", []) or []):
             events = turn.get("events", []) or []
@@ -664,4 +668,6 @@ class BattleStateTracker:
                 "action_token": action_token,
                 "opponent_action": opponent_action,
                 "opponent_action_token": opponent_action_token,
+                "winner": winner,
+                "terminal_result": terminal_result,
             }

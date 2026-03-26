@@ -1,22 +1,72 @@
 from __future__ import annotations
 
 import argparse
-import json
+import atexit
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
 import numpy as np
-import tensorflow as tf
 from flask import Flask, jsonify, request
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Serve one or more Pokemon Showdown policy models.")
     parser.add_argument("--repo-path", help="Training repo root containing artifacts and ActionLegality.py")
-    parser.add_argument("--mode", choices=["model1", "model2", "model2_large", "multi"], default="multi")
+    parser.add_argument(
+        "--mode",
+        default="multi",
+        help="Model ID to serve or 'multi' to load all discovered policy models.",
+    )
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=5000)
+    parser.add_argument(
+        "--request-timeout-seconds",
+        type=float,
+        default=15.0,
+        help="Hard timeout for a single model inference request before the worker is restarted.",
+    )
+    parser.add_argument(
+        "--worker-max-requests",
+        type=int,
+        default=5000,
+        help="Gracefully recycle a model worker after this many completed predictions. Set 0 to disable.",
+    )
+    parser.add_argument(
+        "--worker-max-age-seconds",
+        type=float,
+        default=3600.0,
+        help="Gracefully recycle a model worker after this many seconds. Set 0 to disable.",
+    )
+    parser.add_argument(
+        "--workers-per-model",
+        type=int,
+        default=1,
+        help="Default number of inference worker processes to launch per loaded model.",
+    )
+    parser.add_argument(
+        "--model-worker-overrides",
+        default="",
+        help="Per-model worker counts, for example 'model4=4,model2_large=2'.",
+    )
+    parser.add_argument(
+        "--model-ids",
+        default="",
+        help="Comma-separated model ids to load when --mode multi is used, for example 'model4,model4_large'.",
+    )
+    parser.add_argument(
+        "--worker-startup-timeout-seconds",
+        type=float,
+        default=120.0,
+        help="Maximum time to wait for an inference worker process to load its model and report ready.",
+    )
+    parser.add_argument(
+        "--worker-bootstrap-timeout-seconds",
+        type=float,
+        default=30.0,
+        help="Maximum time to wait for a spawned worker process to boot and signal that it started running.",
+    )
     return parser.parse_args()
 
 
@@ -26,13 +76,13 @@ if str(REPO_PATH) not in sys.path:
     sys.path.insert(0, str(REPO_PATH))
 
 from ActionLegality import filter_legal_revive_targets, filter_legal_switches  # noqa: E402
-
-
-def resolve_vocab_path(candidates: list[Path]) -> Path:
-    for path in candidates:
-        if path.exists():
-            return path
-    raise FileNotFoundError(f"Could not resolve action vocab from: {candidates}")
+from ModelRegistry import build_model_registry, parse_model_id_list, select_registered_models  # noqa: E402
+from ModelWorkers import (  # noqa: E402
+    ModelWorkerPool,
+    load_runtime_artifacts,
+    parse_worker_count_overrides,
+    softmax,
+)
 
 
 def vocab_uses_action_tokens(action_vocab: dict[str, int]) -> bool:
@@ -60,67 +110,98 @@ def build_switch_tokens(action_vocab: dict[str, int], slot: int) -> list[str]:
     return []
 
 
-def load_model_artifacts(model_id: str, model_path: Path, vocab_candidates: list[Path]) -> dict[str, Any]:
-    model = tf.keras.models.load_model(model_path)
-    expected_input_dim = None
-    if getattr(model, "input_shape", None):
-        shape = model.input_shape
-        if isinstance(shape, tuple) and len(shape) >= 2 and shape[-1] is not None:
-            expected_input_dim = int(shape[-1])
-
-    vocab_path = resolve_vocab_path(vocab_candidates)
-    with open(vocab_path, "r", encoding="utf-8") as handle:
-        action_vocab = json.load(handle)
-
-    return {
-        "model_id": model_id,
-        "model_path": str(model_path),
-        "vocab_path": str(vocab_path),
-        "model": model,
-        "expected_input_dim": expected_input_dim,
-        "action_vocab": action_vocab,
-    }
-
-
 def load_models(mode: str) -> tuple[dict[str, dict[str, Any]], str]:
-    base_configs: dict[str, tuple[Path, list[Path]]] = {
-        "model1": (
-            REPO_PATH / "artifacts" / "model_1.keras",
-            [
-                REPO_PATH / "artifacts" / "action_vocab_1.json",
-                REPO_PATH / "artifacts" / "move_vocab.json",
-                REPO_PATH / "move_vocab.json",
-            ],
-        ),
-        "model2": (
-            REPO_PATH / "artifacts" / "model_2.keras",
-            [
-                REPO_PATH / "artifacts" / "action_vocab_2.json",
-                REPO_PATH / "artifacts" / "move_vocab.json",
-                REPO_PATH / "move_vocab.json",
-            ],
-        ),
-        "model2_large": (
-            REPO_PATH / "artifacts" / "model_2_large.keras",
-            [
-                REPO_PATH / "artifacts" / "action_vocab_2_large.json",
-                REPO_PATH / "artifacts" / "move_vocab.json",
-                REPO_PATH / "move_vocab.json",
-            ],
-        ),
-    }
+    registry = build_model_registry(REPO_PATH)
+    registered_models = registry["models"]
+    if not registered_models:
+        raise FileNotFoundError(f"No runnable policy models found under {REPO_PATH / 'artifacts'}")
 
-    model_ids = ["model1", "model2", "model2_large"] if mode == "multi" else [mode]
+    model_ids = select_registered_models(
+        registered_models,
+        mode=mode,
+        requested_model_ids=parse_model_id_list(ARGS.model_ids),
+    )
+
     artifacts = {
-        model_id: load_model_artifacts(model_id, *base_configs[model_id])
+        model_id: load_runtime_artifacts(REPO_PATH, registered_models[model_id])
         for model_id in model_ids
     }
-    default_model_id = "model1" if "model1" in artifacts else model_ids[0]
+    worker_overrides = parse_worker_count_overrides(ARGS.model_worker_overrides)
+    for model_id, artifact in artifacts.items():
+        worker_count = worker_overrides.get(model_id, ARGS.workers_per_model)
+        worker_pool = ModelWorkerPool(
+            repo_path=REPO_PATH,
+            model_entry=registered_models[model_id],
+            worker_count=worker_count,
+            request_timeout_seconds=ARGS.request_timeout_seconds,
+            max_requests_before_recycle=ARGS.worker_max_requests,
+            max_worker_age_seconds=ARGS.worker_max_age_seconds,
+            bootstrap_timeout_seconds=ARGS.worker_bootstrap_timeout_seconds,
+            startup_timeout_seconds=ARGS.worker_startup_timeout_seconds,
+        )
+        worker_pool.start()
+        artifact["worker_pool"] = worker_pool
+
+    default_model_id = (
+        str(registry["default_model_id"])
+        if registry.get("default_model_id") in artifacts
+        else model_ids[0]
+    )
     return artifacts, default_model_id
 
-
-MODEL_ARTIFACTS, DEFAULT_MODEL_ID = load_models(ARGS.mode)
+MODEL_ARTIFACTS: dict[str, dict[str, Any]] = {}
+DEFAULT_MODEL_ID = ""
 APP = Flask(__name__)
+
+
+def shutdown_workers() -> None:
+    for artifact in MODEL_ARTIFACTS.values():
+        worker_pool = artifact.get("worker_pool")
+        if worker_pool is not None:
+            worker_pool.close()
+
+
+def log_loaded_models() -> None:
+    print(f"[startup] mode={ARGS.mode}")
+    print(f"[startup] default_model_id={DEFAULT_MODEL_ID}")
+    print(f"[startup] request_timeout_seconds={ARGS.request_timeout_seconds}")
+    print(f"[startup] worker_max_requests={ARGS.worker_max_requests}")
+    print(f"[startup] worker_max_age_seconds={ARGS.worker_max_age_seconds}")
+    print(f"[startup] workers_per_model={ARGS.workers_per_model}")
+    print(f"[startup] model_worker_overrides={ARGS.model_worker_overrides or '(none)'}")
+    print(f"[startup] worker_bootstrap_timeout_seconds={ARGS.worker_bootstrap_timeout_seconds}")
+    print(f"[startup] worker_startup_timeout_seconds={ARGS.worker_startup_timeout_seconds}")
+    print(f"[startup] requested_model_ids={ARGS.model_ids or '(auto)'}")
+    print(f"[startup] supported_model_ids={', '.join(sorted(MODEL_ARTIFACTS.keys()))}")
+    for model_id in sorted(MODEL_ARTIFACTS.keys()):
+        artifacts = MODEL_ARTIFACTS[model_id]
+        worker_health = artifacts["worker_pool"].health()
+        worker_pids = ",".join(
+            str(worker_entry["pid"])
+            for worker_entry in worker_health["workers"]
+            if worker_entry.get("pid") is not None
+        )
+        print(
+            "[startup] "
+            f"model_id={model_id} "
+            f"model_path={artifacts['model_path']} "
+            f"vocab_path={artifacts['vocab_path']} "
+            f"worker_count={worker_health['worker_count']} "
+            f"worker_pids={worker_pids or '(starting)'}"
+        )
+        for worker_entry in worker_health["workers"]:
+            timings = worker_entry.get("last_startup_timings") or {}
+            if timings:
+                print(
+                    "[startup-worker] "
+                    f"model_id={model_id} "
+                    f"worker_index={worker_entry['worker_index']} "
+                    f"bootstrap_s={timings.get('process_bootstrap_seconds', 0.0):.2f} "
+                    f"tf_import_s={timings.get('tensorflow_import_seconds', 0.0):.2f} "
+                    f"model_load_s={timings.get('model_load_seconds', 0.0):.2f} "
+                    f"ready_s={timings.get('worker_ready_seconds', 0.0):.2f} "
+                    f"total_s={timings.get('total_startup_seconds', 0.0):.2f}"
+                )
 
 
 def choose_model_artifacts(request_data: dict[str, Any]) -> dict[str, Any]:
@@ -134,9 +215,14 @@ def choose_model_artifacts(request_data: dict[str, Any]) -> dict[str, Any]:
     return artifacts
 
 
-def predict_logits(model_artifacts: dict[str, Any], state_vector: list[float]) -> np.ndarray:
-    arr = np.asarray([state_vector], dtype=np.float32)
-    return model_artifacts["model"].predict(arr, verbose=0)[0]
+def predict_logits(
+    model_artifacts: dict[str, Any],
+    state_vector: list[float],
+) -> tuple[np.ndarray, dict[str, Any]]:
+    worker_pool = model_artifacts["worker_pool"]
+    if hasattr(worker_pool, "predict_with_metadata"):
+        return worker_pool.predict_with_metadata(state_vector)
+    return worker_pool.predict(state_vector), {}
 
 
 def pick_best_slot_target(
@@ -145,7 +231,7 @@ def pick_best_slot_target(
     slot_targets: list[dict[str, Any]],
     target_type: str,
 ) -> tuple[dict[str, Any] | None, float | None]:
-    probs = tf.nn.softmax(logits).numpy()
+    probs = softmax(logits)
     action_vocab = model_artifacts["action_vocab"]
     best_target = None
     best_prob = -1.0
@@ -178,7 +264,7 @@ def pick_best_action(
     legal_moves: list[dict[str, Any]],
     legal_switches: list[dict[str, Any]],
 ) -> tuple[dict[str, Any] | None, float]:
-    probs = tf.nn.softmax(logits).numpy()
+    probs = softmax(logits)
     action_vocab = model_artifacts["action_vocab"]
     best_action = None
     best_prob = -1.0
@@ -234,11 +320,17 @@ def build_response_context(model_artifacts: dict[str, Any]) -> dict[str, Any]:
 
 @APP.route("/health", methods=["GET"])
 def health():
+    worker_health = {
+        model_id: artifacts["worker_pool"].health()
+        for model_id, artifacts in MODEL_ARTIFACTS.items()
+    }
+    overall_status = "ok" if all(entry["alive"] for entry in worker_health.values()) else "degraded"
     return jsonify(
-        status="ok",
+        status=overall_status,
         mode=ARGS.mode,
         default_model_id=DEFAULT_MODEL_ID,
         supported_model_ids=sorted(MODEL_ARTIFACTS.keys()),
+        worker_health=worker_health,
     )
 
 
@@ -260,7 +352,23 @@ def predict():
         )
         legal_switches, switch_reason = filter_legal_switches(data, data.get("legal_switches", []) or [])
 
-        logits = predict_logits(model_artifacts, state_vector)
+        started_at = time.perf_counter()
+        logits, worker_metrics = predict_logits(model_artifacts, state_vector)
+        elapsed_ms = (time.perf_counter() - started_at) * 1000.0
+        worker_index = worker_metrics.get("worker_index")
+        worker_pid = worker_metrics.get("worker_pid")
+        queue_wait_ms = worker_metrics.get("queue_wait_ms")
+        service_ms = worker_metrics.get("service_ms")
+        print(
+            "[predict] "
+            f"model_id={model_artifacts['model_id']} "
+            f"worker_index={worker_index} "
+            f"worker_pid={worker_pid} "
+            f"state_len={len(state_vector)} "
+            f"queue_wait_ms={0.0 if queue_wait_ms is None else float(queue_wait_ms):.2f} "
+            f"service_ms={0.0 if service_ms is None else float(service_ms):.2f} "
+            f"elapsed_ms={elapsed_ms:.2f}"
+        )
 
         if revive_targets:
             best_revive, best_prob = pick_best_slot_target(model_artifacts, logits, revive_targets, "revive")
@@ -315,6 +423,12 @@ def predict():
         return jsonify(error=str(error), supported_model_ids=sorted(MODEL_ARTIFACTS.keys())), 400
     except ValueError as error:
         return jsonify(error=str(error), supported_model_ids=sorted(MODEL_ARTIFACTS.keys())), 400
+    except TimeoutError as error:
+        return jsonify(
+            error=str(error),
+            retryable=True,
+            supported_model_ids=sorted(MODEL_ARTIFACTS.keys()),
+        ), 503
     except Exception as error:
         import traceback
 
@@ -323,4 +437,10 @@ def predict():
 
 
 if __name__ == "__main__":
-    APP.run(host=ARGS.host, port=ARGS.port, debug=False, use_reloader=False)
+    import multiprocessing as mp
+
+    mp.freeze_support()
+    MODEL_ARTIFACTS, DEFAULT_MODEL_ID = load_models(ARGS.mode)
+    atexit.register(shutdown_workers)
+    log_loaded_models()
+    APP.run(host=ARGS.host, port=ARGS.port, debug=False, use_reloader=False, threaded=True)

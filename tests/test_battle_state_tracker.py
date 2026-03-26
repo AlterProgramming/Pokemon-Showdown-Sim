@@ -13,6 +13,7 @@ from StateVectorization import (
     turn_outcome_dim,
     vectorize_action_dataset,
     vectorize_action_transition_dataset,
+    vectorize_multitask_dataset,
 )
 
 
@@ -47,6 +48,15 @@ class BattleStateTrackerTests(unittest.TestCase):
         self.assertEqual(turn_three["action"], ("switch", "p2-1"))
         self.assertEqual(turn_three["action_token"], "switch:2")
         self.assertEqual(turn_three["opponent_action_token"], "move:double-edge")
+
+    def test_examples_include_winner_and_terminal_result(self) -> None:
+        p1_examples = list(self.tracker.iter_turn_examples(self.sample_battle, player="p1"))
+        p2_examples = list(self.tracker.iter_turn_examples(self.sample_battle, player="p2"))
+
+        self.assertEqual(p1_examples[0]["winner"], "p1")
+        self.assertEqual(p2_examples[0]["winner"], "p1")
+        self.assertEqual(p1_examples[0]["terminal_result"], 1.0)
+        self.assertEqual(p2_examples[0]["terminal_result"], 0.0)
 
     def test_effects_status_end_and_tera_are_tracked(self) -> None:
         synthetic_battle = {
@@ -229,6 +239,36 @@ class BattleStateTrackerTests(unittest.TestCase):
         encoded = encode_turn_outcome(first["state"], first["next_state"], first["player"])
         self.assertEqual(len(encoded), turn_outcome_dim())
         self.assertEqual(encoded, y_transition[0])
+
+    def test_multitask_vectorization_emits_value_targets(self) -> None:
+        examples = list(
+            iter_turn_examples_both_players(
+                self.tracker,
+                self.sample_battle,
+                include_switches=True,
+            )
+        )
+        action_vocab = build_action_vocab(examples, include_switches=True)
+        action_context_vocab = build_action_context_vocab(examples)
+        X, targets = vectorize_multitask_dataset(
+            examples,
+            action_vocab,
+            include_switches=True,
+            use_action_tokens=True,
+            action_context_vocab=action_context_vocab,
+            include_transition=True,
+            include_value=True,
+        )
+
+        self.assertIn("state", X)
+        self.assertIn("policy", targets)
+        self.assertIn("transition", targets)
+        self.assertIn("value", targets)
+        self.assertEqual(len(X["state"]), len(targets["policy"]))
+        self.assertEqual(len(targets["policy"]), len(targets["transition"]))
+        self.assertEqual(len(targets["policy"]), len(targets["value"]))
+        self.assertIn(1.0, targets["value"])
+        self.assertIn(0.0, targets["value"])
 
 
 if __name__ == "__main__":

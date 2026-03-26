@@ -1,0 +1,82 @@
+{
+  "repo_path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent",
+  "registry_path": "artifacts\\model_registry.json",
+  "default_model_id": "model2",
+  "models": {
+    "model2": {
+      "model_id": "model2",
+      "model_name": null,
+      "model_variant": null,
+      "metadata_path": "artifacts\\training_metadata_2.json",
+      "policy_model_path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\model_2.keras",
+      "policy_vocab_path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\action_vocab_2.json",
+      "policy_value_model_path": null,
+      "training_model_path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\training_model_2.keras",
+      "action_space": "joint",
+      "predict_value": false,
+      "predict_turn_outcome": true,
+      "feature_dim": 582,
+      "num_action_classes": 357
+    },
+    "model2_large": {
+      "model_id": "model2_large",
+      "model_name": "model_2_large",
+      "model_variant": "model_2_large",
+      "metadata_path": "artifacts\\training_metadata_2_large.json",
+      "policy_model_path": "artifacts\\model_2_large.keras",
+      "policy_vocab_path": "artifacts\\action_vocab_2_large.json",
+      "policy_value_model_path": null,
+      "training_model_path": "artifacts\\training_model_2_large.keras",
+      "action_space": "joint",
+      "predict_value": false,
+      "predict_turn_outcome": true,
+      "feature_dim": 582,
+      "num_action_classes": 357
+    },
+    "model3": {
+      "model_id": "model3",
+      "model_name": null,
+      "model_variant": "default",
+      "metadata_path": "artifacts\\training_metadata_3.json",
+      "policy_model_path": "artifacts\\model_3.keras",
+      "policy_vocab_path": "artifacts\\action_vocab_3.json",
+      "policy_value_model_path": null,
+      "training_model_path": "artifacts\\training_model_3.keras",
+      "action_space": "joint",
+      "predict_value": false,
+      "predict_turn_outcome": true,
+      "feature_dim": 582,
+      "num_action_classes": 357
+    },
+    "model4": {
+      "model_id": "model4",
+      "model_name": null,
+      "model_variant": "default",
+      "metadata_path": "artifacts\\training_metadata_4.json",
+      "policy_model_path": "artifacts\\model_4.keras",
+      "policy_vocab_path": "artifacts\\action_vocab_4.json",
+      "policy_value_model_path": "artifacts\\policy_value_model_4.keras",
+      "training_model_path": "artifacts\\training_model_4.keras",
+      "action_space": "joint",
+      "predict_value": true,
+      "predict_turn_outcome": true,
+      "feature_dim": 582,
+      "num_action_classes": 357
+    },
+    "model4_large": {
+      "model_id": "model4_large",
+      "model_name": "model_4_large",
+      "model_variant": "model_4_large",
+      "metadata_path": "artifacts\\training_metadata_4_large.json",
+      "policy_model_path": "artifacts\\model_4_large.keras",
+      "policy_vocab_path": "artifacts\\action_vocab_4_large.json",
+      "policy_value_model_path": "artifacts\\policy_value_model_4_large.keras",
+      "training_model_path": "artifacts\\training_model_4_large.keras",
+      "action_space": "joint",
+      "predict_value": true,
+      "predict_turn_outcome": true,
+      "feature_dim": 582,
+      "num_action_classes": 357
+    }
+  }
+}

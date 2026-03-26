@@ -506,6 +506,8 @@ def iter_turn_examples_both_players(
                 "action_token": ex["action_token"],
                 "opponent_action": ex["opponent_action"],
                 "opponent_action_token": ex["opponent_action_token"],
+                "winner": ex.get("winner"),
+                "terminal_result": ex.get("terminal_result"),
             }
 
 
@@ -622,39 +624,94 @@ def vectorize_action_transition_dataset(
     state_encoder: Callable[[Dict[str, Any], str], List[float]] = encode_state_v0,
     outcome_encoder: Callable[[Dict[str, Any], Dict[str, Any], str], List[float]] = encode_turn_outcome,
 ) -> Tuple[Dict[str, List[List[float]] | List[int]], List[int], List[List[float]]]:
+    X, targets = vectorize_multitask_dataset(
+        examples,
+        action_vocab,
+        include_switches=include_switches,
+        use_action_tokens=True,
+        action_context_vocab=action_context_vocab,
+        state_encoder=state_encoder,
+        outcome_encoder=outcome_encoder,
+        include_transition=True,
+    )
+    return X, targets["policy"], targets["transition"]
+
+
+def vectorize_multitask_dataset(
+    examples: List[Dict[str, Any]],
+    policy_vocab: Dict[str, int],
+    *,
+    include_switches: bool,
+    use_action_tokens: bool,
+    action_context_vocab: Dict[str, int] | None = None,
+    state_encoder: Callable[[Dict[str, Any], str], List[float]] = encode_state_v0,
+    outcome_encoder: Callable[[Dict[str, Any], Dict[str, Any], str], List[float]] = encode_turn_outcome,
+    include_transition: bool = False,
+    include_value: bool = False,
+) -> Tuple[List[List[float]] | Dict[str, List[List[float]] | List[int]], Dict[str, List[Any]]]:
     X_state: List[List[float]] = []
     X_my_action: List[int] = []
     X_opp_action: List[int] = []
     y_policy: List[int] = []
     y_transition: List[List[float]] = []
+    y_value: List[float] = []
 
-    action_unk = action_vocab.get("<UNK>", 0)
-    ctx_none = action_context_vocab.get(ACTION_CONTEXT_NONE, 0)
-    ctx_unk = action_context_vocab.get(ACTION_CONTEXT_UNK, ctx_none)
+    policy_unk = policy_vocab.get("<UNK>", 0)
+    ctx_none = action_context_vocab.get(ACTION_CONTEXT_NONE, 0) if action_context_vocab else 0
+    ctx_unk = action_context_vocab.get(ACTION_CONTEXT_UNK, ctx_none) if action_context_vocab else ctx_none
 
     for ex in examples:
+        action = ex.get("action")
         action_token = ex.get("action_token")
-        if not action_token:
+        if action is None:
             continue
-        if not include_switches and action_token.startswith("switch:"):
-            continue
+
+        if use_action_tokens:
+            if not action_token:
+                continue
+            if not include_switches and action_token.startswith("switch:"):
+                continue
+            policy_label = policy_vocab.get(action_token, policy_unk)
+        else:
+            kind, move_id = action
+            if kind != "move":
+                continue
+            policy_label = policy_vocab.get(move_id, policy_unk)
 
         player = ex["player"]
         opp_action_token = ex.get("opponent_action_token")
 
         X_state.append(state_encoder(ex["state"], perspective_player=player))
-        X_my_action.append(action_context_vocab.get(action_token, ctx_unk))
-        if opp_action_token is None:
-            X_opp_action.append(ctx_none)
-        else:
-            X_opp_action.append(action_context_vocab.get(opp_action_token, ctx_unk))
+        if include_transition:
+            if action_context_vocab is None or not action_token:
+                raise ValueError("include_transition requires action_context_vocab and action_token labels")
+            X_my_action.append(action_context_vocab.get(action_token, ctx_unk))
+            if opp_action_token is None:
+                X_opp_action.append(ctx_none)
+            else:
+                X_opp_action.append(action_context_vocab.get(opp_action_token, ctx_unk))
+            y_transition.append(outcome_encoder(ex["state"], ex["next_state"], player))
 
-        y_policy.append(action_vocab.get(action_token, action_unk))
-        y_transition.append(outcome_encoder(ex["state"], ex["next_state"], player))
+        y_policy.append(policy_label)
+        if include_value:
+            terminal_result = ex.get("terminal_result")
+            if terminal_result is None:
+                raise ValueError("include_value requires terminal_result on every example")
+            y_value.append(float(terminal_result))
 
-    X = {
-        "state": X_state,
-        "my_action": X_my_action,
-        "opp_action": X_opp_action,
-    }
-    return X, y_policy, y_transition
+    X: List[List[float]] | Dict[str, List[List[float]] | List[int]]
+    if include_transition:
+        X = {
+            "state": X_state,
+            "my_action": X_my_action,
+            "opp_action": X_opp_action,
+        }
+    else:
+        X = X_state
+
+    targets: Dict[str, List[Any]] = {"policy": y_policy}
+    if include_transition:
+        targets["transition"] = y_transition
+    if include_value:
+        targets["value"] = y_value
+    return X, targets
