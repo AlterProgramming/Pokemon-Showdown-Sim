@@ -48,22 +48,30 @@ If you want the shared Python module map, start with `core/README.md`.
 
 ## Simulator Repo
 
-The Pokemon Showdown simulator repo used alongside this project lives at:
+This repo is meant to be used alongside a sibling `pokemon-showdown` checkout.
+Recommended layout:
 
-`C:\Users\jeanj\Documents\Programming\pokemon-showdown`
+```text
+pokemon-workspace/
+  Pokemon-Showdown-Sim/
+  pokemon-showdown/
+```
+
+If you keep the two repos somewhere else, set the simulator path explicitly in
+your own shell scripts or environment, for example with `POKEMON_SHOWDOWN_REPO`.
 
 Relevant simulator-side files we have been integrating with:
 
-- [sim/tools/rl-model-client.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/tools/rl-model-client.ts)
-- [sim/tools/rl-agent.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/tools/rl-agent.ts)
-- [sim/tools/runner.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/tools/runner.ts)
-- [sim/tools/model-league-runner.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/tools/model-league-runner.ts)
-- [sim/examples/model-vs-model-runner.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/examples/model-vs-model-runner.ts)
-- [sim/examples/statistical-runner.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/examples/statistical-runner.ts)
+- `sim/tools/rl-model-client.ts`
+- `sim/tools/rl-agent.ts`
+- `sim/tools/runner.ts`
+- `sim/tools/model-league-runner.ts`
+- `sim/examples/model-vs-model-runner.ts`
+- `sim/examples/statistical-runner.ts`
 
 The built JavaScript runner artifact for statistical runs lives at:
 
-- [dist/sim/examples/statistical-runner.js](C:/Users/jeanj/Documents/Programming/pokemon-showdown/dist/sim/examples/statistical-runner.js)
+- `dist/sim/examples/statistical-runner.js`
 
 ## Model Server
 
@@ -81,14 +89,23 @@ For the Intel Mac handoff path, use the containerized serving flow in:
 
 For model-vs-model runs, use the simulator-side wrapper in the sibling repo:
 
-- [scripts/benchmark-model-vs-model.ps1](C:/Users/jeanj/Documents/Programming/pokemon-showdown/scripts/benchmark-model-vs-model.ps1)
+- `scripts/benchmark-model-vs-model.ps1`
 
 The recorded replay grid is driven by `-ReplayGrid`, and replay capture is enabled with
-`-ReplayCaptureMode` plus `-ReplayCaptureCount`. This example uses the runbook's
-`model2` vs `model4` pairing and prefers port `5009` if it is free:
+`-ReplayCaptureMode` plus `-ReplayCaptureCount`. This example assumes:
+
+- your current shell has `POKEMON_SHOWDOWN_REPO` set to the simulator checkout, or
+- you are running it from within the sibling `pokemon-showdown` repo
+
+It uses the runbook's `model2` vs `model4` pairing and prefers port `5009` if it is free:
 
 ```powershell
-Set-Location 'C:\Users\jeanj\Documents\Programming\pokemon-showdown'
+$showdownRepo = if ($env:POKEMON_SHOWDOWN_REPO) {
+    $env:POKEMON_SHOWDOWN_REPO
+} else {
+    (Resolve-Path "..\pokemon-showdown").Path
+}
+Set-Location $showdownRepo
 
 $port = 5009
 while (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) {
@@ -117,4 +134,14 @@ Write-Host "Using server port $port"
 
 The matching runbook is here:
 
-- [BENCHMARK_RUNBOOK.md](C:/Users/jeanj/Documents/Programming/pokemon-showdown/BENCHMARK_RUNBOOK.md#L113)
+- `BENCHMARK_RUNBOOK.md`
+
+## Local Setup
+
+These launchers are portable if you either keep standard sibling repos or set a
+few environment variables yourself:
+
+- `POKEMON_SHOWDOWN_REPO`: path to the simulator repo if it is not a sibling folder
+- `PS_AGENT_PYTHON`: path to the Python interpreter or venv to use for this repo
+- `PS_AGENT_DATA`: optional path to a local battle-log dataset; if omitted, the
+  trainers can fall back to their dataset-download logic

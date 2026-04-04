@@ -2,21 +2,33 @@
 setlocal
 
 for %%I in ("%~dp0..") do set "REPO=%%~fI"
-set "PY=C:\Users\jeanj\Documents\School - Research\deepLearning\Scripts\python.exe"
-set "DATA=C:\Users\jeanj\.cache\kagglehub\datasets\thephilliplin\pokemon-showdown-battles-gen9-randbats\versions\1"
+if defined PS_AGENT_PYTHON (
+  set "PY=%PS_AGENT_PYTHON%"
+) else if exist "%REPO%\.venv\Scripts\python.exe" (
+  set "PY=%REPO%\.venv\Scripts\python.exe"
+) else if exist "%REPO%\venv\Scripts\python.exe" (
+  set "PY=%REPO%\venv\Scripts\python.exe"
+) else (
+  set "PY=python"
+)
+if defined PS_AGENT_DATA (
+  set "DATA=%PS_AGENT_DATA%"
+)
 set "RUN=entity_action_bc_v1_20260403_switchbias_run3"
 set "PYTHONUNBUFFERED=1"
 
 set "LOG_DIR=%REPO%\logs"
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 set "LOG_FILE=%LOG_DIR%\%RUN%.log"
+set "DATA_ARGS="
+if defined DATA set "DATA_ARGS=\"%DATA%\""
 
 >> "%LOG_FILE%" echo [launcher] started %DATE% %TIME%
 >> "%LOG_FILE%" echo [launcher] repo=%REPO%
 >> "%LOG_FILE%" echo [launcher] python=%PY%
 >> "%LOG_FILE%" echo [launcher] data=%DATA%
 
-"%PY%" -u "%REPO%\train_entity_action.py" "%DATA%" ^
+"%PY%" -u "%REPO%\train_entity_action.py" %DATA_ARGS% ^
   --output-dir "%REPO%\artifacts" ^
   --model-name "%RUN%" ^
   --max-battles 5000 ^

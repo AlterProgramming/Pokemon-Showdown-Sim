@@ -25,15 +25,35 @@ $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $logPath = Join-Path $logsDir "$ModelName-$timestamp.train.out.log"
 $statePath = Join-Path $logsDir "$ModelName-$timestamp.train.state.json"
 
-# Prefer the existing project-local deepLearning environment so the training
-# stack stays isolated from the system Python installation.
-$venvPython = Join-Path $repoRoot "..\..\deepLearning\Scripts\python.exe"
-$venvActivate = Join-Path $repoRoot "..\..\deepLearning\Scripts\Activate.ps1"
+# Prefer an explicit override first, then a repo-local or nearby virtualenv, and
+# finally the Python visible on PATH.
+$venvRoot = $null
+$venvPython = $null
+$venvActivate = $null
 $pythonExe = $null
 $activateScript = $null
-if (Test-Path $venvPython) {
+if ($env:PS_AGENT_PYTHON) {
+    $pythonExe = $env:PS_AGENT_PYTHON
+} else {
+    $venvCandidates = @(
+        (Join-Path $repoRoot ".venv"),
+        (Join-Path $repoRoot "venv"),
+        (Join-Path $repoRoot "..\.venv")
+    )
+    foreach ($candidate in $venvCandidates) {
+        $candidatePython = Join-Path $candidate "Scripts\python.exe"
+        if (Test-Path $candidatePython) {
+            $venvRoot = $candidate
+            $venvPython = $candidatePython
+            $venvActivate = Join-Path $candidate "Scripts\Activate.ps1"
+            break
+        }
+    }
+}
+
+if ($venvPython -and (Test-Path $venvPython)) {
     $pythonExe = (Resolve-Path $venvPython).Path
-    if (Test-Path $venvActivate) {
+    if ($venvActivate -and (Test-Path $venvActivate)) {
         $activateScript = (Resolve-Path $venvActivate).Path
     }
 } else {
@@ -66,6 +86,8 @@ if ($MoveOnly) {
 }
 if ($DataPaths.Count -gt 0) {
     $argList += $DataPaths
+} elseif ($env:PS_AGENT_DATA) {
+    $argList += $env:PS_AGENT_DATA
 }
 if ($ExtraArgs) {
     $argList += $ExtraArgs

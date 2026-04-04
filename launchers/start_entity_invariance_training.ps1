@@ -31,13 +31,33 @@ $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $logPath = Join-Path $logsDir "$ModelName-$timestamp.train.out.log"
 $statePath = Join-Path $logsDir "$ModelName-$timestamp.train.state.json"
 
-$venvPython = Join-Path $repoRoot "..\..\deepLearning\Scripts\python.exe"
-$venvActivate = Join-Path $repoRoot "..\..\deepLearning\Scripts\Activate.ps1"
+$venvRoot = $null
+$venvPython = $null
+$venvActivate = $null
 $pythonExe = $null
 $activateScript = $null
-if (Test-Path $venvPython) {
+if ($env:PS_AGENT_PYTHON) {
+    $pythonExe = $env:PS_AGENT_PYTHON
+} else {
+    $venvCandidates = @(
+        (Join-Path $repoRoot ".venv"),
+        (Join-Path $repoRoot "venv"),
+        (Join-Path $repoRoot "..\.venv")
+    )
+    foreach ($candidate in $venvCandidates) {
+        $candidatePython = Join-Path $candidate "Scripts\python.exe"
+        if (Test-Path $candidatePython) {
+            $venvRoot = $candidate
+            $venvPython = $candidatePython
+            $venvActivate = Join-Path $candidate "Scripts\Activate.ps1"
+            break
+        }
+    }
+}
+
+if ($venvPython -and (Test-Path $venvPython)) {
     $pythonExe = (Resolve-Path $venvPython).Path
-    if (Test-Path $venvActivate) {
+    if ($venvActivate -and (Test-Path $venvActivate)) {
         $activateScript = (Resolve-Path $venvActivate).Path
     }
 } else {
@@ -81,6 +101,8 @@ if ($InitCheckpoint) {
 }
 if ($DataPaths.Count -gt 0) {
     $argList += $DataPaths
+} elseif ($env:PS_AGENT_DATA) {
+    $argList += $env:PS_AGENT_DATA
 }
 if ($ExtraArgs) {
     $argList += $ExtraArgs
