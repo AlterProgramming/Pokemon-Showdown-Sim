@@ -27,6 +27,14 @@ The first entity-centric behavior-cloning family now lives in:
 - `core/EntityTensorization.py`
 - `core/EntityModelV1.py`
 
+The next identity-invariance phase now lives in:
+
+- `docs/GENERATION_MAP.md`
+- `docs/ENTITY_INVARIANCE_AUX_V1.md`
+- `train_entity_invariance.py`
+- `core/EntityInvarianceTensorization.py`
+- `core/EntityInvarianceModelV1.py`
+
 ## Simulator Repo
 
 The Pokemon Showdown simulator repo used alongside this project lives at:
