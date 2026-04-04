@@ -1,0 +1,16 @@
+.git
+.ipynb_checkpoints
+.pytest_cache
+.mypy_cache
+.ruff_cache
+__pycache__
+*.pyc
+
+.venv
+benchmark_runs
+logs
+out
+notebooks
+codex notes
+
+artifacts
