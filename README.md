@@ -1,49 +1,50 @@
 # Pokemon-Showdown-Sim
 A simulator to test model capabilities in real environment
 
+## Roadmap
+
+The current model-family and training-generation roadmap lives in:
+
+`docs/GENERATION_MAP.md`
+
+Artifact governance and completeness can be audited with:
+
+`tools/audit_artifacts.py`
+
+Historical runs can be backfilled with manifests and evaluation summaries using:
+
+`tools/backfill_governance_artifacts.py`
+
+The concrete first entity-centric family contract lives in:
+
+`docs/ENTITY_ACTION_V1.md`
+
+The identity-invariance follow-on family contract lives in:
+
+`docs/ENTITY_INVARIANCE_AUX_V1.md`
+
+The runnable trainer and launcher for that family live in:
+
+- `train_entity_invariance.py`
+- `launchers/start_entity_invariance_training.ps1`
+
 ## Repository Layout
 
-The repo root now stays focused on runnable training and serving entrypoints.
-Supporting material is grouped into folders:
+The repo is grouped to keep the root focused on runnable code:
 
-- `core/` for shared training, state-tracking, reward, and serving helpers
-- `tools/` for standalone analysis utilities
-- `docs/` for notes that used to live in the root
-- `notebooks/` for exploratory notebooks
-- `data/` for raw reference JSON inputs
-- `artifacts/legacy/` for the older root-level model blobs kept for history
+- `docs/` holds the roadmap, family contracts, benchmark notes, and the run journal.
+- `notebooks/` holds exploratory notebooks.
+- `core/` holds the shared battle-state, tensorization, model, registry, and training helpers.
+- `server/` holds the server runtime and benchmark implementations.
+- `tools/` holds audits, replay utilities, and visualizations.
+- `launchers/` holds PowerShell entrypoints.
+- `data/` holds raw JSON inputs used by exploratory scripts.
+- `artifacts/legacy/` holds the older root-level model blobs.
+- `artifacts/`, `logs/`, `benchmark_runs/`, and `out/` hold generated outputs.
+- Root-level `*.py` files are mostly runnable entrypoints plus thin compatibility shims for the modules that now live under `core/`, `server/`, and `tools/`.
 
-Root-level modules such as `BattleStateTracker.py` and `ModelRegistry.py` remain
-as compatibility shims so existing imports and scripts keep working while the
-real implementations live under `core/`.
-
-## Entity Action Baseline
-
-The first entity-centric behavior-cloning family now lives in:
-
-- `docs/ENTITY_ACTION_V1.md`
-- `train_entity_action.py`
-- `core/EntityActionV1.py`
-- `core/EntityTensorization.py`
-- `core/EntityModelV1.py`
-
-The next identity-invariance phase now lives in:
-
-- `docs/GENERATION_MAP.md`
-- `docs/ENTITY_INVARIANCE_AUX_V1.md`
-- `train_entity_invariance.py`
-- `core/EntityInvarianceTensorization.py`
-- `core/EntityInvarianceModelV1.py`
-
-## Serving And Governance
-
-The serving, benchmark, and governance layer now lives in:
-
-- `server/`
-- `launchers/`
-- `tools/audit_artifacts.py`
-- `tools/backfill_governance_artifacts.py`
-- `serve_entity_model_benchmark.py`
+If you want the doc index, start with `docs/README.md`.
+If you want the shared Python module map, start with `core/README.md`.
 
 ## Simulator Repo
 
@@ -53,7 +54,67 @@ The Pokemon Showdown simulator repo used alongside this project lives at:
 
 Relevant simulator-side files we have been integrating with:
 
-- `C:\Users\jeanj\Documents\Programming\pokemon-showdown\sim\tools\rl-model-client.ts`
-- `C:\Users\jeanj\Documents\Programming\pokemon-showdown\sim\tools\rl-agent.ts`
-- `C:\Users\jeanj\Documents\Programming\pokemon-showdown\sim\examples\model-vs-model-runner.ts`
-- `C:\Users\jeanj\Documents\Programming\pokemon-showdown\dist\sim\examples\statistical-runner.js`
+- [sim/tools/rl-model-client.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/tools/rl-model-client.ts)
+- [sim/tools/rl-agent.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/tools/rl-agent.ts)
+- [sim/tools/runner.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/tools/runner.ts)
+- [sim/tools/model-league-runner.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/tools/model-league-runner.ts)
+- [sim/examples/model-vs-model-runner.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/examples/model-vs-model-runner.ts)
+- [sim/examples/statistical-runner.ts](C:/Users/jeanj/Documents/Programming/pokemon-showdown/sim/examples/statistical-runner.ts)
+
+The built JavaScript runner artifact for statistical runs lives at:
+
+- [dist/sim/examples/statistical-runner.js](C:/Users/jeanj/Documents/Programming/pokemon-showdown/dist/sim/examples/statistical-runner.js)
+
+## Model Server
+
+`flask_api_multi.py` is the unified model-server entrypoint. It now routes both flat
+`state_vector` payloads and entity `battle_state` payloads on the same port, so the
+request shape no longer forces a port switch.
+
+The single-model entity benchmark server lives in `server/serve_entity_model_benchmark.py`.
+
+For the Intel Mac handoff path, use the containerized serving flow in:
+
+- `docs/INTEL_MAC_CONTAINER_RUNBOOK.md`
+
+## Benchmarking
+
+For model-vs-model runs, use the simulator-side wrapper in the sibling repo:
+
+- [scripts/benchmark-model-vs-model.ps1](C:/Users/jeanj/Documents/Programming/pokemon-showdown/scripts/benchmark-model-vs-model.ps1)
+
+The recorded replay grid is driven by `-ReplayGrid`, and replay capture is enabled with
+`-ReplayCaptureMode` plus `-ReplayCaptureCount`. This example uses the runbook's
+`model2` vs `model4` pairing and prefers port `5009` if it is free:
+
+```powershell
+Set-Location 'C:\Users\jeanj\Documents\Programming\pokemon-showdown'
+
+$port = 5009
+while (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) {
+    $port++
+}
+Write-Host "Using server port $port"
+
+& .\scripts\benchmark-model-vs-model.ps1 `
+    -ServerHost '127.0.0.1' `
+    -ServerPort $port `
+    -ServerModelIDs 'model2,model4' `
+    -TotalGames 10 `
+    -Concurrency 2 `
+    -WorkersPerModel 2 `
+    -ReplayCaptureMode all `
+    -ReplayCaptureCount 10 `
+    -ReplayOutputDir 'logs\replays' `
+    -ReplayGrid `
+    -ModelAName 'Model2' `
+    -ModelAID 'model2' `
+    -ModelAProfile 'joint-policy' `
+    -ModelBName 'Model4' `
+    -ModelBID 'model4' `
+    -ModelBProfile 'joint-policy-value'
+```
+
+The matching runbook is here:
+
+- [BENCHMARK_RUNBOOK.md](C:/Users/jeanj/Documents/Programming/pokemon-showdown/BENCHMARK_RUNBOOK.md#L113)

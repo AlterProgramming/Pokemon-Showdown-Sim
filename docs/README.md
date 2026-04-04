@@ -1,10 +1,12 @@
 # Docs
 
-Human-facing notes that used to live in the repo root now live here.
+This folder groups the human-facing notes and roadmap docs that used to live
+in the repo root.
 
-- `benchmark.md`
-- `useful.md`
-- `ENTITY_ACTION_V1.md`
-- `ENTITY_INVARIANCE_AUX_V1.md`
-- `GENERATION_MAP.md`
-- `journal-2026-03-27-entity-benchmark-worker-sweep.md`
+- `GENERATION_MAP.md`: model-family roadmap and generation sequencing
+- `ENTITY_ACTION_V1.md`: contract for the first entity-centric family
+- `ENTITY_INVARIANCE_AUX_V1.md`: follow-on identity-invariance contract
+- `INTEL_MAC_CONTAINER_RUNBOOK.md`: container-first operator flow for the Intel Mac handoff
+- `benchmark.md`: benchmark notes and observations
+- `useful.md`: short reference notes
+- `journal-2026-03-27-entity-benchmark-worker-sweep.md`: run journal
