@@ -1,6 +1,22 @@
 # Pokemon-Showdown-Sim
 A simulator to test model capabilities in real environment
 
+## Repository Layout
+
+The repo root now stays focused on runnable training and serving entrypoints.
+Supporting material is grouped into folders:
+
+- `core/` for shared training, state-tracking, reward, and serving helpers
+- `tools/` for standalone analysis utilities
+- `docs/` for notes that used to live in the root
+- `notebooks/` for exploratory notebooks
+- `data/` for raw reference JSON inputs
+- `artifacts/legacy/` for the older root-level model blobs kept for history
+
+Root-level modules such as `BattleStateTracker.py` and `ModelRegistry.py` remain
+as compatibility shims so existing imports and scripts keep working while the
+real implementations live under `core/`.
+
 ## Simulator Repo
 
 The Pokemon Showdown simulator repo used alongside this project lives at:

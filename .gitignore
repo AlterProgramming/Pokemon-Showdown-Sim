@@ -1,13 +1,34 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # generated local server wrappers
 .codex-flask_api_model*.py
 
+# generated runtime output
+benchmark_runs/
+logs/
+out/
+*.log
+*.out
+*.err
+
 # generated training artifacts
+artifacts/model_registry.json
 artifacts/model_*.keras
 artifacts/training_model_*.keras
 artifacts/action_vocab_*.json
 artifacts/action_context_vocab_*.json
 artifacts/training_metadata_*.json
+artifacts/training_metadata*.json
+artifacts/*_history*.json
+artifacts/*_manifest*.json
+artifacts/*_metrics*.csv
+artifacts/*_profile*.json
+artifacts/*_summary*.json
+artifacts/*_vocab*.json
+artifacts/*.keras
+artifacts/*.h5
