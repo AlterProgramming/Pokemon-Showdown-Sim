@@ -17,6 +17,16 @@ Root-level modules such as `BattleStateTracker.py` and `ModelRegistry.py` remain
 as compatibility shims so existing imports and scripts keep working while the
 real implementations live under `core/`.
 
+## Entity Action Baseline
+
+The first entity-centric behavior-cloning family now lives in:
+
+- `docs/ENTITY_ACTION_V1.md`
+- `train_entity_action.py`
+- `core/EntityActionV1.py`
+- `core/EntityTensorization.py`
+- `core/EntityModelV1.py`
+
 ## Simulator Repo
 
 The Pokemon Showdown simulator repo used alongside this project lives at:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 from typing import Any, Dict, List
@@ -8,10 +9,11 @@ from typing import Any, Dict, List
 import numpy as np
 
 from BattleStateTracker import BattleStateTracker
-from ModelRegistry import write_model_registry
+from ModelRegistry import enrich_training_metadata_recipe_fields, write_model_registry
 from RewardSignals import (
     TRACE_SCHEMA_VERSION,
     RewardConfig,
+    attach_reward_targets,
     build_move_reward_profile,
 )
 from StateVectorization import (
@@ -87,10 +89,81 @@ def make_reward_config(args: argparse.Namespace) -> RewardConfig:
         hp_weight=args.reward_hp_weight,
         ko_weight=args.reward_ko_weight,
         wasted_move_penalty=args.reward_wasted_move_penalty,
+        redundant_setup_penalty=args.reward_redundant_setup_penalty,
+        wasted_setup_penalty=args.reward_wasted_setup_penalty,
         terminal_weight=args.reward_terminal_weight,
+        return_discount=args.reward_return_discount,
         offensive_move_min_uses=args.reward_offensive_move_min_uses,
         offensive_move_min_damage_rate=args.reward_offensive_move_min_damage_rate,
     )
+
+
+def example_contributes_policy_target(
+    ex: Dict[str, Any],
+    *,
+    include_switches: bool,
+    use_action_tokens: bool,
+) -> bool:
+    action = ex.get("action")
+    if action is None:
+        return False
+
+    if use_action_tokens:
+        action_token = ex.get("action_token")
+        if not action_token:
+            return False
+        if not include_switches and str(action_token).startswith("switch:"):
+            return False
+        return True
+
+    kind, _ = action
+    return kind == "move"
+
+
+def build_policy_training_sample_weights(
+    examples: List[Dict[str, Any]],
+    *,
+    include_switches: bool,
+    use_action_tokens: bool,
+    weighting_mode: str,
+    scale: float,
+    min_weight: float,
+    max_weight: float,
+) -> np.ndarray | None:
+    if weighting_mode == "none":
+        return None
+
+    returns: List[float] = []
+    for ex in examples:
+        if not example_contributes_policy_target(
+            ex,
+            include_switches=include_switches,
+            use_action_tokens=use_action_tokens,
+        ):
+            continue
+        return_to_go = ex.get("return_to_go")
+        if return_to_go is None:
+            return_to_go = ex.get("terminal_result")
+        returns.append(float(return_to_go) if return_to_go is not None else 0.0)
+
+    if not returns:
+        return None
+
+    returns_np = np.asarray(returns, dtype=np.float32)
+    if weighting_mode == "exp":
+        std = float(np.std(returns_np))
+        if std <= 1e-6:
+            return np.ones_like(returns_np, dtype=np.float32)
+
+        z_scores = (returns_np - float(np.mean(returns_np))) / std
+        weights = np.exp(float(scale) * z_scores)
+        weights = np.clip(weights, float(min_weight), float(max_weight))
+        mean_weight = float(np.mean(weights))
+        if mean_weight > 1e-6:
+            weights = weights / mean_weight
+        return np.clip(weights, float(min_weight), float(max_weight)).astype(np.float32)
+
+    raise ValueError(f"Unsupported policy weighting mode: {weighting_mode}")
 
 
 def build_policy_models(
@@ -149,9 +222,10 @@ def build_policy_models(
         value_x = layers.Dense(value_hidden_dim or max(64, hidden_dim // 2), activation="relu")(shared)
         if dropout > 0:
             value_x = layers.Dropout(dropout)(value_x)
-        value_out = layers.Dense(1, activation="sigmoid", name="value")(value_x)
+        # Use a direct regression target so the head can model signed return-to-go.
+        value_out = layers.Dense(1, activation="linear", name="value")(value_x)
         outputs["value"] = value_out
-        losses["value"] = keras.losses.BinaryCrossentropy()
+        losses["value"] = keras.losses.Huber()
         loss_weights["value"] = value_weight
         metrics["value"] = [
             keras.metrics.MeanAbsoluteError(name="mae"),
@@ -232,6 +306,71 @@ def save_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
+def metric_direction(metric_name: str) -> str:
+    lowered = metric_name.lower()
+    minimizing_tokens = ("loss", "mae", "mse", "rmse", "brier", "error", "crossentropy")
+    if any(token in lowered for token in minimizing_tokens):
+        return "min"
+    return "max"
+
+
+def summarize_training_history(history) -> dict:
+    history_dict = history.history if history is not None else {}
+    metric_summaries: Dict[str, Dict[str, Any]] = {}
+
+    for metric_name, raw_values in sorted(history_dict.items()):
+        values = [float(value) for value in raw_values]
+        if not values:
+            continue
+        direction = metric_direction(metric_name)
+        best_value = min(values) if direction == "min" else max(values)
+        best_epoch = values.index(best_value) + 1
+        metric_summaries[metric_name] = {
+            "direction": direction,
+            "first": values[0],
+            "last": values[-1],
+            "best": best_value,
+            "best_epoch": int(best_epoch),
+            "count": int(len(values)),
+        }
+
+    return {
+        "epochs_completed": int(max((len(values) for values in history_dict.values()), default=0)),
+        "metrics": metric_summaries,
+    }
+
+
+def build_run_manifest(
+    *,
+    metadata: dict,
+    artifact_paths: Dict[str, Path],
+    evaluation_summary: dict,
+    registry_path: Path,
+) -> dict:
+    artifact_records = {
+        name: {
+            "path": str(path),
+            "exists": bool(path.exists()),
+        }
+        for name, path in sorted(artifact_paths.items())
+    }
+    return {
+        "manifest_version": "1.0",
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "model_release_id": metadata.get("model_release_id"),
+        "family_id": metadata.get("family_id"),
+        "family_version": metadata.get("family_version"),
+        "family_name": metadata.get("family_name"),
+        "training_regime": metadata.get("training_regime"),
+        "registry_visibility": metadata.get("registry_visibility"),
+        "metadata_path": metadata.get("metadata_path"),
+        "evaluation_summary_path": metadata.get("evaluation_summary_path"),
+        "registry_path": str(registry_path),
+        "artifacts": artifact_records,
+        "evaluation_snapshot": evaluation_summary,
+    }
+
+
 def build_artifact_paths(
     output_dir: Path,
     *,
@@ -248,6 +387,8 @@ def build_artifact_paths(
             "policy_vocab": output_dir / f"{policy_vocab_stem}{run_suffix}.json",
             "metadata": output_dir / f"training_metadata{run_suffix}.json",
             "reward_profile": output_dir / f"move_reward_profile{run_suffix}.json",
+            "evaluation_summary": output_dir / f"evaluation_summary{run_suffix}.json",
+            "run_manifest": output_dir / f"run_manifest{run_suffix}.json",
         }
         if save_training_model:
             paths["training_model"] = output_dir / f"training_model{run_suffix}.keras"
@@ -284,6 +425,8 @@ def build_named_artifact_paths(
         "policy_vocab": output_dir / f"{policy_vocab_stem}{suffix}.json",
         "metadata": output_dir / f"training_metadata{suffix}.json",
         "reward_profile": output_dir / f"move_reward_profile{suffix}.json",
+        "evaluation_summary": output_dir / f"evaluation_summary{suffix}.json",
+        "run_manifest": output_dir / f"run_manifest{suffix}.json",
     }
     if save_training_model:
         paths["training_model"] = output_dir / f"training_model{suffix}.keras"
@@ -301,6 +444,28 @@ def build_named_artifact_paths(
     return paths
 
 
+def build_data_source_metadata(
+    *,
+    raw_data_paths: List[str],
+    resolved_data_paths: List[str],
+    json_paths: List[str],
+) -> tuple[str, dict]:
+    used_default_kaggle_dataset = not raw_data_paths
+    if used_default_kaggle_dataset:
+        data_source_id = f"kaggle:{DEFAULT_KAGGLE_DATASET}"
+    else:
+        data_source_id = "explicit_paths"
+
+    details = {
+        "used_default_kaggle_dataset": used_default_kaggle_dataset,
+        "default_kaggle_dataset": DEFAULT_KAGGLE_DATASET if used_default_kaggle_dataset else None,
+        "raw_data_paths": list(raw_data_paths),
+        "resolved_data_paths": list(resolved_data_paths),
+        "json_path_count": int(len(json_paths)),
+    }
+    return data_source_id, details
+
+
 def make_training_metadata(
     args: argparse.Namespace,
     *,
@@ -315,18 +480,41 @@ def make_training_metadata(
     training_param_count: int | None = None,
     reward_config: RewardConfig,
     move_reward_profile: dict,
+    policy_weight_stats: dict | None = None,
+    raw_data_paths: List[str] | None = None,
+    resolved_data_paths: List[str] | None = None,
+    json_paths: List[str] | None = None,
 ) -> dict:
     history_dict = history.history if history is not None else {}
+    data_source_id, data_source_details = build_data_source_metadata(
+        raw_data_paths=list(raw_data_paths or []),
+        resolved_data_paths=list(resolved_data_paths or []),
+        json_paths=list(json_paths or []),
+    )
+    objective_set = ["policy"]
+    if args.predict_turn_outcome:
+        objective_set.append("transition")
+    if args.predict_value:
+        objective_set.append("value")
     payload = {
         "policy_model_path": str(artifact_paths["policy_model"]),
         "policy_vocab_path": str(artifact_paths["policy_vocab"]),
         "metadata_path": str(artifact_paths["metadata"]),
         "reward_profile_path": str(artifact_paths["reward_profile"]),
+        "evaluation_summary_path": str(artifact_paths["evaluation_summary"]),
+        "run_manifest_path": str(artifact_paths["run_manifest"]),
+        "parent_release_id": None,
         "feature_dim": feature_dim,
         "feature_layout": state_vector_layout(),
+        "information_policy": "public_only",
+        "state_schema_version": "flat_public_v1",
+        "entity_schema_version": None,
+        "history_schema_version": None,
         "num_action_classes": len(action_vocab),
         "policy_label_format": "action_tokens" if use_action_vocab(args) else "move_ids",
         "action_space": "joint" if args.include_switches else "move_only",
+        "action_parameterization": "joint_vocab" if use_action_vocab(args) else "move_vocab",
+        "objective_set": objective_set,
         "train_examples": train_size,
         "val_examples": val_size,
         "epochs_requested": args.epochs,
@@ -346,11 +534,52 @@ def make_training_metadata(
         "transition_weight": args.transition_weight,
         "value_weight": args.value_weight,
         "value_hidden_dim": args.value_hidden_dim or max(64, args.hidden_dim // 2),
+        "value_target": "discounted_return_to_go",
+        "value_target_definition": "discounted_return_to_go" if args.predict_value else None,
+        "value_head_activation": "linear",
         "action_embed_dim": args.action_embed_dim,
         "transition_hidden_dim": args.transition_hidden_dim,
         "model_variant": args.model_variant,
         "model_name": args.model_name,
         "reward_config": reward_config.to_dict(),
+        "reward_definition_id": "dense_reward_v2",
+        "policy_return_weighting": args.policy_return_weighting,
+        "policy_return_weight_scale": args.policy_return_weight_scale,
+        "policy_return_weight_min": args.policy_return_weight_min,
+        "policy_return_weight_max": args.policy_return_weight_max,
+        "policy_weighting_definition": {
+            "mode": args.policy_return_weighting,
+            "scale": args.policy_return_weight_scale,
+            "min_weight": args.policy_return_weight_min,
+            "max_weight": args.policy_return_weight_max,
+        },
+        "training_regime": (
+            "offline_bc_aux_weighted"
+            if requires_training_model(args) and args.policy_return_weighting != "none"
+            else "offline_bc_aux"
+            if requires_training_model(args)
+            else "offline_bc_weighted"
+            if args.policy_return_weighting != "none"
+            else "offline_bc"
+        ),
+        "data_source_id": data_source_id,
+        "data_source_details": data_source_details,
+        "split_definition": {
+            "method": "group_split_by_battle_id",
+            "val_ratio": args.val_ratio,
+            "seed": args.seed,
+        },
+        "environment_definition": {
+            "battle_log_source": "pokemon_showdown_json",
+            "observation_scope": "public_only",
+            "format_hint": "gen9randombattle",
+        },
+        "initialization_source": {
+            "type": "scratch",
+            "checkpoint": None,
+        },
+        "evaluation_bundle_id": "offline_validation_v1",
+        "registry_visibility": "runnable_policy",
         "trace_schema_version": TRACE_SCHEMA_VERSION,
         "num_reward_profiled_moves": len(move_reward_profile),
         "num_offensive_reward_moves": sum(
@@ -370,10 +599,13 @@ def make_training_metadata(
         payload["turn_outcome_layout"] = turn_outcome_layout()
         payload["action_context_vocab_path"] = str(artifact_paths["action_context_vocab"])
         payload["num_action_context_classes"] = len(action_context_vocab or {})
+        payload["transition_target_definition"] = "public_turn_outcome_summary_v1"
     if args.predict_value:
         payload["policy_value_model_path"] = str(artifact_paths["policy_value_model"])
+    if policy_weight_stats is not None:
+        payload["policy_weight_stats"] = policy_weight_stats
 
-    return payload
+    return enrich_training_metadata_recipe_fields(payload)
 
 
 def parse_args() -> argparse.Namespace:
@@ -424,7 +656,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--predict-value",
         action="store_true",
-        help="Add a state-value head that predicts the acting player's terminal win probability.",
+        help="Add a state-value head that predicts the acting player's discounted return-to-go.",
     )
     parser.add_argument(
         "--transition-weight",
@@ -487,10 +719,52 @@ def parse_args() -> argparse.Namespace:
         help="Penalty weight for offensive moves that fail to cause any tracked opponent HP loss.",
     )
     parser.add_argument(
+        "--reward-redundant-setup-penalty",
+        type=float,
+        default=0.25,
+        help="Penalty weight for using a setup move when the relevant boosted stats are already maxed.",
+    )
+    parser.add_argument(
+        "--reward-wasted-setup-penalty",
+        type=float,
+        default=1.0,
+        help="Penalty weight applied to each setup turn in a chain that never cashes out before the mon dies or abandons the boosts.",
+    )
+    parser.add_argument(
         "--reward-terminal-weight",
         type=float,
         default=1.0,
         help="Weight for the terminal reward component in replay traces.",
+    )
+    parser.add_argument(
+        "--reward-return-discount",
+        type=float,
+        default=1.0,
+        help="Discount factor used when converting shaped per-turn rewards into return-to-go targets.",
+    )
+    parser.add_argument(
+        "--policy-return-weighting",
+        choices=["none", "exp"],
+        default="exp",
+        help="How to weight policy examples using return-to-go. 'exp' upweights higher-return examples and downweights lower-return ones.",
+    )
+    parser.add_argument(
+        "--policy-return-weight-scale",
+        type=float,
+        default=0.75,
+        help="Strength of return-to-go weighting when policy weighting is enabled.",
+    )
+    parser.add_argument(
+        "--policy-return-weight-min",
+        type=float,
+        default=0.25,
+        help="Lower clip for policy example sample weights.",
+    )
+    parser.add_argument(
+        "--policy-return-weight-max",
+        type=float,
+        default=4.0,
+        help="Upper clip for policy example sample weights.",
     )
     parser.add_argument(
         "--reward-offensive-move-min-uses",
@@ -559,6 +833,7 @@ def main() -> None:
     vocab_source = train_examples if train_examples else examples
     reward_config = make_reward_config(args)
     move_reward_profile = build_move_reward_profile(vocab_source, reward_config)
+    examples = attach_reward_targets(examples, reward_config, move_reward_profile)
 
     action_context_vocab = None
     if use_action_vocab(args):
@@ -621,6 +896,29 @@ def main() -> None:
         y_train_value = None
         y_val_value = None
 
+    policy_train_weights = build_policy_training_sample_weights(
+        train_examples,
+        include_switches=args.include_switches,
+        use_action_tokens=use_action_vocab(args),
+        weighting_mode=args.policy_return_weighting,
+        scale=args.policy_return_weight_scale,
+        min_weight=args.policy_return_weight_min,
+        max_weight=args.policy_return_weight_max,
+    )
+    if policy_train_weights is not None and len(policy_train_weights) != len(y_train_policy):
+        raise ValueError(
+            "policy sample weights length does not match the policy training targets; "
+            "example filtering and vectorization fell out of sync"
+        )
+    policy_weight_stats = None
+    if policy_train_weights is not None:
+        policy_weight_stats = {
+            "count": int(len(policy_train_weights)),
+            "mean": float(np.mean(policy_train_weights)),
+            "min": float(np.min(policy_train_weights)),
+            "max": float(np.max(policy_train_weights)),
+        }
+
     switch_examples = sum(1 for ex in examples if ex["action"][0] == "switch")
     state_input_dim = X["state"].shape[1] if isinstance(X, dict) else X.shape[1]
     print(
@@ -644,6 +942,14 @@ def main() -> None:
         f" moves={len(move_reward_profile)}"
         f" offensive={sum(1 for entry in move_reward_profile.values() if entry.get('is_offensive'))}"
     )
+    if policy_weight_stats is not None:
+        print(
+            "policy_weighting:"
+            f" mode={args.policy_return_weighting}"
+            f" mean={policy_weight_stats['mean']:.3f}"
+            f" min={policy_weight_stats['min']:.3f}"
+            f" max={policy_weight_stats['max']:.3f}"
+        )
 
     model, policy_model, policy_value_model = build_policy_models(
         input_dim=state_input_dim,
@@ -688,6 +994,17 @@ def main() -> None:
         fit_kwargs["y"] = train_targets
     else:
         fit_kwargs["y"] = y_train_policy
+
+    if policy_train_weights is not None:
+        if multitask_targets:
+            sample_weights: Dict[str, Any] = {"policy": policy_train_weights}
+            if args.predict_turn_outcome:
+                sample_weights["transition"] = np.ones(len(y_train_policy), dtype=np.float32)
+            if args.predict_value:
+                sample_weights["value"] = np.ones(len(y_train_policy), dtype=np.float32)
+            fit_kwargs["sample_weight"] = sample_weights
+        else:
+            fit_kwargs["sample_weight"] = policy_train_weights
 
     if X_val is not None and y_val_policy is not None and len(val_idx):
         if multitask_targets:
@@ -751,29 +1068,44 @@ def main() -> None:
     if args.predict_turn_outcome:
         save_json(artifact_paths["action_context_vocab"], action_context_vocab or {})
 
+    metadata_payload = make_training_metadata(
+        args,
+        feature_dim=int(state_input_dim),
+        action_vocab=action_vocab,
+        train_size=int(len(train_idx)),
+        val_size=int(len(val_idx)),
+        history=history,
+        artifact_paths=artifact_paths,
+        action_context_vocab=action_context_vocab,
+        policy_param_count=policy_param_count,
+        training_param_count=training_param_count,
+        reward_config=reward_config,
+        move_reward_profile=move_reward_profile,
+        policy_weight_stats=policy_weight_stats,
+        raw_data_paths=args.data_paths,
+        resolved_data_paths=data_paths,
+        json_paths=json_paths,
+    )
+    save_json(artifact_paths["metadata"], metadata_payload)
+    evaluation_summary = summarize_training_history(history)
+    save_json(artifact_paths["evaluation_summary"], evaluation_summary)
+    registry_path = write_model_registry(Path(__file__).resolve().parent)
     save_json(
-        artifact_paths["metadata"],
-        make_training_metadata(
-            args,
-            feature_dim=int(state_input_dim),
-            action_vocab=action_vocab,
-            train_size=int(len(train_idx)),
-            val_size=int(len(val_idx)),
-            history=history,
+        artifact_paths["run_manifest"],
+        build_run_manifest(
+            metadata=metadata_payload,
             artifact_paths=artifact_paths,
-            action_context_vocab=action_context_vocab,
-            policy_param_count=policy_param_count,
-            training_param_count=training_param_count,
-            reward_config=reward_config,
-            move_reward_profile=move_reward_profile,
+            evaluation_summary=evaluation_summary,
+            registry_path=registry_path,
         ),
     )
-    registry_path = write_model_registry(Path(__file__).resolve().parent)
 
     print(f"saved_policy_model={artifact_paths['policy_model']}")
     print(f"saved_policy_vocab={artifact_paths['policy_vocab']}")
     print(f"saved_reward_profile={artifact_paths['reward_profile']}")
     print(f"saved_metadata={artifact_paths['metadata']}")
+    print(f"saved_evaluation_summary={artifact_paths['evaluation_summary']}")
+    print(f"saved_run_manifest={artifact_paths['run_manifest']}")
     print(f"saved_model_registry={registry_path}")
     if args.predict_value:
         print(f"saved_policy_value_model={artifact_paths['policy_value_model']}")
