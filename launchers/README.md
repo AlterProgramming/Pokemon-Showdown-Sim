@@ -11,6 +11,16 @@ launcher location and support optional environment overrides:
 - `POKEMON_SHOWDOWN_REPO`: simulator repo path when a sibling `pokemon-showdown`
   checkout is not used
 
+Recommended setup:
+
+1. Create a venv for this repo, usually at `.\.venv`.
+2. Install the dependencies you need into that venv.
+3. Set `PS_AGENT_PYTHON` to that venv's interpreter if you do not want to rely
+   on auto-detection.
+
+The launchers will first honor `PS_AGENT_PYTHON`, then try `.\.venv`,
+`.\venv`, and a parent `.venv`, and finally fall back to `python` on `PATH`.
+
 - `start_entity_training.ps1`
 - `start_entity_invariance_training.ps1`
 - `start_entity_benchmark_server.ps1`: starts the unified model server on the

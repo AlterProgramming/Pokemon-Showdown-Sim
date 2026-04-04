@@ -145,3 +145,23 @@ few environment variables yourself:
 - `PS_AGENT_PYTHON`: path to the Python interpreter or venv to use for this repo
 - `PS_AGENT_DATA`: optional path to a local battle-log dataset; if omitted, the
   trainers can fall back to their dataset-download logic
+
+Do not rely on any old machine-local `deepLearning` folder name. Each user
+should create their own virtual environment for this repo.
+
+Example on Windows PowerShell:
+
+```powershell
+Set-Location .\Pokemon-Showdown-Sim
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+```
+
+Then either:
+
+- set `PS_AGENT_PYTHON` to `.\.venv\Scripts\python.exe`, or
+- let the launchers auto-detect `.\.venv\Scripts\python.exe`
+
+If your environment lives somewhere else, point `PS_AGENT_PYTHON` at that
+interpreter explicitly.
