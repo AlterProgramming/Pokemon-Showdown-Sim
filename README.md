@@ -35,6 +35,16 @@ The next identity-invariance phase now lives in:
 - `core/EntityInvarianceTensorization.py`
 - `core/EntityInvarianceModelV1.py`
 
+## Serving And Governance
+
+The serving, benchmark, and governance layer now lives in:
+
+- `server/`
+- `launchers/`
+- `tools/audit_artifacts.py`
+- `tools/backfill_governance_artifacts.py`
+- `serve_entity_model_benchmark.py`
+
 ## Simulator Repo
 
 The Pokemon Showdown simulator repo used alongside this project lives at:

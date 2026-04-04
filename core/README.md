@@ -9,5 +9,6 @@ Main areas:
 - `RewardSignals.py` for reward shaping helpers.
 - `EntityActionV1.py`, `EntityTensorization.py`, and `EntityModelV1.py` for the first entity-centric action-scoring family.
 - `EntityInvarianceTensorization.py` and `EntityInvarianceModelV1.py` for the identity-invariance follow-on family.
-- `ModelRegistry.py` and `ModelWorkers.py` for artifact lookup and model-serving orchestration.
+- `ActionSelection.py` for policy-logit post-processing such as switch-bias handling.
+- `ModelRegistry.py`, `ModelServerRouting.py`, and `ModelWorkers.py` for artifact lookup and model-serving orchestration.
 - `TransferLearning.py` for warm-start and initialization metadata helpers shared by trainers.
