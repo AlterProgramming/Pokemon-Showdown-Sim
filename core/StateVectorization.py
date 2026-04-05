@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 
 from .BattleStateTracker import BattleStateTracker, STAT_ORDER
 from .StaticDex import StaticDex
+from .TurnEventTokenizer import encode_turn_event_sequence
 
 
 STATUS_ORDER: List[str] = ["brn", "par", "psn", "tox", "slp", "frz"]
@@ -648,6 +649,9 @@ def vectorize_multitask_dataset(
     outcome_encoder: Callable[[Dict[str, Any], Dict[str, Any], str], List[float]] = encode_turn_outcome,
     include_transition: bool = False,
     include_value: bool = False,
+    include_sequence: bool = False,
+    sequence_vocab: Dict[str, int] | None = None,
+    max_seq_len: int = 32,
 ) -> Tuple[List[List[float]] | Dict[str, List[List[float]] | List[int]], Dict[str, List[Any]]]:
     X_state: List[List[float]] = []
     X_my_action: List[int] = []
@@ -655,6 +659,7 @@ def vectorize_multitask_dataset(
     y_policy: List[int] = []
     y_transition: List[List[float]] = []
     y_value: List[float] = []
+    y_sequence: List[List[int]] = []
 
     policy_unk = policy_vocab.get("<UNK>", 0)
     ctx_none = action_context_vocab.get(ACTION_CONTEXT_NONE, 0) if action_context_vocab else 0
@@ -701,6 +706,13 @@ def vectorize_multitask_dataset(
                 raise ValueError("include_value requires return_to_go or terminal_result on every example")
             y_value.append(float(value_target))
 
+        if include_sequence:
+            turn_events = ex.get("turn_events_v1", [])
+            if sequence_vocab is not None and turn_events:
+                y_sequence.append(encode_turn_event_sequence(turn_events, sequence_vocab, max_seq_len))
+            else:
+                y_sequence.append([0] * max_seq_len)  # all PAD if no events
+
     X: List[List[float]] | Dict[str, List[List[float]] | List[int]]
     if include_transition:
         X = {
@@ -716,4 +728,6 @@ def vectorize_multitask_dataset(
         targets["transition"] = y_transition
     if include_value:
         targets["value"] = y_value
+    if include_sequence:
+        targets["sequence"] = y_sequence
     return X, targets

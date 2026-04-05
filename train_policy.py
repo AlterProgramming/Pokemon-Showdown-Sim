@@ -16,6 +16,7 @@ from RewardSignals import (
     attach_reward_targets,
     build_move_reward_profile,
 )
+from TurnEventTokenizer import build_sequence_vocab, PAD_ID
 from StateVectorization import (
     build_action_context_vocab,
     build_action_vocab,
@@ -77,11 +78,11 @@ def resolve_data_paths(raw_paths: List[str]) -> List[str]:
 
 
 def use_action_vocab(args: argparse.Namespace) -> bool:
-    return bool(args.include_switches or args.predict_turn_outcome)
+    return bool(args.include_switches or args.predict_turn_outcome or args.predict_turn_sequence)
 
 
 def requires_training_model(args: argparse.Namespace) -> bool:
-    return bool(args.predict_turn_outcome or args.predict_value)
+    return bool(args.predict_turn_outcome or args.predict_value or args.predict_turn_sequence)
 
 
 def make_reward_config(args: argparse.Namespace) -> RewardConfig:
@@ -182,6 +183,10 @@ def build_policy_models(
     predict_value: bool = False,
     value_hidden_dim: int | None = None,
     value_weight: float = 0.25,
+    sequence_vocab_size: int | None = None,
+    sequence_length: int | None = None,
+    sequence_hidden_dim: int = 128,
+    sequence_weight: float = 0.1,
 ):
     from tensorflow import keras
     from tensorflow.keras import layers
@@ -202,7 +207,8 @@ def build_policy_models(
         policy_metrics.append(keras.metrics.SparseTopKCategoricalAccuracy(k=3, name="top3"))
 
     use_transition = transition_dim is not None and action_context_vocab_size is not None
-    if not use_transition and not predict_value:
+    use_sequence = sequence_vocab_size is not None and sequence_length is not None
+    if not use_transition and not predict_value and not use_sequence:
         policy_model.compile(
             optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
             loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -262,8 +268,42 @@ def build_policy_models(
         loss_weights["transition"] = transition_weight
         metrics["transition"] = [keras.metrics.MeanAbsoluteError(name="mae")]
 
+    if use_sequence:
+        # Reuse action inputs/embedding from transition head, or create new ones
+        if not use_transition:
+            my_action_input = layers.Input(shape=(), dtype="int32", name="my_action")
+            opp_action_input = layers.Input(shape=(), dtype="int32", name="opp_action")
+            action_context_vs = action_context_vocab_size or (sequence_vocab_size + 4)
+            action_embedding = layers.Embedding(
+                input_dim=action_context_vs,
+                output_dim=max(8, action_embed_dim),
+                name="action_embedding",
+            )
+
+        # Build conditioning: shared state + action embeddings
+        seq_context = layers.Concatenate(name="sequence_context")([
+            shared,
+            action_embedding(my_action_input),
+            action_embedding(opp_action_input),
+        ])
+
+        # Repeat context across timesteps -> LSTM -> Dense per timestep
+        seq_x = layers.RepeatVector(sequence_length, name="sequence_repeat")(seq_context)
+        seq_x = layers.LSTM(sequence_hidden_dim, return_sequences=True, name="sequence_lstm")(seq_x)
+        if dropout > 0:
+            seq_x = layers.Dropout(dropout)(seq_x)
+        sequence_out = layers.TimeDistributed(
+            layers.Dense(sequence_vocab_size),
+            name="sequence",
+        )(seq_x)
+
+        outputs["sequence"] = sequence_out
+        losses["sequence"] = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        loss_weights["sequence"] = sequence_weight
+        metrics["sequence"] = [keras.metrics.SparseCategoricalAccuracy(name="token_acc")]
+
     model_inputs: Any
-    if use_transition:
+    if use_transition or use_sequence:
         model_inputs = {
             "state": state_input,
             "my_action": my_action_input,
@@ -484,6 +524,7 @@ def make_training_metadata(
     raw_data_paths: List[str] | None = None,
     resolved_data_paths: List[str] | None = None,
     json_paths: List[str] | None = None,
+    sequence_vocab: dict | None = None,
 ) -> dict:
     history_dict = history.history if history is not None else {}
     data_source_id, data_source_details = build_data_source_metadata(
@@ -496,6 +537,8 @@ def make_training_metadata(
         objective_set.append("transition")
     if args.predict_value:
         objective_set.append("value")
+    if args.predict_turn_sequence:
+        objective_set.append("sequence")
     payload = {
         "policy_model_path": str(artifact_paths["policy_model"]),
         "policy_vocab_path": str(artifact_paths["policy_vocab"]),
@@ -602,6 +645,11 @@ def make_training_metadata(
         payload["transition_target_definition"] = "public_turn_outcome_summary_v1"
     if args.predict_value:
         payload["policy_value_model_path"] = str(artifact_paths["policy_value_model"])
+    if args.predict_turn_sequence:
+        payload["sequence_vocab_size"] = len(sequence_vocab) if sequence_vocab else 0
+        payload["max_seq_len"] = args.max_seq_len
+        payload["sequence_hidden_dim"] = args.sequence_hidden_dim
+        payload["sequence_weight"] = args.sequence_weight
     if policy_weight_stats is not None:
         payload["policy_weight_stats"] = policy_weight_stats
 
@@ -688,6 +736,14 @@ def parse_args() -> argparse.Namespace:
         default=256,
         help="Hidden width for the transition head MLP block.",
     )
+    parser.add_argument("--predict-turn-sequence", action="store_true", default=False,
+                        help="Add auxiliary autoregressive sequence head for turn event prediction.")
+    parser.add_argument("--sequence-weight", type=float, default=0.1,
+                        help="Loss weight for sequence head (default 0.1).")
+    parser.add_argument("--sequence-hidden-dim", type=int, default=128,
+                        help="LSTM hidden dimension for sequence head.")
+    parser.add_argument("--max-seq-len", type=int, default=32,
+                        help="Maximum padded sequence length for turn event tokens.")
     parser.add_argument(
         "--patience",
         type=int,
@@ -836,13 +892,17 @@ def main() -> None:
     examples = attach_reward_targets(examples, reward_config, move_reward_profile)
 
     action_context_vocab = None
+    sequence_vocab = None
+    if args.predict_turn_sequence:
+        sequence_vocab = build_sequence_vocab(train_examples)
+    needs_action_context = args.predict_turn_outcome or args.predict_turn_sequence
     if use_action_vocab(args):
         action_vocab = build_action_vocab(
             vocab_source,
             min_count=args.min_move_count,
             include_switches=args.include_switches,
         )
-        if args.predict_turn_outcome:
+        if needs_action_context:
             action_context_vocab = build_action_context_vocab(vocab_source)
         X_raw, targets_raw = vectorize_multitask_dataset(
             examples,
@@ -850,8 +910,11 @@ def main() -> None:
             include_switches=args.include_switches,
             use_action_tokens=True,
             action_context_vocab=action_context_vocab,
-            include_transition=args.predict_turn_outcome,
+            include_transition=needs_action_context,
             include_value=args.predict_value,
+            include_sequence=args.predict_turn_sequence,
+            sequence_vocab=sequence_vocab,
+            max_seq_len=args.max_seq_len,
         )
     else:
         action_vocab = build_move_vocab(vocab_source, min_count=args.min_move_count)
@@ -876,6 +939,11 @@ def main() -> None:
         if "value" not in targets_raw
         else np.asarray(targets_raw["value"], dtype=np.float32).reshape(-1, 1)
     )
+    y_sequence_np = (
+        None
+        if "sequence" not in targets_raw
+        else np.asarray(targets_raw["sequence"], dtype=np.int64)
+    )
 
     X_train = slice_inputs(X, train_idx)
     y_train_policy = y_policy[train_idx]
@@ -895,6 +963,13 @@ def main() -> None:
     else:
         y_train_value = None
         y_val_value = None
+
+    if y_sequence_np is not None:
+        y_train_sequence = y_sequence_np[train_idx]
+        y_val_sequence = y_sequence_np[val_idx] if len(val_idx) else None
+    else:
+        y_train_sequence = None
+        y_val_sequence = None
 
     policy_train_weights = build_policy_training_sample_weights(
         train_examples,
@@ -959,13 +1034,17 @@ def main() -> None:
         dropout=args.dropout,
         learning_rate=args.learning_rate,
         transition_dim=turn_outcome_dim() if args.predict_turn_outcome else None,
-        action_context_vocab_size=len(action_context_vocab or {}) if args.predict_turn_outcome else None,
+        action_context_vocab_size=len(action_context_vocab or {}) if needs_action_context else None,
         action_embed_dim=args.action_embed_dim,
         transition_hidden_dim=args.transition_hidden_dim,
         transition_weight=args.transition_weight,
         predict_value=args.predict_value,
         value_hidden_dim=args.value_hidden_dim or None,
         value_weight=args.value_weight,
+        sequence_vocab_size=len(sequence_vocab) if sequence_vocab else None,
+        sequence_length=args.max_seq_len if args.predict_turn_sequence else None,
+        sequence_hidden_dim=args.sequence_hidden_dim,
+        sequence_weight=args.sequence_weight,
     )
     policy_param_count = int(policy_model.count_params())
     training_param_count = int(model.count_params())
@@ -991,6 +1070,8 @@ def main() -> None:
             train_targets["transition"] = y_train_transition
         if args.predict_value:
             train_targets["value"] = y_train_value
+        if args.predict_turn_sequence:
+            train_targets["sequence"] = y_train_sequence
         fit_kwargs["y"] = train_targets
     else:
         fit_kwargs["y"] = y_train_policy
@@ -1002,6 +1083,8 @@ def main() -> None:
                 sample_weights["transition"] = np.ones(len(y_train_policy), dtype=np.float32)
             if args.predict_value:
                 sample_weights["value"] = np.ones(len(y_train_policy), dtype=np.float32)
+            if args.predict_turn_sequence:
+                sample_weights["sequence"] = np.ones(len(y_train_policy), dtype=np.float32)
             fit_kwargs["sample_weight"] = sample_weights
         else:
             fit_kwargs["sample_weight"] = policy_train_weights
@@ -1014,6 +1097,8 @@ def main() -> None:
                 val_targets["transition"] = y_val_transition
             if args.predict_value:
                 val_targets["value"] = y_val_value
+            if args.predict_turn_sequence:
+                val_targets["sequence"] = y_val_sequence
             fit_kwargs["validation_data"] = (
                 X_val,
                 val_targets,
@@ -1044,7 +1129,7 @@ def main() -> None:
             model_name=args.model_name,
             policy_vocab_stem="action_vocab" if use_action_vocab(args) else "move_vocab",
             save_training_model=requires_training_model(args),
-            save_action_context_vocab=args.predict_turn_outcome,
+            save_action_context_vocab=needs_action_context,
             save_policy_value_model=args.predict_value,
         )
         if args.model_name else
@@ -1052,7 +1137,7 @@ def main() -> None:
             output_dir,
             policy_vocab_stem="action_vocab" if use_action_vocab(args) else "move_vocab",
             save_training_model=requires_training_model(args),
-            save_action_context_vocab=args.predict_turn_outcome,
+            save_action_context_vocab=needs_action_context,
             save_policy_value_model=args.predict_value,
         )
     )
@@ -1065,8 +1150,10 @@ def main() -> None:
         policy_value_model.save(artifact_paths["policy_value_model"])
     if requires_training_model(args):
         model.save(artifact_paths["training_model"])
-    if args.predict_turn_outcome:
+    if needs_action_context:
         save_json(artifact_paths["action_context_vocab"], action_context_vocab or {})
+    if sequence_vocab is not None:
+        save_json(output_dir / "sequence_vocab.json", sequence_vocab)
 
     metadata_payload = make_training_metadata(
         args,
@@ -1085,6 +1172,7 @@ def main() -> None:
         raw_data_paths=args.data_paths,
         resolved_data_paths=data_paths,
         json_paths=json_paths,
+        sequence_vocab=sequence_vocab,
     )
     save_json(artifact_paths["metadata"], metadata_payload)
     evaluation_summary = summarize_training_history(history)
@@ -1111,8 +1199,10 @@ def main() -> None:
         print(f"saved_policy_value_model={artifact_paths['policy_value_model']}")
     if requires_training_model(args):
         print(f"saved_training_model={artifact_paths['training_model']}")
-    if args.predict_turn_outcome:
+    if needs_action_context:
         print(f"saved_action_context_vocab={artifact_paths['action_context_vocab']}")
+    if sequence_vocab is not None:
+        print(f"saved_sequence_vocab={output_dir / 'sequence_vocab.json'}")
 
 
 if __name__ == "__main__":
