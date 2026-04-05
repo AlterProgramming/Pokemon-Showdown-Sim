@@ -18,12 +18,37 @@ python3 -m pytest tests/test_battle_state_tracker.py -v  # regression check
 - `_backfill_visible_actives()` does NOT emit events (runs before apply_turn)
 - Side normalization uses raw p1/p2 from UIDs (not perspective-relative)
 
-## What's Next (Session 2)
-1. `core/TurnEventTokenizer.py` — Convert TurnEventV1 lists to integer token sequences (BOS/EOS/PAD)
-2. Extend `StateVectorization.py` with `vectorize_sequence_targets()`
-3. Add `--predict-turn-sequence` autoregressive decoder head in `train_policy.py`
+---
+
+# Session 2: TurnEvent Tokenization + Sequence Head
+
+## What Was Built
+- `core/TurnEventTokenizer.py` — Composite-key tokenizer converting TurnEventV1 event dicts to integer token sequences with BOS/EOS/PAD
+- `core/StateVectorization.py` — Extended `vectorize_multitask_dataset()` with `include_sequence`, `sequence_vocab`, `max_seq_len` parameters
+- `train_policy.py` — New `--predict-turn-sequence` flag adds LSTM sequence decoder head conditioned on state + my_action + opp_action. Shared action embeddings with transition head when both active.
+- `tests/test_turn_event_tokenizer.py` — 19 tests covering composite keys, vocab building, encode/decode, and vectorization integration
+
+## How to Validate
+```
+python3 -m pytest tests/test_turn_event_tokenizer.py -v
+python3 -m pytest tests/test_turn_event_v1.py -v  # Session 1 regression check
+```
+
+## New CLI Flags
+- `--predict-turn-sequence` — Enable auxiliary sequence head (default: off)
+- `--sequence-weight 0.1` — Loss weight for sequence head
+- `--sequence-hidden-dim 128` — LSTM hidden dimension
+- `--max-seq-len 32` — Maximum padded token sequence length
+
+## Design Decisions
+- **Composite token per event**: Each TurnEventV1 becomes one string token (e.g. `"move:p2:thunderbolt:p1"`), keeping sequence length = number of events per turn (typically 3-15)
+- **Non-autoregressive LSTM**: Context is repeated across timesteps via RepeatVector; each position is predicted independently. True autoregressive decoding deferred to future session.
+- **Shared action embeddings**: When both `--predict-turn-outcome` and `--predict-turn-sequence` are active, they share the same action embedding layer
+- **Vocab built from training data**: `build_sequence_vocab()` scans examples and assigns sorted IDs. Saved as `sequence_vocab.json` artifact.
+- **Truncation preserves EOS**: If events exceed max_seq_len, sequence is truncated but EOS token is always the last non-PAD token
 
 ## What's Next (Session 3)
-1. TypeScript `TurnEventAccumulator` in `pokemon-showdown-model-feature` repo
+1. Phase 2: TypeScript `TurnEventAccumulator` in `pokemon-showdown-model-feature` repo
 2. Browser-side decision-boundary gating (one request per turn)
 3. Completeness oracle against flat vector layout
+4. True autoregressive decoding (teacher-forced at train, beam/greedy at inference)
