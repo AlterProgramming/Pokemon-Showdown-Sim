@@ -356,7 +356,13 @@ class BattleStateTracker:
 
     # ---------- Event application ----------
     def _side_from_uid(self, uid: str) -> str:
-        """Extract player side ('p1' or 'p2') from a UID string."""
+        """Extract player side ('p1' or 'p2') from a UID string.
+
+        Returns '' for None, empty, or unrecognised UIDs (e.g. moves with no
+        target such as Encore whose target_uid is null in the battle log).
+        """
+        if not uid:
+            return ""
         if uid.startswith("p1"):
             return "p1"
         if uid.startswith("p2"):

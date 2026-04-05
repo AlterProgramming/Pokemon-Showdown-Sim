@@ -1,3 +1,7 @@
+# virtual environment
+.venv/
+venv/
+
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
@@ -15,6 +19,9 @@ out/
 *.log
 *.out
 *.err
+
+# bulk training data (download via scripts/fetch_training_data.sh)
+data/battles/
 
 # generated training artifacts
 artifacts/model_registry.json
