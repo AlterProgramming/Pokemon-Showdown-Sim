@@ -564,7 +564,8 @@ class BattleStateTracker:
         self._current_turn_events.append(TurnEventV1(
             event_type=EVENT_FORME_CHANGE,
             target_side=target_side,
-            species_id=tera_type or "",
+            forme_change_kind="tera",
+            status=tera_type or "",
         ))
 
     def _apply_effect(self, ev: Dict[str, Any]) -> None:
@@ -632,6 +633,7 @@ class BattleStateTracker:
             event_type=EVENT_SIDE_CONDITION,
             actor_side=player,
             side_condition=condition,
+            is_removal=not add,
         ))
 
     def _apply_field_condition(self, raw_parts: List[Any], *, add: bool) -> None:
@@ -650,6 +652,7 @@ class BattleStateTracker:
         self._current_turn_events.append(TurnEventV1(
             event_type=EVENT_FIELD,
             terrain=condition,
+            is_removal=not add,
         ))
 
     def _apply_revealed_ability(self, raw_parts: List[Any]) -> None:
@@ -697,6 +700,7 @@ class BattleStateTracker:
         self._current_turn_events.append(TurnEventV1(
             event_type=EVENT_FORME_CHANGE,
             target_side=target_side,
+            forme_change_kind="species",
             species_id=new_species,
         ))
 

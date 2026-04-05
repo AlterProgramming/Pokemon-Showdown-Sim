@@ -107,8 +107,9 @@ class TurnEventV1:
     * **faint** -- ``target_side``
     * **weather** -- ``weather``
     * **field** -- ``terrain``
-    * **side_condition** -- ``actor_side``, ``side_condition``
-    * **forme_change** -- ``target_side``, ``species_id``
+    * **side_condition** -- ``actor_side``, ``side_condition``, ``is_removal``
+    * **field** -- ``terrain``, ``is_removal``
+    * **forme_change** -- ``target_side``, ``forme_change_kind`` ("tera" or "species"), ``species_id`` (species changes) or ``status`` (tera type, reusing field)
     * **turn_end** -- (no extra fields)
     """
 
@@ -125,6 +126,8 @@ class TurnEventV1:
     terrain: str = ""        # Field condition for FIELD
     side_condition: str = "" # Side condition for SIDE_CONDITION
     slot_index: int = 0      # Slot index for SWITCH (1-6)
+    is_removal: bool = False # True when a FIELD or SIDE_CONDITION event is an end/removal
+    forme_change_kind: str = ""  # "tera" or "species" discriminator for FORME_CHANGE
 
     # ---- Serialization ----------------------------------------------------
 
@@ -140,7 +143,9 @@ class TurnEventV1:
             if f.name == "event_type":
                 continue
             value = getattr(self, f.name)
-            # Skip default-like values.
+            # Skip default-like values (bool check before int, since bool is a subclass of int).
+            if isinstance(value, bool) and value is False:
+                continue
             if isinstance(value, str) and value == "":
                 continue
             if isinstance(value, int) and value == 0:
