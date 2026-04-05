@@ -298,9 +298,32 @@ def build_policy_models(
         )(seq_x)
 
         outputs["sequence"] = sequence_out
-        losses["sequence"] = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+
+        # Masked loss and metric: ignore PAD_ID (0) positions so padded
+        # timesteps do not bias the head toward predicting PAD.
+        import tensorflow as tf
+
+        def masked_sequence_loss(y_true, y_pred):
+            mask = tf.cast(tf.not_equal(y_true, PAD_ID), tf.float32)
+            per_token = keras.losses.sparse_categorical_crossentropy(
+                y_true, y_pred, from_logits=True,
+            )
+            masked = per_token * mask
+            return tf.reduce_sum(masked) / (tf.reduce_sum(mask) + 1e-8)
+
+        def masked_token_accuracy(y_true, y_pred):
+            mask = tf.cast(tf.not_equal(y_true, PAD_ID), tf.float32)
+            matches = tf.cast(
+                tf.equal(tf.cast(y_true, tf.int64), tf.argmax(y_pred, axis=-1)),
+                tf.float32,
+            )
+            return tf.reduce_sum(matches * mask) / (tf.reduce_sum(mask) + 1e-8)
+
+        masked_token_accuracy.__name__ = "token_acc"
+
+        losses["sequence"] = masked_sequence_loss
         loss_weights["sequence"] = sequence_weight
-        metrics["sequence"] = [keras.metrics.SparseCategoricalAccuracy(name="token_acc")]
+        metrics["sequence"] = [masked_token_accuracy]
 
     model_inputs: Any
     if use_transition or use_sequence:
@@ -418,6 +441,7 @@ def build_artifact_paths(
     save_training_model: bool,
     save_action_context_vocab: bool,
     save_policy_value_model: bool,
+    save_sequence_vocab: bool = False,
 ) -> Dict[str, Path]:
     idx = 0
     while True:
@@ -436,6 +460,8 @@ def build_artifact_paths(
             paths["action_context_vocab"] = output_dir / f"action_context_vocab{run_suffix}.json"
         if save_policy_value_model:
             paths["policy_value_model"] = output_dir / f"policy_value_model{run_suffix}.keras"
+        if save_sequence_vocab:
+            paths["sequence_vocab"] = output_dir / f"sequence_vocab{run_suffix}.json"
 
         if all(not path.exists() for path in paths.values()):
             return paths
@@ -450,6 +476,7 @@ def build_named_artifact_paths(
     save_training_model: bool,
     save_action_context_vocab: bool,
     save_policy_value_model: bool,
+    save_sequence_vocab: bool = False,
 ) -> Dict[str, Path]:
     if not model_name:
         raise ValueError("model_name must be non-empty")
@@ -474,6 +501,8 @@ def build_named_artifact_paths(
         paths["action_context_vocab"] = output_dir / f"action_context_vocab{suffix}.json"
     if save_policy_value_model:
         paths["policy_value_model"] = output_dir / f"policy_value_model{suffix}.keras"
+    if save_sequence_vocab:
+        paths["sequence_vocab"] = output_dir / f"sequence_vocab{suffix}.json"
 
     existing = [str(path) for path in paths.values() if path.exists()]
     if existing:
@@ -650,6 +679,11 @@ def make_training_metadata(
         payload["max_seq_len"] = args.max_seq_len
         payload["sequence_hidden_dim"] = args.sequence_hidden_dim
         payload["sequence_weight"] = args.sequence_weight
+        payload["sequence_target_definition"] = "composite_turn_event_sequence_v1"
+        payload["sequence_vocab_path"] = str(artifact_paths.get("sequence_vocab", ""))
+        if not args.predict_turn_outcome and action_context_vocab:
+            payload["action_context_vocab_path"] = str(artifact_paths.get("action_context_vocab", ""))
+            payload["num_action_context_classes"] = len(action_context_vocab)
     if policy_weight_stats is not None:
         payload["policy_weight_stats"] = policy_weight_stats
 
@@ -737,7 +771,7 @@ def parse_args() -> argparse.Namespace:
         help="Hidden width for the transition head MLP block.",
     )
     parser.add_argument("--predict-turn-sequence", action="store_true", default=False,
-                        help="Add auxiliary autoregressive sequence head for turn event prediction.")
+                        help="Add auxiliary LSTM sequence head for turn event prediction.")
     parser.add_argument("--sequence-weight", type=float, default=0.1,
                         help="Loss weight for sequence head (default 0.1).")
     parser.add_argument("--sequence-hidden-dim", type=int, default=128,
@@ -1131,6 +1165,7 @@ def main() -> None:
             save_training_model=requires_training_model(args),
             save_action_context_vocab=needs_action_context,
             save_policy_value_model=args.predict_value,
+            save_sequence_vocab=sequence_vocab is not None,
         )
         if args.model_name else
         build_artifact_paths(
@@ -1139,6 +1174,7 @@ def main() -> None:
             save_training_model=requires_training_model(args),
             save_action_context_vocab=needs_action_context,
             save_policy_value_model=args.predict_value,
+            save_sequence_vocab=sequence_vocab is not None,
         )
     )
 
@@ -1153,7 +1189,7 @@ def main() -> None:
     if needs_action_context:
         save_json(artifact_paths["action_context_vocab"], action_context_vocab or {})
     if sequence_vocab is not None:
-        save_json(output_dir / "sequence_vocab.json", sequence_vocab)
+        save_json(artifact_paths["sequence_vocab"], sequence_vocab)
 
     metadata_payload = make_training_metadata(
         args,
@@ -1202,7 +1238,7 @@ def main() -> None:
     if needs_action_context:
         print(f"saved_action_context_vocab={artifact_paths['action_context_vocab']}")
     if sequence_vocab is not None:
-        print(f"saved_sequence_vocab={output_dir / 'sequence_vocab.json'}")
+        print(f"saved_sequence_vocab={artifact_paths['sequence_vocab']}")
 
 
 if __name__ == "__main__":
