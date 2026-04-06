@@ -1,0 +1,2102 @@
+{
+  "accelerock": {
+    "uses": 35,
+    "damage_turns": 26,
+    "damage_turn_rate": 0.7428571428571429,
+    "is_offensive": true
+  },
+  "acidarmor": {
+    "uses": 154,
+    "damage_turns": 14,
+    "damage_turn_rate": 0.09090909090909091,
+    "is_offensive": false
+  },
+  "acrobatics": {
+    "uses": 400,
+    "damage_turns": 270,
+    "damage_turn_rate": 0.675,
+    "is_offensive": true
+  },
+  "aeroblast": {
+    "uses": 219,
+    "damage_turns": 128,
+    "damage_turn_rate": 0.5844748858447488,
+    "is_offensive": true
+  },
+  "agility": {
+    "uses": 132,
+    "damage_turns": 14,
+    "damage_turn_rate": 0.10606060606060606,
+    "is_offensive": false
+  },
+  "airslash": {
+    "uses": 704,
+    "damage_turns": 450,
+    "damage_turn_rate": 0.6392045454545454,
+    "is_offensive": true
+  },
+  "alluringvoice": {
+    "uses": 636,
+    "damage_turns": 437,
+    "damage_turn_rate": 0.6871069182389937,
+    "is_offensive": true
+  },
+  "appleacid": {
+    "uses": 125,
+    "damage_turns": 84,
+    "damage_turn_rate": 0.672,
+    "is_offensive": true
+  },
+  "aquacutter": {
+    "uses": 62,
+    "damage_turns": 38,
+    "damage_turn_rate": 0.6129032258064516,
+    "is_offensive": true
+  },
+  "aquajet": {
+    "uses": 260,
+    "damage_turns": 190,
+    "damage_turn_rate": 0.7307692307692307,
+    "is_offensive": true
+  },
+  "aquastep": {
+    "uses": 104,
+    "damage_turns": 65,
+    "damage_turn_rate": 0.625,
+    "is_offensive": true
+  },
+  "armorcannon": {
+    "uses": 63,
+    "damage_turns": 39,
+    "damage_turn_rate": 0.6190476190476191,
+    "is_offensive": true
+  },
+  "astralbarrage": {
+    "uses": 53,
+    "damage_turns": 30,
+    "damage_turn_rate": 0.5660377358490566,
+    "is_offensive": true
+  },
+  "aurasphere": {
+    "uses": 178,
+    "damage_turns": 110,
+    "damage_turn_rate": 0.6179775280898876,
+    "is_offensive": true
+  },
+  "aurawheel": {
+    "uses": 166,
+    "damage_turns": 98,
+    "damage_turn_rate": 0.5903614457831325,
+    "is_offensive": true
+  },
+  "auroraveil": {
+    "uses": 155,
+    "damage_turns": 12,
+    "damage_turn_rate": 0.07741935483870968,
+    "is_offensive": false
+  },
+  "avalanche": {
+    "uses": 81,
+    "damage_turns": 43,
+    "damage_turn_rate": 0.5308641975308642,
+    "is_offensive": true
+  },
+  "beakblast": {
+    "uses": 93,
+    "damage_turns": 50,
+    "damage_turn_rate": 0.5376344086021505,
+    "is_offensive": true
+  },
+  "beatup": {
+    "uses": 39,
+    "damage_turns": 19,
+    "damage_turn_rate": 0.48717948717948717,
+    "is_offensive": false
+  },
+  "behemothblade": {
+    "uses": 44,
+    "damage_turns": 32,
+    "damage_turn_rate": 0.7272727272727273,
+    "is_offensive": true
+  },
+  "bellydrum": {
+    "uses": 118,
+    "damage_turns": 8,
+    "damage_turn_rate": 0.06779661016949153,
+    "is_offensive": false
+  },
+  "bite": {
+    "uses": 52,
+    "damage_turns": 30,
+    "damage_turn_rate": 0.5769230769230769,
+    "is_offensive": true
+  },
+  "bitterblade": {
+    "uses": 128,
+    "damage_turns": 93,
+    "damage_turn_rate": 0.7265625,
+    "is_offensive": true
+  },
+  "bittermalice": {
+    "uses": 22,
+    "damage_turns": 15,
+    "damage_turn_rate": 0.6818181818181818,
+    "is_offensive": true
+  },
+  "bleakwindstorm": {
+    "uses": 165,
+    "damage_turns": 89,
+    "damage_turn_rate": 0.5393939393939394,
+    "is_offensive": true
+  },
+  "blizzard": {
+    "uses": 176,
+    "damage_turns": 89,
+    "damage_turn_rate": 0.5056818181818182,
+    "is_offensive": true
+  },
+  "bloodmoon": {
+    "uses": 53,
+    "damage_turns": 37,
+    "damage_turn_rate": 0.6981132075471698,
+    "is_offensive": true
+  },
+  "blueflare": {
+    "uses": 54,
+    "damage_turns": 35,
+    "damage_turn_rate": 0.6481481481481481,
+    "is_offensive": true
+  },
+  "bodypress": {
+    "uses": 1892,
+    "damage_turns": 1260,
+    "damage_turn_rate": 0.6659619450317125,
+    "is_offensive": true
+  },
+  "bodyslam": {
+    "uses": 1803,
+    "damage_turns": 1142,
+    "damage_turn_rate": 0.6333887964503605,
+    "is_offensive": true
+  },
+  "boltstrike": {
+    "uses": 88,
+    "damage_turns": 55,
+    "damage_turn_rate": 0.625,
+    "is_offensive": true
+  },
+  "boomburst": {
+    "uses": 300,
+    "damage_turns": 193,
+    "damage_turn_rate": 0.6433333333333333,
+    "is_offensive": true
+  },
+  "bravebird": {
+    "uses": 1611,
+    "damage_turns": 1012,
+    "damage_turn_rate": 0.6281812538795779,
+    "is_offensive": true
+  },
+  "brickbreak": {
+    "uses": 36,
+    "damage_turns": 22,
+    "damage_turn_rate": 0.6111111111111112,
+    "is_offensive": true
+  },
+  "bugbite": {
+    "uses": 30,
+    "damage_turns": 16,
+    "damage_turn_rate": 0.5333333333333333,
+    "is_offensive": true
+  },
+  "bugbuzz": {
+    "uses": 812,
+    "damage_turns": 510,
+    "damage_turn_rate": 0.6280788177339901,
+    "is_offensive": true
+  },
+  "bulkup": {
+    "uses": 1054,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.07400379506641366,
+    "is_offensive": false
+  },
+  "bulletpunch": {
+    "uses": 197,
+    "damage_turns": 143,
+    "damage_turn_rate": 0.7258883248730964,
+    "is_offensive": true
+  },
+  "bulletseed": {
+    "uses": 190,
+    "damage_turns": 130,
+    "damage_turn_rate": 0.6842105263157895,
+    "is_offensive": true
+  },
+  "calmmind": {
+    "uses": 4061,
+    "damage_turns": 260,
+    "damage_turn_rate": 0.06402363949766067,
+    "is_offensive": false
+  },
+  "ceaselessedge": {
+    "uses": 123,
+    "damage_turns": 70,
+    "damage_turn_rate": 0.5691056910569106,
+    "is_offensive": true
+  },
+  "chillyreception": {
+    "uses": 22,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.18181818181818182,
+    "is_offensive": false
+  },
+  "circlethrow": {
+    "uses": 91,
+    "damage_turns": 40,
+    "damage_turn_rate": 0.43956043956043955,
+    "is_offensive": false
+  },
+  "clangingscales": {
+    "uses": 35,
+    "damage_turns": 19,
+    "damage_turn_rate": 0.5428571428571428,
+    "is_offensive": true
+  },
+  "clangoroussoul": {
+    "uses": 28,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.03571428571428571,
+    "is_offensive": false
+  },
+  "clearsmog": {
+    "uses": 15,
+    "damage_turns": 7,
+    "damage_turn_rate": 0.4666666666666667,
+    "is_offensive": false
+  },
+  "closecombat": {
+    "uses": 2889,
+    "damage_turns": 1949,
+    "damage_turn_rate": 0.6746278989269644,
+    "is_offensive": true
+  },
+  "coil": {
+    "uses": 420,
+    "damage_turns": 34,
+    "damage_turn_rate": 0.08095238095238096,
+    "is_offensive": false
+  },
+  "collisioncourse": {
+    "uses": 10,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.4,
+    "is_offensive": false
+  },
+  "cosmicpower": {
+    "uses": 373,
+    "damage_turns": 32,
+    "damage_turn_rate": 0.08579088471849866,
+    "is_offensive": false
+  },
+  "courtchange": {
+    "uses": 6,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.16666666666666666,
+    "is_offensive": false
+  },
+  "crabhammer": {
+    "uses": 84,
+    "damage_turns": 42,
+    "damage_turn_rate": 0.5,
+    "is_offensive": true
+  },
+  "crunch": {
+    "uses": 559,
+    "damage_turns": 340,
+    "damage_turn_rate": 0.6082289803220036,
+    "is_offensive": true
+  },
+  "curse": {
+    "uses": 559,
+    "damage_turns": 76,
+    "damage_turn_rate": 0.13595706618962433,
+    "is_offensive": false
+  },
+  "darkpulse": {
+    "uses": 1072,
+    "damage_turns": 685,
+    "damage_turn_rate": 0.6389925373134329,
+    "is_offensive": true
+  },
+  "dazzlinggleam": {
+    "uses": 853,
+    "damage_turns": 587,
+    "damage_turn_rate": 0.6881594372801876,
+    "is_offensive": true
+  },
+  "defog": {
+    "uses": 189,
+    "damage_turns": 13,
+    "damage_turn_rate": 0.06878306878306878,
+    "is_offensive": false
+  },
+  "destinybond": {
+    "uses": 32,
+    "damage_turns": 16,
+    "damage_turn_rate": 0.5,
+    "is_offensive": true
+  },
+  "diamondstorm": {
+    "uses": 117,
+    "damage_turns": 60,
+    "damage_turn_rate": 0.5128205128205128,
+    "is_offensive": true
+  },
+  "direclaw": {
+    "uses": 54,
+    "damage_turns": 33,
+    "damage_turn_rate": 0.6111111111111112,
+    "is_offensive": true
+  },
+  "disable": {
+    "uses": 16,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.0625,
+    "is_offensive": false
+  },
+  "discharge": {
+    "uses": 454,
+    "damage_turns": 278,
+    "damage_turn_rate": 0.6123348017621145,
+    "is_offensive": true
+  },
+  "double-edge": {
+    "uses": 735,
+    "damage_turns": 469,
+    "damage_turn_rate": 0.638095238095238,
+    "is_offensive": true
+  },
+  "doubleshock": {
+    "uses": 61,
+    "damage_turns": 29,
+    "damage_turn_rate": 0.47540983606557374,
+    "is_offensive": false
+  },
+  "dracometeor": {
+    "uses": 984,
+    "damage_turns": 583,
+    "damage_turn_rate": 0.592479674796748,
+    "is_offensive": true
+  },
+  "dragonascent": {
+    "uses": 59,
+    "damage_turns": 38,
+    "damage_turn_rate": 0.6440677966101694,
+    "is_offensive": true
+  },
+  "dragonclaw": {
+    "uses": 38,
+    "damage_turns": 21,
+    "damage_turn_rate": 0.5526315789473685,
+    "is_offensive": true
+  },
+  "dragondance": {
+    "uses": 1550,
+    "damage_turns": 194,
+    "damage_turn_rate": 0.12516129032258064,
+    "is_offensive": false
+  },
+  "dragondarts": {
+    "uses": 69,
+    "damage_turns": 47,
+    "damage_turn_rate": 0.6811594202898551,
+    "is_offensive": true
+  },
+  "dragonenergy": {
+    "uses": 41,
+    "damage_turns": 28,
+    "damage_turn_rate": 0.6829268292682927,
+    "is_offensive": true
+  },
+  "dragonpulse": {
+    "uses": 342,
+    "damage_turns": 210,
+    "damage_turn_rate": 0.6140350877192983,
+    "is_offensive": true
+  },
+  "dragontail": {
+    "uses": 432,
+    "damage_turns": 233,
+    "damage_turn_rate": 0.5393518518518519,
+    "is_offensive": true
+  },
+  "drainingkiss": {
+    "uses": 606,
+    "damage_turns": 437,
+    "damage_turn_rate": 0.7211221122112211,
+    "is_offensive": true
+  },
+  "drainpunch": {
+    "uses": 1078,
+    "damage_turns": 693,
+    "damage_turn_rate": 0.6428571428571429,
+    "is_offensive": true
+  },
+  "drillrun": {
+    "uses": 71,
+    "damage_turns": 31,
+    "damage_turn_rate": 0.43661971830985913,
+    "is_offensive": false
+  },
+  "dualwingbeat": {
+    "uses": 194,
+    "damage_turns": 117,
+    "damage_turn_rate": 0.6030927835051546,
+    "is_offensive": true
+  },
+  "dynamaxcannon": {
+    "uses": 105,
+    "damage_turns": 70,
+    "damage_turn_rate": 0.6666666666666666,
+    "is_offensive": true
+  },
+  "dynamicpunch": {
+    "uses": 40,
+    "damage_turns": 20,
+    "damage_turn_rate": 0.5,
+    "is_offensive": true
+  },
+  "earthpower": {
+    "uses": 1036,
+    "damage_turns": 634,
+    "damage_turn_rate": 0.611969111969112,
+    "is_offensive": true
+  },
+  "earthquake": {
+    "uses": 5286,
+    "damage_turns": 3369,
+    "damage_turn_rate": 0.6373439273552781,
+    "is_offensive": true
+  },
+  "electrodrift": {
+    "uses": 85,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.6705882352941176,
+    "is_offensive": true
+  },
+  "encore": {
+    "uses": 1049,
+    "damage_turns": 104,
+    "damage_turn_rate": 0.09914204003813155,
+    "is_offensive": false
+  },
+  "endeavor": {
+    "uses": 99,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.45454545454545453,
+    "is_offensive": false
+  },
+  "energyball": {
+    "uses": 300,
+    "damage_turns": 206,
+    "damage_turn_rate": 0.6866666666666666,
+    "is_offensive": true
+  },
+  "eruption": {
+    "uses": 88,
+    "damage_turns": 50,
+    "damage_turn_rate": 0.5681818181818182,
+    "is_offensive": true
+  },
+  "esperwing": {
+    "uses": 58,
+    "damage_turns": 28,
+    "damage_turn_rate": 0.4827586206896552,
+    "is_offensive": false
+  },
+  "expandingforce": {
+    "uses": 51,
+    "damage_turns": 31,
+    "damage_turn_rate": 0.6078431372549019,
+    "is_offensive": true
+  },
+  "explosion": {
+    "uses": 47,
+    "damage_turns": 22,
+    "damage_turn_rate": 0.46808510638297873,
+    "is_offensive": false
+  },
+  "extremespeed": {
+    "uses": 233,
+    "damage_turns": 165,
+    "damage_turn_rate": 0.7081545064377682,
+    "is_offensive": true
+  },
+  "facade": {
+    "uses": 483,
+    "damage_turns": 316,
+    "damage_turn_rate": 0.6542443064182195,
+    "is_offensive": true
+  },
+  "fakeout": {
+    "uses": 317,
+    "damage_turns": 169,
+    "damage_turn_rate": 0.5331230283911672,
+    "is_offensive": true
+  },
+  "ficklebeam": {
+    "uses": 143,
+    "damage_turns": 95,
+    "damage_turn_rate": 0.6643356643356644,
+    "is_offensive": true
+  },
+  "fierydance": {
+    "uses": 129,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.6046511627906976,
+    "is_offensive": true
+  },
+  "fierywrath": {
+    "uses": 84,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.6428571428571429,
+    "is_offensive": true
+  },
+  "filletaway": {
+    "uses": 14,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.07142857142857142,
+    "is_offensive": false
+  },
+  "fireblast": {
+    "uses": 1342,
+    "damage_turns": 720,
+    "damage_turn_rate": 0.5365126676602087,
+    "is_offensive": true
+  },
+  "firefang": {
+    "uses": 7,
+    "damage_turns": 3,
+    "damage_turn_rate": 0.42857142857142855,
+    "is_offensive": false
+  },
+  "firepunch": {
+    "uses": 49,
+    "damage_turns": 25,
+    "damage_turn_rate": 0.5102040816326531,
+    "is_offensive": true
+  },
+  "firstimpression": {
+    "uses": 120,
+    "damage_turns": 64,
+    "damage_turn_rate": 0.5333333333333333,
+    "is_offensive": true
+  },
+  "flamecharge": {
+    "uses": 127,
+    "damage_turns": 77,
+    "damage_turn_rate": 0.6062992125984252,
+    "is_offensive": true
+  },
+  "flamethrower": {
+    "uses": 502,
+    "damage_turns": 348,
+    "damage_turn_rate": 0.6932270916334662,
+    "is_offensive": true
+  },
+  "flareblitz": {
+    "uses": 685,
+    "damage_turns": 457,
+    "damage_turn_rate": 0.6671532846715329,
+    "is_offensive": true
+  },
+  "flashcannon": {
+    "uses": 423,
+    "damage_turns": 253,
+    "damage_turn_rate": 0.5981087470449172,
+    "is_offensive": true
+  },
+  "fleurcannon": {
+    "uses": 74,
+    "damage_turns": 39,
+    "damage_turn_rate": 0.527027027027027,
+    "is_offensive": true
+  },
+  "flipturn": {
+    "uses": 825,
+    "damage_turns": 346,
+    "damage_turn_rate": 0.4193939393939394,
+    "is_offensive": false
+  },
+  "flowertrick": {
+    "uses": 77,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.7012987012987013,
+    "is_offensive": true
+  },
+  "focusblast": {
+    "uses": 757,
+    "damage_turns": 372,
+    "damage_turn_rate": 0.4914134742404227,
+    "is_offensive": false
+  },
+  "focuspunch": {
+    "uses": 18,
+    "damage_turns": 10,
+    "damage_turn_rate": 0.5555555555555556,
+    "is_offensive": false
+  },
+  "foulplay": {
+    "uses": 659,
+    "damage_turns": 431,
+    "damage_turn_rate": 0.65402124430956,
+    "is_offensive": true
+  },
+  "freeze-dry": {
+    "uses": 874,
+    "damage_turns": 573,
+    "damage_turn_rate": 0.6556064073226545,
+    "is_offensive": true
+  },
+  "freezingglare": {
+    "uses": 110,
+    "damage_turns": 69,
+    "damage_turn_rate": 0.6272727272727273,
+    "is_offensive": true
+  },
+  "fusionbolt": {
+    "uses": 7,
+    "damage_turns": 3,
+    "damage_turn_rate": 0.42857142857142855,
+    "is_offensive": false
+  },
+  "fusionflare": {
+    "uses": 11,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.36363636363636365,
+    "is_offensive": false
+  },
+  "futuresight": {
+    "uses": 94,
+    "damage_turns": 13,
+    "damage_turn_rate": 0.13829787234042554,
+    "is_offensive": false
+  },
+  "gigadrain": {
+    "uses": 1242,
+    "damage_turns": 838,
+    "damage_turn_rate": 0.6747181964573269,
+    "is_offensive": true
+  },
+  "gigaimpact": {
+    "uses": 80,
+    "damage_turns": 51,
+    "damage_turn_rate": 0.6375,
+    "is_offensive": true
+  },
+  "gigatonhammer": {
+    "uses": 90,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.6,
+    "is_offensive": true
+  },
+  "glaciallance": {
+    "uses": 40,
+    "damage_turns": 25,
+    "damage_turn_rate": 0.625,
+    "is_offensive": true
+  },
+  "glaiverush": {
+    "uses": 20,
+    "damage_turns": 14,
+    "damage_turn_rate": 0.7,
+    "is_offensive": true
+  },
+  "glare": {
+    "uses": 218,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.01834862385321101,
+    "is_offensive": false
+  },
+  "grassknot": {
+    "uses": 170,
+    "damage_turns": 107,
+    "damage_turn_rate": 0.6294117647058823,
+    "is_offensive": true
+  },
+  "grassyglide": {
+    "uses": 76,
+    "damage_turns": 53,
+    "damage_turn_rate": 0.6973684210526315,
+    "is_offensive": true
+  },
+  "gravapple": {
+    "uses": 67,
+    "damage_turns": 30,
+    "damage_turn_rate": 0.44776119402985076,
+    "is_offensive": false
+  },
+  "gunkshot": {
+    "uses": 1195,
+    "damage_turns": 596,
+    "damage_turn_rate": 0.49874476987447697,
+    "is_offensive": false
+  },
+  "haze": {
+    "uses": 285,
+    "damage_turns": 46,
+    "damage_turn_rate": 0.16140350877192983,
+    "is_offensive": false
+  },
+  "headbutt": {
+    "uses": 156,
+    "damage_turns": 99,
+    "damage_turn_rate": 0.6346153846153846,
+    "is_offensive": true
+  },
+  "headlongrush": {
+    "uses": 99,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.5757575757575758,
+    "is_offensive": true
+  },
+  "headsmash": {
+    "uses": 210,
+    "damage_turns": 113,
+    "damage_turn_rate": 0.5380952380952381,
+    "is_offensive": true
+  },
+  "healbell": {
+    "uses": 41,
+    "damage_turns": 2,
+    "damage_turn_rate": 0.04878048780487805,
+    "is_offensive": false
+  },
+  "healingwish": {
+    "uses": 9,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "is_offensive": false
+  },
+  "heatcrash": {
+    "uses": 297,
+    "damage_turns": 193,
+    "damage_turn_rate": 0.6498316498316499,
+    "is_offensive": true
+  },
+  "heatwave": {
+    "uses": 107,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.5327102803738317,
+    "is_offensive": true
+  },
+  "heavyslam": {
+    "uses": 524,
+    "damage_turns": 314,
+    "damage_turn_rate": 0.5992366412213741,
+    "is_offensive": true
+  },
+  "hex": {
+    "uses": 61,
+    "damage_turns": 51,
+    "damage_turn_rate": 0.8360655737704918,
+    "is_offensive": true
+  },
+  "highhorsepower": {
+    "uses": 310,
+    "damage_turns": 178,
+    "damage_turn_rate": 0.5741935483870968,
+    "is_offensive": true
+  },
+  "highjumpkick": {
+    "uses": 209,
+    "damage_turns": 135,
+    "damage_turn_rate": 0.645933014354067,
+    "is_offensive": true
+  },
+  "hornleech": {
+    "uses": 322,
+    "damage_turns": 208,
+    "damage_turn_rate": 0.6459627329192547,
+    "is_offensive": true
+  },
+  "hurricane": {
+    "uses": 1461,
+    "damage_turns": 715,
+    "damage_turn_rate": 0.4893908281998631,
+    "is_offensive": false
+  },
+  "hydropump": {
+    "uses": 1464,
+    "damage_turns": 775,
+    "damage_turn_rate": 0.5293715846994536,
+    "is_offensive": true
+  },
+  "hydrosteam": {
+    "uses": 42,
+    "damage_turns": 28,
+    "damage_turn_rate": 0.6666666666666666,
+    "is_offensive": true
+  },
+  "hyperspacefury": {
+    "uses": 54,
+    "damage_turns": 36,
+    "damage_turn_rate": 0.6666666666666666,
+    "is_offensive": true
+  },
+  "hypervoice": {
+    "uses": 889,
+    "damage_turns": 570,
+    "damage_turn_rate": 0.641169853768279,
+    "is_offensive": true
+  },
+  "hypnosis": {
+    "uses": 105,
+    "damage_turns": 18,
+    "damage_turn_rate": 0.17142857142857143,
+    "is_offensive": false
+  },
+  "icebeam": {
+    "uses": 1570,
+    "damage_turns": 975,
+    "damage_turn_rate": 0.6210191082802548,
+    "is_offensive": true
+  },
+  "icefang": {
+    "uses": 17,
+    "damage_turns": 11,
+    "damage_turn_rate": 0.6470588235294118,
+    "is_offensive": false
+  },
+  "icehammer": {
+    "uses": 61,
+    "damage_turns": 35,
+    "damage_turn_rate": 0.5737704918032787,
+    "is_offensive": true
+  },
+  "icepunch": {
+    "uses": 330,
+    "damage_turns": 194,
+    "damage_turn_rate": 0.5878787878787879,
+    "is_offensive": true
+  },
+  "iceshard": {
+    "uses": 350,
+    "damage_turns": 235,
+    "damage_turn_rate": 0.6714285714285714,
+    "is_offensive": true
+  },
+  "icespinner": {
+    "uses": 228,
+    "damage_turns": 145,
+    "damage_turn_rate": 0.6359649122807017,
+    "is_offensive": true
+  },
+  "iciclecrash": {
+    "uses": 465,
+    "damage_turns": 271,
+    "damage_turn_rate": 0.5827956989247312,
+    "is_offensive": true
+  },
+  "iciclespear": {
+    "uses": 170,
+    "damage_turns": 124,
+    "damage_turn_rate": 0.7294117647058823,
+    "is_offensive": true
+  },
+  "irondefense": {
+    "uses": 896,
+    "damage_turns": 87,
+    "damage_turn_rate": 0.09709821428571429,
+    "is_offensive": false
+  },
+  "ironhead": {
+    "uses": 1476,
+    "damage_turns": 967,
+    "damage_turn_rate": 0.6551490514905149,
+    "is_offensive": true
+  },
+  "irontail": {
+    "uses": 31,
+    "damage_turns": 20,
+    "damage_turn_rate": 0.6451612903225806,
+    "is_offensive": true
+  },
+  "ivycudgel": {
+    "uses": 186,
+    "damage_turns": 129,
+    "damage_turn_rate": 0.6935483870967742,
+    "is_offensive": true
+  },
+  "jetpunch": {
+    "uses": 112,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.6964285714285714,
+    "is_offensive": true
+  },
+  "judgment": {
+    "uses": 272,
+    "damage_turns": 200,
+    "damage_turn_rate": 0.7352941176470589,
+    "is_offensive": true
+  },
+  "knockoff": {
+    "uses": 6262,
+    "damage_turns": 3404,
+    "damage_turn_rate": 0.5435962951133823,
+    "is_offensive": true
+  },
+  "kowtowcleave": {
+    "uses": 69,
+    "damage_turns": 41,
+    "damage_turn_rate": 0.5942028985507246,
+    "is_offensive": true
+  },
+  "lashout": {
+    "uses": 66,
+    "damage_turns": 34,
+    "damage_turn_rate": 0.5151515151515151,
+    "is_offensive": true
+  },
+  "lavaplume": {
+    "uses": 242,
+    "damage_turns": 131,
+    "damage_turn_rate": 0.5413223140495868,
+    "is_offensive": true
+  },
+  "leafblade": {
+    "uses": 417,
+    "damage_turns": 270,
+    "damage_turn_rate": 0.6474820143884892,
+    "is_offensive": true
+  },
+  "leafstorm": {
+    "uses": 363,
+    "damage_turns": 202,
+    "damage_turn_rate": 0.5564738292011019,
+    "is_offensive": true
+  },
+  "leechlife": {
+    "uses": 184,
+    "damage_turns": 115,
+    "damage_turn_rate": 0.625,
+    "is_offensive": true
+  },
+  "leechseed": {
+    "uses": 1074,
+    "damage_turns": 501,
+    "damage_turn_rate": 0.4664804469273743,
+    "is_offensive": false
+  },
+  "lightscreen": {
+    "uses": 50,
+    "damage_turns": 6,
+    "damage_turn_rate": 0.12,
+    "is_offensive": false
+  },
+  "liquidation": {
+    "uses": 939,
+    "damage_turns": 605,
+    "damage_turn_rate": 0.6443024494142705,
+    "is_offensive": true
+  },
+  "lowkick": {
+    "uses": 112,
+    "damage_turns": 77,
+    "damage_turn_rate": 0.6875,
+    "is_offensive": true
+  },
+  "luminacrash": {
+    "uses": 69,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6521739130434783,
+    "is_offensive": true
+  },
+  "lunge": {
+    "uses": 140,
+    "damage_turns": 88,
+    "damage_turn_rate": 0.6285714285714286,
+    "is_offensive": true
+  },
+  "lusterpurge": {
+    "uses": 55,
+    "damage_turns": 37,
+    "damage_turn_rate": 0.6727272727272727,
+    "is_offensive": true
+  },
+  "machpunch": {
+    "uses": 260,
+    "damage_turns": 182,
+    "damage_turn_rate": 0.7,
+    "is_offensive": true
+  },
+  "magmastorm": {
+    "uses": 44,
+    "damage_turns": 24,
+    "damage_turn_rate": 0.5454545454545454,
+    "is_offensive": true
+  },
+  "magnetrise": {
+    "uses": 19,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.05263157894736842,
+    "is_offensive": false
+  },
+  "makeitrain": {
+    "uses": 51,
+    "damage_turns": 31,
+    "damage_turn_rate": 0.6078431372549019,
+    "is_offensive": true
+  },
+  "malignantchain": {
+    "uses": 133,
+    "damage_turns": 69,
+    "damage_turn_rate": 0.518796992481203,
+    "is_offensive": true
+  },
+  "matchagotcha": {
+    "uses": 138,
+    "damage_turns": 83,
+    "damage_turn_rate": 0.6014492753623188,
+    "is_offensive": true
+  },
+  "megahorn": {
+    "uses": 217,
+    "damage_turns": 128,
+    "damage_turn_rate": 0.5898617511520737,
+    "is_offensive": true
+  },
+  "meteorbeam": {
+    "uses": 136,
+    "damage_turns": 63,
+    "damage_turn_rate": 0.4632352941176471,
+    "is_offensive": false
+  },
+  "meteormash": {
+    "uses": 55,
+    "damage_turns": 30,
+    "damage_turn_rate": 0.5454545454545454,
+    "is_offensive": true
+  },
+  "mightycleave": {
+    "uses": 65,
+    "damage_turns": 49,
+    "damage_turn_rate": 0.7538461538461538,
+    "is_offensive": true
+  },
+  "milkdrink": {
+    "uses": 105,
+    "damage_turns": 15,
+    "damage_turn_rate": 0.14285714285714285,
+    "is_offensive": false
+  },
+  "mirrorcoat": {
+    "uses": 12,
+    "damage_turns": 5,
+    "damage_turn_rate": 0.4166666666666667,
+    "is_offensive": false
+  },
+  "moonblast": {
+    "uses": 1597,
+    "damage_turns": 1033,
+    "damage_turn_rate": 0.6468378209142142,
+    "is_offensive": true
+  },
+  "moongeistbeam": {
+    "uses": 165,
+    "damage_turns": 107,
+    "damage_turn_rate": 0.6484848484848484,
+    "is_offensive": true
+  },
+  "moonlight": {
+    "uses": 333,
+    "damage_turns": 43,
+    "damage_turn_rate": 0.12912912912912913,
+    "is_offensive": false
+  },
+  "morningsun": {
+    "uses": 186,
+    "damage_turns": 41,
+    "damage_turn_rate": 0.22043010752688172,
+    "is_offensive": false
+  },
+  "mortalspin": {
+    "uses": 7,
+    "damage_turns": 3,
+    "damage_turn_rate": 0.42857142857142855,
+    "is_offensive": false
+  },
+  "muddywater": {
+    "uses": 118,
+    "damage_turns": 68,
+    "damage_turn_rate": 0.576271186440678,
+    "is_offensive": true
+  },
+  "mudshot": {
+    "uses": 70,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6428571428571429,
+    "is_offensive": true
+  },
+  "mysticalfire": {
+    "uses": 238,
+    "damage_turns": 148,
+    "damage_turn_rate": 0.6218487394957983,
+    "is_offensive": true
+  },
+  "nastyplot": {
+    "uses": 1314,
+    "damage_turns": 99,
+    "damage_turn_rate": 0.07534246575342465,
+    "is_offensive": false
+  },
+  "nightshade": {
+    "uses": 88,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.6477272727272727,
+    "is_offensive": true
+  },
+  "nightslash": {
+    "uses": 79,
+    "damage_turns": 52,
+    "damage_turn_rate": 0.6582278481012658,
+    "is_offensive": true
+  },
+  "noretreat": {
+    "uses": 67,
+    "damage_turns": 12,
+    "damage_turn_rate": 0.1791044776119403,
+    "is_offensive": false
+  },
+  "nuzzle": {
+    "uses": 237,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.3291139240506329,
+    "is_offensive": false
+  },
+  "originpulse": {
+    "uses": 84,
+    "damage_turns": 53,
+    "damage_turn_rate": 0.6309523809523809,
+    "is_offensive": true
+  },
+  "outrage": {
+    "uses": 869,
+    "damage_turns": 536,
+    "damage_turn_rate": 0.616800920598389,
+    "is_offensive": true
+  },
+  "overdrive": {
+    "uses": 62,
+    "damage_turns": 40,
+    "damage_turn_rate": 0.6451612903225806,
+    "is_offensive": true
+  },
+  "overheat": {
+    "uses": 290,
+    "damage_turns": 163,
+    "damage_turn_rate": 0.5620689655172414,
+    "is_offensive": true
+  },
+  "painsplit": {
+    "uses": 141,
+    "damage_turns": 49,
+    "damage_turn_rate": 0.3475177304964539,
+    "is_offensive": false
+  },
+  "partingshot": {
+    "uses": 282,
+    "damage_turns": 31,
+    "damage_turn_rate": 0.1099290780141844,
+    "is_offensive": false
+  },
+  "payback": {
+    "uses": 28,
+    "damage_turns": 20,
+    "damage_turn_rate": 0.7142857142857143,
+    "is_offensive": true
+  },
+  "petalblizzard": {
+    "uses": 30,
+    "damage_turns": 18,
+    "damage_turn_rate": 0.6,
+    "is_offensive": true
+  },
+  "petaldance": {
+    "uses": 13,
+    "damage_turns": 9,
+    "damage_turn_rate": 0.6923076923076923,
+    "is_offensive": false
+  },
+  "photongeyser": {
+    "uses": 61,
+    "damage_turns": 38,
+    "damage_turn_rate": 0.6229508196721312,
+    "is_offensive": true
+  },
+  "playrough": {
+    "uses": 1245,
+    "damage_turns": 713,
+    "damage_turn_rate": 0.5726907630522088,
+    "is_offensive": true
+  },
+  "poisonfang": {
+    "uses": 37,
+    "damage_turns": 15,
+    "damage_turn_rate": 0.40540540540540543,
+    "is_offensive": false
+  },
+  "poisonjab": {
+    "uses": 371,
+    "damage_turns": 221,
+    "damage_turn_rate": 0.5956873315363881,
+    "is_offensive": true
+  },
+  "pollenpuff": {
+    "uses": 20,
+    "damage_turns": 13,
+    "damage_turn_rate": 0.65,
+    "is_offensive": true
+  },
+  "poltergeist": {
+    "uses": 1044,
+    "damage_turns": 551,
+    "damage_turn_rate": 0.5277777777777778,
+    "is_offensive": true
+  },
+  "populationbomb": {
+    "uses": 228,
+    "damage_turns": 170,
+    "damage_turn_rate": 0.7456140350877193,
+    "is_offensive": true
+  },
+  "pounce": {
+    "uses": 84,
+    "damage_turns": 56,
+    "damage_turn_rate": 0.6666666666666666,
+    "is_offensive": true
+  },
+  "powergem": {
+    "uses": 150,
+    "damage_turns": 93,
+    "damage_turn_rate": 0.62,
+    "is_offensive": true
+  },
+  "powertrip": {
+    "uses": 22,
+    "damage_turns": 14,
+    "damage_turn_rate": 0.6363636363636364,
+    "is_offensive": true
+  },
+  "powerwhip": {
+    "uses": 350,
+    "damage_turns": 192,
+    "damage_turn_rate": 0.5485714285714286,
+    "is_offensive": true
+  },
+  "precipiceblades": {
+    "uses": 90,
+    "damage_turns": 51,
+    "damage_turn_rate": 0.5666666666666667,
+    "is_offensive": true
+  },
+  "protect": {
+    "uses": 2537,
+    "damage_turns": 692,
+    "damage_turn_rate": 0.272763106030745,
+    "is_offensive": false
+  },
+  "psyblade": {
+    "uses": 47,
+    "damage_turns": 32,
+    "damage_turn_rate": 0.6808510638297872,
+    "is_offensive": true
+  },
+  "psychic": {
+    "uses": 884,
+    "damage_turns": 561,
+    "damage_turn_rate": 0.6346153846153846,
+    "is_offensive": true
+  },
+  "psychicfangs": {
+    "uses": 244,
+    "damage_turns": 169,
+    "damage_turn_rate": 0.6926229508196722,
+    "is_offensive": true
+  },
+  "psychicnoise": {
+    "uses": 1182,
+    "damage_turns": 830,
+    "damage_turn_rate": 0.7021996615905245,
+    "is_offensive": true
+  },
+  "psychoboost": {
+    "uses": 95,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.6,
+    "is_offensive": true
+  },
+  "psychocut": {
+    "uses": 143,
+    "damage_turns": 99,
+    "damage_turn_rate": 0.6923076923076923,
+    "is_offensive": true
+  },
+  "psyshock": {
+    "uses": 1243,
+    "damage_turns": 791,
+    "damage_turn_rate": 0.6363636363636364,
+    "is_offensive": true
+  },
+  "psystrike": {
+    "uses": 111,
+    "damage_turns": 75,
+    "damage_turn_rate": 0.6756756756756757,
+    "is_offensive": true
+  },
+  "pyroball": {
+    "uses": 100,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.54,
+    "is_offensive": true
+  },
+  "quickattack": {
+    "uses": 124,
+    "damage_turns": 82,
+    "damage_turn_rate": 0.6612903225806451,
+    "is_offensive": true
+  },
+  "quiverdance": {
+    "uses": 1163,
+    "damage_turns": 88,
+    "damage_turn_rate": 0.07566638005159071,
+    "is_offensive": false
+  },
+  "ragefist": {
+    "uses": 70,
+    "damage_turns": 55,
+    "damage_turn_rate": 0.7857142857142857,
+    "is_offensive": true
+  },
+  "ragingbull": {
+    "uses": 26,
+    "damage_turns": 17,
+    "damage_turn_rate": 0.6538461538461539,
+    "is_offensive": true
+  },
+  "raindance": {
+    "uses": 87,
+    "damage_turns": 6,
+    "damage_turn_rate": 0.06896551724137931,
+    "is_offensive": false
+  },
+  "rapidspin": {
+    "uses": 876,
+    "damage_turns": 458,
+    "damage_turn_rate": 0.5228310502283106,
+    "is_offensive": true
+  },
+  "razorshell": {
+    "uses": 24,
+    "damage_turns": 12,
+    "damage_turn_rate": 0.5,
+    "is_offensive": true
+  },
+  "recover": {
+    "uses": 2283,
+    "damage_turns": 457,
+    "damage_turn_rate": 0.20017520805957073,
+    "is_offensive": false
+  },
+  "reflect": {
+    "uses": 66,
+    "damage_turns": 12,
+    "damage_turn_rate": 0.18181818181818182,
+    "is_offensive": false
+  },
+  "relicsong": {
+    "uses": 30,
+    "damage_turns": 18,
+    "damage_turn_rate": 0.6,
+    "is_offensive": true
+  },
+  "rest": {
+    "uses": 654,
+    "damage_turns": 112,
+    "damage_turn_rate": 0.1712538226299694,
+    "is_offensive": false
+  },
+  "revelationdance": {
+    "uses": 263,
+    "damage_turns": 171,
+    "damage_turn_rate": 0.6501901140684411,
+    "is_offensive": true
+  },
+  "revivalblessing": {
+    "uses": 100,
+    "damage_turns": 10,
+    "damage_turn_rate": 0.1,
+    "is_offensive": false
+  },
+  "roar": {
+    "uses": 229,
+    "damage_turns": 21,
+    "damage_turn_rate": 0.09170305676855896,
+    "is_offensive": false
+  },
+  "rockblast": {
+    "uses": 123,
+    "damage_turns": 76,
+    "damage_turn_rate": 0.6178861788617886,
+    "is_offensive": true
+  },
+  "rockpolish": {
+    "uses": 127,
+    "damage_turns": 17,
+    "damage_turn_rate": 0.13385826771653545,
+    "is_offensive": false
+  },
+  "rockslide": {
+    "uses": 158,
+    "damage_turns": 84,
+    "damage_turn_rate": 0.5316455696202531,
+    "is_offensive": true
+  },
+  "rocktomb": {
+    "uses": 33,
+    "damage_turns": 24,
+    "damage_turn_rate": 0.7272727272727273,
+    "is_offensive": true
+  },
+  "roost": {
+    "uses": 1572,
+    "damage_turns": 230,
+    "damage_turn_rate": 0.14631043256997456,
+    "is_offensive": false
+  },
+  "ruination": {
+    "uses": 74,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6081081081081081,
+    "is_offensive": true
+  },
+  "sacredfire": {
+    "uses": 263,
+    "damage_turns": 148,
+    "damage_turn_rate": 0.5627376425855514,
+    "is_offensive": true
+  },
+  "sacredsword": {
+    "uses": 126,
+    "damage_turns": 81,
+    "damage_turn_rate": 0.6428571428571429,
+    "is_offensive": true
+  },
+  "saltcure": {
+    "uses": 288,
+    "damage_turns": 157,
+    "damage_turn_rate": 0.5451388888888888,
+    "is_offensive": true
+  },
+  "scald": {
+    "uses": 1792,
+    "damage_turns": 1100,
+    "damage_turn_rate": 0.6138392857142857,
+    "is_offensive": true
+  },
+  "scaleshot": {
+    "uses": 291,
+    "damage_turns": 183,
+    "damage_turn_rate": 0.6288659793814433,
+    "is_offensive": true
+  },
+  "scorchingsands": {
+    "uses": 104,
+    "damage_turns": 58,
+    "damage_turn_rate": 0.5576923076923077,
+    "is_offensive": true
+  },
+  "secretsword": {
+    "uses": 137,
+    "damage_turns": 76,
+    "damage_turn_rate": 0.5547445255474452,
+    "is_offensive": true
+  },
+  "seedbomb": {
+    "uses": 99,
+    "damage_turns": 58,
+    "damage_turn_rate": 0.5858585858585859,
+    "is_offensive": true
+  },
+  "seedflare": {
+    "uses": 181,
+    "damage_turns": 100,
+    "damage_turn_rate": 0.5524861878453039,
+    "is_offensive": true
+  },
+  "seismictoss": {
+    "uses": 652,
+    "damage_turns": 417,
+    "damage_turn_rate": 0.6395705521472392,
+    "is_offensive": true
+  },
+  "shadowball": {
+    "uses": 1914,
+    "damage_turns": 1232,
+    "damage_turn_rate": 0.6436781609195402,
+    "is_offensive": true
+  },
+  "shadowclaw": {
+    "uses": 52,
+    "damage_turns": 29,
+    "damage_turn_rate": 0.5576923076923077,
+    "is_offensive": true
+  },
+  "shadowsneak": {
+    "uses": 411,
+    "damage_turns": 283,
+    "damage_turn_rate": 0.6885644768856448,
+    "is_offensive": true
+  },
+  "shedtail": {
+    "uses": 103,
+    "damage_turns": 11,
+    "damage_turn_rate": 0.10679611650485436,
+    "is_offensive": false
+  },
+  "shellsidearm": {
+    "uses": 92,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.5869565217391305,
+    "is_offensive": true
+  },
+  "shellsmash": {
+    "uses": 533,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.10694183864915573,
+    "is_offensive": false
+  },
+  "shiftgear": {
+    "uses": 158,
+    "damage_turns": 7,
+    "damage_turn_rate": 0.04430379746835443,
+    "is_offensive": false
+  },
+  "shoreup": {
+    "uses": 45,
+    "damage_turns": 9,
+    "damage_turn_rate": 0.2,
+    "is_offensive": false
+  },
+  "slackoff": {
+    "uses": 351,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.2222222222222222,
+    "is_offensive": false
+  },
+  "sleeppowder": {
+    "uses": 565,
+    "damage_turns": 33,
+    "damage_turn_rate": 0.0584070796460177,
+    "is_offensive": false
+  },
+  "sleeptalk": {
+    "uses": 648,
+    "damage_turns": 224,
+    "damage_turn_rate": 0.345679012345679,
+    "is_offensive": false
+  },
+  "sludgebomb": {
+    "uses": 1079,
+    "damage_turns": 668,
+    "damage_turn_rate": 0.6190917516218721,
+    "is_offensive": true
+  },
+  "sludgewave": {
+    "uses": 594,
+    "damage_turns": 356,
+    "damage_turn_rate": 0.5993265993265994,
+    "is_offensive": true
+  },
+  "snowscape": {
+    "uses": 29,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.034482758620689655,
+    "is_offensive": false
+  },
+  "soft-boiled": {
+    "uses": 191,
+    "damage_turns": 22,
+    "damage_turn_rate": 0.11518324607329843,
+    "is_offensive": false
+  },
+  "solarbeam": {
+    "uses": 99,
+    "damage_turns": 63,
+    "damage_turn_rate": 0.6363636363636364,
+    "is_offensive": true
+  },
+  "spacialrend": {
+    "uses": 88,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.6136363636363636,
+    "is_offensive": true
+  },
+  "sparklingaria": {
+    "uses": 116,
+    "damage_turns": 72,
+    "damage_turn_rate": 0.6206896551724138,
+    "is_offensive": true
+  },
+  "spikes": {
+    "uses": 997,
+    "damage_turns": 115,
+    "damage_turn_rate": 0.11534603811434303,
+    "is_offensive": false
+  },
+  "spiritbreak": {
+    "uses": 150,
+    "damage_turns": 100,
+    "damage_turn_rate": 0.6666666666666666,
+    "is_offensive": true
+  },
+  "spiritshackle": {
+    "uses": 22,
+    "damage_turns": 16,
+    "damage_turn_rate": 0.7272727272727273,
+    "is_offensive": true
+  },
+  "spore": {
+    "uses": 328,
+    "damage_turns": 19,
+    "damage_turn_rate": 0.057926829268292686,
+    "is_offensive": false
+  },
+  "stealthrock": {
+    "uses": 1345,
+    "damage_turns": 91,
+    "damage_turn_rate": 0.06765799256505577,
+    "is_offensive": false
+  },
+  "steameruption": {
+    "uses": 107,
+    "damage_turns": 64,
+    "damage_turn_rate": 0.5981308411214953,
+    "is_offensive": true
+  },
+  "stickyweb": {
+    "uses": 709,
+    "damage_turns": 58,
+    "damage_turn_rate": 0.08180535966149506,
+    "is_offensive": false
+  },
+  "stompingtantrum": {
+    "uses": 185,
+    "damage_turns": 103,
+    "damage_turn_rate": 0.5567567567567567,
+    "is_offensive": true
+  },
+  "stoneaxe": {
+    "uses": 94,
+    "damage_turns": 52,
+    "damage_turn_rate": 0.5531914893617021,
+    "is_offensive": true
+  },
+  "stoneedge": {
+    "uses": 1255,
+    "damage_turns": 643,
+    "damage_turn_rate": 0.5123505976095617,
+    "is_offensive": true
+  },
+  "storedpower": {
+    "uses": 343,
+    "damage_turns": 218,
+    "damage_turn_rate": 0.6355685131195336,
+    "is_offensive": true
+  },
+  "strangesteam": {
+    "uses": 67,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6716417910447762,
+    "is_offensive": true
+  },
+  "strengthsap": {
+    "uses": 911,
+    "damage_turns": 138,
+    "damage_turn_rate": 0.15148188803512624,
+    "is_offensive": false
+  },
+  "struggle": {
+    "uses": 75,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6,
+    "is_offensive": true
+  },
+  "stunspore": {
+    "uses": 100,
+    "damage_turns": 9,
+    "damage_turn_rate": 0.09,
+    "is_offensive": false
+  },
+  "substitute": {
+    "uses": 1747,
+    "damage_turns": 476,
+    "damage_turn_rate": 0.2724670864338867,
+    "is_offensive": false
+  },
+  "suckerpunch": {
+    "uses": 958,
+    "damage_turns": 532,
+    "damage_turn_rate": 0.5553235908141962,
+    "is_offensive": true
+  },
+  "sunnyday": {
+    "uses": 105,
+    "damage_turns": 10,
+    "damage_turn_rate": 0.09523809523809523,
+    "is_offensive": false
+  },
+  "sunsteelstrike": {
+    "uses": 137,
+    "damage_turns": 97,
+    "damage_turn_rate": 0.708029197080292,
+    "is_offensive": true
+  },
+  "supercellslam": {
+    "uses": 214,
+    "damage_turns": 135,
+    "damage_turn_rate": 0.6308411214953271,
+    "is_offensive": true
+  },
+  "superfang": {
+    "uses": 262,
+    "damage_turns": 142,
+    "damage_turn_rate": 0.5419847328244275,
+    "is_offensive": true
+  },
+  "superpower": {
+    "uses": 389,
+    "damage_turns": 237,
+    "damage_turn_rate": 0.609254498714653,
+    "is_offensive": true
+  },
+  "surf": {
+    "uses": 773,
+    "damage_turns": 488,
+    "damage_turn_rate": 0.6313065976714101,
+    "is_offensive": true
+  },
+  "surgingstrikes": {
+    "uses": 54,
+    "damage_turns": 34,
+    "damage_turn_rate": 0.6296296296296297,
+    "is_offensive": true
+  },
+  "switcheroo": {
+    "uses": 15,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "is_offensive": false
+  },
+  "swordsdance": {
+    "uses": 2157,
+    "damage_turns": 126,
+    "damage_turn_rate": 0.0584144645340751,
+    "is_offensive": false
+  },
+  "synthesis": {
+    "uses": 308,
+    "damage_turns": 33,
+    "damage_turn_rate": 0.10714285714285714,
+    "is_offensive": false
+  },
+  "tachyoncutter": {
+    "uses": 70,
+    "damage_turns": 41,
+    "damage_turn_rate": 0.5857142857142857,
+    "is_offensive": true
+  },
+  "tailglow": {
+    "uses": 83,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.04819277108433735,
+    "is_offensive": false
+  },
+  "tailslap": {
+    "uses": 97,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.5876288659793815,
+    "is_offensive": true
+  },
+  "tailwind": {
+    "uses": 22,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.045454545454545456,
+    "is_offensive": false
+  },
+  "takeheart": {
+    "uses": 162,
+    "damage_turns": 25,
+    "damage_turn_rate": 0.15432098765432098,
+    "is_offensive": false
+  },
+  "taunt": {
+    "uses": 364,
+    "damage_turns": 22,
+    "damage_turn_rate": 0.06043956043956044,
+    "is_offensive": false
+  },
+  "teleport": {
+    "uses": 12,
+    "damage_turns": 2,
+    "damage_turn_rate": 0.16666666666666666,
+    "is_offensive": false
+  },
+  "temperflare": {
+    "uses": 15,
+    "damage_turns": 10,
+    "damage_turn_rate": 0.6666666666666666,
+    "is_offensive": false
+  },
+  "terablast": {
+    "uses": 710,
+    "damage_turns": 517,
+    "damage_turn_rate": 0.7281690140845071,
+    "is_offensive": true
+  },
+  "terastarstorm": {
+    "uses": 90,
+    "damage_turns": 64,
+    "damage_turn_rate": 0.7111111111111111,
+    "is_offensive": true
+  },
+  "throatchop": {
+    "uses": 337,
+    "damage_turns": 203,
+    "damage_turn_rate": 0.6023738872403561,
+    "is_offensive": true
+  },
+  "thunder": {
+    "uses": 179,
+    "damage_turns": 99,
+    "damage_turn_rate": 0.553072625698324,
+    "is_offensive": true
+  },
+  "thunderbolt": {
+    "uses": 2814,
+    "damage_turns": 1739,
+    "damage_turn_rate": 0.6179815209665956,
+    "is_offensive": true
+  },
+  "thunderclap": {
+    "uses": 79,
+    "damage_turns": 42,
+    "damage_turn_rate": 0.5316455696202531,
+    "is_offensive": true
+  },
+  "thunderpunch": {
+    "uses": 33,
+    "damage_turns": 16,
+    "damage_turn_rate": 0.48484848484848486,
+    "is_offensive": false
+  },
+  "thunderwave": {
+    "uses": 2043,
+    "damage_turns": 119,
+    "damage_turn_rate": 0.05824767498776309,
+    "is_offensive": false
+  },
+  "tidyup": {
+    "uses": 201,
+    "damage_turns": 15,
+    "damage_turn_rate": 0.07462686567164178,
+    "is_offensive": false
+  },
+  "torchsong": {
+    "uses": 130,
+    "damage_turns": 100,
+    "damage_turn_rate": 0.7692307692307693,
+    "is_offensive": true
+  },
+  "toxic": {
+    "uses": 1052,
+    "damage_turns": 279,
+    "damage_turn_rate": 0.2652091254752852,
+    "is_offensive": false
+  },
+  "toxicspikes": {
+    "uses": 555,
+    "damage_turns": 59,
+    "damage_turn_rate": 0.1063063063063063,
+    "is_offensive": false
+  },
+  "trailblaze": {
+    "uses": 392,
+    "damage_turns": 223,
+    "damage_turn_rate": 0.5688775510204082,
+    "is_offensive": true
+  },
+  "triattack": {
+    "uses": 177,
+    "damage_turns": 117,
+    "damage_turn_rate": 0.6610169491525424,
+    "is_offensive": true
+  },
+  "trick": {
+    "uses": 228,
+    "damage_turns": 11,
+    "damage_turn_rate": 0.04824561403508772,
+    "is_offensive": false
+  },
+  "trickroom": {
+    "uses": 69,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.057971014492753624,
+    "is_offensive": false
+  },
+  "triplearrows": {
+    "uses": 62,
+    "damage_turns": 40,
+    "damage_turn_rate": 0.6451612903225806,
+    "is_offensive": true
+  },
+  "tripleaxel": {
+    "uses": 535,
+    "damage_turns": 327,
+    "damage_turn_rate": 0.611214953271028,
+    "is_offensive": true
+  },
+  "u-turn": {
+    "uses": 2437,
+    "damage_turns": 1324,
+    "damage_turn_rate": 0.5432909314731227,
+    "is_offensive": true
+  },
+  "vacuumwave": {
+    "uses": 78,
+    "damage_turns": 56,
+    "damage_turn_rate": 0.717948717948718,
+    "is_offensive": true
+  },
+  "victorydance": {
+    "uses": 55,
+    "damage_turns": 3,
+    "damage_turn_rate": 0.05454545454545454,
+    "is_offensive": false
+  },
+  "voltswitch": {
+    "uses": 950,
+    "damage_turns": 433,
+    "damage_turn_rate": 0.4557894736842105,
+    "is_offensive": false
+  },
+  "volttackle": {
+    "uses": 54,
+    "damage_turns": 40,
+    "damage_turn_rate": 0.7407407407407407,
+    "is_offensive": true
+  },
+  "waterfall": {
+    "uses": 234,
+    "damage_turns": 153,
+    "damage_turn_rate": 0.6538461538461539,
+    "is_offensive": true
+  },
+  "waterpulse": {
+    "uses": 88,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.6136363636363636,
+    "is_offensive": true
+  },
+  "waterspout": {
+    "uses": 102,
+    "damage_turns": 63,
+    "damage_turn_rate": 0.6176470588235294,
+    "is_offensive": true
+  },
+  "wavecrash": {
+    "uses": 581,
+    "damage_turns": 351,
+    "damage_turn_rate": 0.6041308089500861,
+    "is_offensive": true
+  },
+  "weatherball": {
+    "uses": 178,
+    "damage_turns": 108,
+    "damage_turn_rate": 0.6067415730337079,
+    "is_offensive": true
+  },
+  "whirlpool": {
+    "uses": 78,
+    "damage_turns": 27,
+    "damage_turn_rate": 0.34615384615384615,
+    "is_offensive": false
+  },
+  "whirlwind": {
+    "uses": 120,
+    "damage_turns": 29,
+    "damage_turn_rate": 0.24166666666666667,
+    "is_offensive": false
+  },
+  "wickedblow": {
+    "uses": 39,
+    "damage_turns": 23,
+    "damage_turn_rate": 0.5897435897435898,
+    "is_offensive": true
+  },
+  "wildcharge": {
+    "uses": 177,
+    "damage_turns": 104,
+    "damage_turn_rate": 0.5875706214689266,
+    "is_offensive": true
+  },
+  "will-o-wisp": {
+    "uses": 941,
+    "damage_turns": 241,
+    "damage_turn_rate": 0.2561105207226355,
+    "is_offensive": false
+  },
+  "wish": {
+    "uses": 1585,
+    "damage_turns": 275,
+    "damage_turn_rate": 0.17350157728706625,
+    "is_offensive": false
+  },
+  "woodhammer": {
+    "uses": 214,
+    "damage_turns": 123,
+    "damage_turn_rate": 0.5747663551401869,
+    "is_offensive": true
+  },
+  "workup": {
+    "uses": 23,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.17391304347826086,
+    "is_offensive": false
+  },
+  "x-scissor": {
+    "uses": 58,
+    "damage_turns": 46,
+    "damage_turn_rate": 0.7931034482758621,
+    "is_offensive": true
+  },
+  "yawn": {
+    "uses": 226,
+    "damage_turns": 8,
+    "damage_turn_rate": 0.035398230088495575,
+    "is_offensive": false
+  },
+  "zenheadbutt": {
+    "uses": 152,
+    "damage_turns": 90,
+    "damage_turn_rate": 0.5921052631578947,
+    "is_offensive": true
+  },
+  "zingzap": {
+    "uses": 97,
+    "damage_turns": 61,
+    "damage_turn_rate": 0.6288659793814433,
+    "is_offensive": true
+  }
+}
