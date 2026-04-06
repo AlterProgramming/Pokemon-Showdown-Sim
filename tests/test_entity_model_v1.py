@@ -101,6 +101,50 @@ class EntityModelV1Tests(unittest.TestCase):
         self.assertIn("value_brier", history.history)
         self.assertIsNotNone(policy_value_model)
 
+    def test_sequence_head_entity_model_fits(self) -> None:
+        max_seq_len = 8
+        sequence_vocab_size = 20
+        action_context_vocab_size = 9
+        model, policy_model, _ = build_entity_action_models(
+            vocab_sizes={
+                "species": 12,
+                "item": 10,
+                "ability": 10,
+                "tera": 8,
+                "status": 8,
+                "move": 20,
+                "weather": 6,
+                "global_condition": 6,
+            },
+            num_policy_classes=7,
+            hidden_dim=24,
+            depth=1,
+            dropout=0.0,
+            learning_rate=1e-3,
+            action_context_vocab_size=action_context_vocab_size,
+            action_embed_dim=8,
+            predict_sequence=True,
+            sequence_vocab_size=sequence_vocab_size,
+            sequence_hidden_dim=16,
+            sequence_weight=0.1,
+            max_seq_len=max_seq_len,
+        )
+        X = fake_inputs()
+        X["my_action"] = np.random.randint(0, action_context_vocab_size, size=(8,), dtype=np.int64)
+        X["opp_action"] = np.random.randint(0, action_context_vocab_size, size=(8,), dtype=np.int64)
+        y = {
+            "policy": np.random.randint(0, 7, size=(8,), dtype=np.int64),
+            "sequence": np.random.randint(0, sequence_vocab_size, size=(8, max_seq_len), dtype=np.int64),
+        }
+        history = model.fit(X, y, epochs=1, batch_size=4, verbose=0)
+        self.assertIn("loss", history.history)
+        # Policy-only model should still work without action inputs
+        preds = policy_model.predict(fake_inputs(), verbose=0)
+        self.assertEqual(preds.shape, (8, 7))
+        # Verify sequence output shape from training model
+        outputs = model(X, training=False)
+        self.assertEqual(outputs["sequence"].shape, (8, max_seq_len, sequence_vocab_size))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -23,6 +23,32 @@ POKEMON_NUMERIC_DIM = 6 + len(STAT_ORDER)
 GLOBAL_NUMERIC_DIM = 1 + 2 * len(SIDE_CONDITION_ORDER)
 
 
+def masked_sequence_loss(y_true, y_pred):
+    """SparseCategoricalCrossentropy that ignores PAD_ID=0 positions."""
+    import tensorflow as tf
+    from tensorflow import keras
+
+    loss_fn = keras.losses.SparseCategoricalCrossentropy(from_logits=False, reduction="none")
+    per_token_loss = loss_fn(y_true, y_pred)
+    mask = tf.cast(tf.not_equal(y_true, 0), dtype=per_token_loss.dtype)
+    masked = per_token_loss * mask
+    denom = tf.reduce_sum(mask, axis=-1)
+    denom = tf.maximum(denom, 1.0)
+    return tf.reduce_mean(tf.reduce_sum(masked, axis=-1) / denom)
+
+
+def masked_token_accuracy(y_true, y_pred):
+    """Token accuracy that ignores PAD_ID=0 positions."""
+    import tensorflow as tf
+
+    predicted = tf.argmax(y_pred, axis=-1, output_type=y_true.dtype)
+    correct = tf.cast(tf.equal(predicted, y_true), dtype=tf.float32)
+    mask = tf.cast(tf.not_equal(y_true, 0), dtype=tf.float32)
+    denom = tf.reduce_sum(mask)
+    denom = tf.maximum(denom, 1.0)
+    return tf.reduce_sum(correct * mask) / denom
+
+
 def build_entity_action_models(
     *,
     vocab_sizes: Dict[str, int],
@@ -40,6 +66,11 @@ def build_entity_action_models(
     predict_value: bool = False,
     value_hidden_dim: int | None = None,
     value_weight: float = 0.25,
+    predict_sequence: bool = False,
+    sequence_vocab_size: int | None = None,
+    sequence_hidden_dim: int = 128,
+    sequence_weight: float = 0.1,
+    max_seq_len: int = 32,
 ):
     """Build the multitask entity-action models.
 
@@ -216,7 +247,8 @@ def build_entity_action_models(
         policy_metrics.append(keras.metrics.SparseTopKCategoricalAccuracy(k=3, name="top3"))
 
     use_transition = transition_dim is not None and action_context_vocab_size is not None
-    if not use_transition and not predict_value:
+    use_sequence = predict_sequence and sequence_vocab_size is not None
+    if not use_transition and not predict_value and not use_sequence:
         policy_model.compile(
             optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
             loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -252,7 +284,13 @@ def build_entity_action_models(
         )
 
     model_inputs: Dict[str, Any] = dict(inputs)
-    if use_transition:
+    # Both the transition head and the sequence head are conditioned on action embeddings.
+    # We create shared action inputs and a shared embedding layer whenever either head is on.
+    need_action_inputs = use_transition or use_sequence
+    my_action_input = None
+    opp_action_input = None
+    action_embedding = None
+    if need_action_inputs:
         my_action_input = layers.Input(shape=(), dtype="int32", name="my_action")
         opp_action_input = layers.Input(shape=(), dtype="int32", name="opp_action")
         action_embedding = layers.Embedding(
@@ -260,6 +298,10 @@ def build_entity_action_models(
             output_dim=max(8, action_embed_dim),
             name="action_embedding",
         )
+        model_inputs["my_action"] = my_action_input
+        model_inputs["opp_action"] = opp_action_input
+
+    if use_transition:
         transition_x = layers.Concatenate(name="transition_features")(
             [
                 shared,
@@ -277,8 +319,27 @@ def build_entity_action_models(
         losses["transition"] = keras.losses.MeanSquaredError()
         loss_weights["transition"] = transition_weight
         metrics["transition"] = [keras.metrics.MeanAbsoluteError(name="mae")]
-        model_inputs["my_action"] = my_action_input
-        model_inputs["opp_action"] = opp_action_input
+
+    if use_sequence:
+        # Non-autoregressive sequence head: concatenate trunk + action embeddings,
+        # repeat across time steps, then apply LSTM to produce per-step distributions.
+        sequence_context = layers.Concatenate(name="sequence_context")(
+            [
+                shared,
+                action_embedding(my_action_input),
+                action_embedding(opp_action_input),
+            ]
+        )
+        sequence_repeated = layers.RepeatVector(max_seq_len, name="sequence_repeat")(sequence_context)
+        sequence_lstm = layers.LSTM(sequence_hidden_dim, return_sequences=True, name="sequence_lstm")(sequence_repeated)
+        sequence_out = layers.TimeDistributed(
+            layers.Dense(sequence_vocab_size, activation="softmax"),
+            name="sequence",
+        )(sequence_lstm)
+        outputs["sequence"] = sequence_out
+        losses["sequence"] = masked_sequence_loss
+        loss_weights["sequence"] = sequence_weight
+        metrics["sequence"] = [masked_token_accuracy]
 
     # The training artifact is the richest object because it includes every enabled
     # auxiliary head. The policy and policy+value artifacts stay serving-friendly.

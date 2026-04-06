@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import unittest
 
+import numpy as np
+
 from BattleStateTracker import STAT_ORDER
 from EntityTensorization import (
     MAX_GLOBAL_CONDITIONS,
@@ -10,6 +12,7 @@ from EntityTensorization import (
     encode_entity_state,
     vectorize_entity_multitask_dataset,
 )
+from TurnEventTokenizer import PAD_TOKEN, BOS_TOKEN, EOS_TOKEN, UNK_TOKEN
 
 
 def make_boosts() -> dict[str, int]:
@@ -117,6 +120,12 @@ def make_examples() -> list[dict]:
             "action_token": "move:thunderbolt",
             "opponent_action_token": "move:surf",
             "terminal_result": 1.0,
+            "turn_events_v1": [
+                {"event_type": "move", "actor_side": "p1", "move_id": "thunderbolt", "target_side": "p2"},
+                {"event_type": "damage", "target_side": "p2", "hp_delta_bin": -2},
+                {"event_type": "move", "actor_side": "p2", "move_id": "surf", "target_side": "p1"},
+                {"event_type": "turn_end"},
+            ],
         }
     ]
 
@@ -169,6 +178,90 @@ class EntityTensorizationTests(unittest.TestCase):
         self.assertEqual(len(targets["policy"]), 1)
         self.assertEqual(len(targets["transition"]), 1)
         self.assertEqual(targets["value"], [1.0])
+
+
+    def test_bundle_includes_sequence_vocab_when_requested(self) -> None:
+        examples = make_examples()
+        bundle = build_entity_training_bundle(
+            examples,
+            include_switches=True,
+            min_move_count=1,
+            include_transition=False,
+            include_value=False,
+            include_sequence=True,
+        )
+
+        self.assertIn("sequence_vocab", bundle)
+        seq_vocab = bundle["sequence_vocab"]
+        # Special tokens must be present
+        self.assertIn(PAD_TOKEN, seq_vocab)
+        self.assertIn(BOS_TOKEN, seq_vocab)
+        self.assertIn(EOS_TOKEN, seq_vocab)
+        self.assertIn(UNK_TOKEN, seq_vocab)
+        # Vocab must have more entries than just the 4 special tokens
+        self.assertGreater(len(seq_vocab), 4)
+
+    def test_vectorization_emits_sequence_target(self) -> None:
+        examples = make_examples()
+        bundle = build_entity_training_bundle(
+            examples,
+            include_switches=True,
+            min_move_count=1,
+            include_transition=False,
+            include_value=False,
+            include_sequence=True,
+            max_seq_len=16,
+        )
+
+        X, targets = vectorize_entity_multitask_dataset(
+            examples,
+            policy_vocab=bundle["policy_vocab"],
+            token_vocabs=bundle["token_vocabs"],
+            action_context_vocab=bundle["action_context_vocab"],
+            include_switches=True,
+            include_transition=False,
+            include_value=False,
+            include_sequence=True,
+            sequence_vocab=bundle["sequence_vocab"],
+            max_seq_len=16,
+        )
+
+        self.assertIn("sequence", targets)
+        seq_arr = np.asarray(targets["sequence"], dtype=np.int64)
+        self.assertEqual(seq_arr.shape, (1, 16))
+        # All token ids should be non-negative
+        self.assertTrue(np.all(seq_arr >= 0))
+
+    def test_action_context_in_X_when_sequence_without_transition(self) -> None:
+        examples = make_examples()
+        bundle = build_entity_training_bundle(
+            examples,
+            include_switches=True,
+            min_move_count=1,
+            include_transition=False,
+            include_value=False,
+            include_sequence=True,
+        )
+
+        # action_context_vocab must be built even when transition is off
+        self.assertIsNotNone(bundle["action_context_vocab"])
+
+        X, targets = vectorize_entity_multitask_dataset(
+            examples,
+            policy_vocab=bundle["policy_vocab"],
+            token_vocabs=bundle["token_vocabs"],
+            action_context_vocab=bundle["action_context_vocab"],
+            include_switches=True,
+            include_transition=False,
+            include_value=False,
+            include_sequence=True,
+            sequence_vocab=bundle["sequence_vocab"],
+        )
+
+        self.assertIn("my_action", X)
+        self.assertIn("opp_action", X)
+        self.assertEqual(len(X["my_action"]), 1)
+        self.assertEqual(len(X["opp_action"]), 1)
 
 
 if __name__ == "__main__":
