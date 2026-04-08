@@ -1,0 +1,7282 @@
+[
+  {
+    "metadata": {
+      "p1_won": false,
+      "battle_id": "unknown",
+      "turn_count": 38,
+      "game_number": 1,
+      "outcome": "WIN"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Pyroar"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "move:Hyper Voice",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Pyroar"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Hyper Voice",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Pyroar"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Camerupt"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Veluza"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Aqua Cutter",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Veluza"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Aqua Cutter",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Veluza"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Camerupt"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Veluza"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Scyther"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Swords Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Recover",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Scyther"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Dual Wingbeat",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Scyther"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Recover",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Apple Acid",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 30,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 31,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 32,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 33,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 34,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 35,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 36,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 37,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Appletun"
+      },
+      {
+        "turn": 38,
+        "player": "p2",
+        "action_chosen": "move:Leech Seed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Appletun"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 27,
+      "game_number": 10,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Misdreavus"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "move:Calm Mind",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Misdreavus"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Calm Mind",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Misdreavus"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Calm Mind",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Misdreavus"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dunsparce"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Coil",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dunsparce"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Coil",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dunsparce"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dodrio"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Brave Bird",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dodrio"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Vikavolt"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Vikavolt"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Encore",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Encore",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Encore",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Encore",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Encore",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Encore",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Encore",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Encore",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Vikavolt"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Vikavolt"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Minun"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 29,
+      "game_number": 11,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Cacturne"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Jumpluff"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Regieleki"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Regieleki"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Regieleki"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Solar Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Solar Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Solar Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Solar Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Orthworm"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Heavy Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Orthworm"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Heavy Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Orthworm"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Orthworm"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Orthworm"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Orthworm"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Jumpluff"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Acrobatics",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jumpluff"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Acrobatics",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jumpluff"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Acrobatics",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jumpluff"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Acrobatics",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jumpluff"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Girafarig"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Cacturne"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Sucker Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Cacturne"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Solar Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Solar Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Solar Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Ninetales"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "move:Solar Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Ninetales"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 25,
+      "game_number": 12,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Bastiodon"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Furret"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Leaf Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Volbeat"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Skuntank"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Skuntank"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Bastiodon"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Bastiodon"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Bastiodon"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Bastiodon"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Bastiodon"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Bastiodon"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Sludge Wave",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Venomoth"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 30,
+      "game_number": 13,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Minun"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kingambit"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Weezing"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Fire Blast",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Weezing"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Wigglytuff"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Alluring Voice",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Wigglytuff"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Wigglytuff"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Wigglytuff"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Wigglytuff"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Wigglytuff"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Wigglytuff"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Wigglytuff"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Weezing"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Weezing"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Fire Blast",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Weezing"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Mightyena"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Weezing"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Mightyena"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Sucker Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mightyena"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Crunch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mightyena"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Crunch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mightyena"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Sucker Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mightyena"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "move:Sucker Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mightyena"
+      },
+      {
+        "turn": 30,
+        "player": "p2",
+        "action_chosen": "move:Sucker Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mightyena"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 25,
+      "game_number": 14,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Palossand"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Palossand"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Palossand"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Palossand"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Palossand"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Slowbro"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Zamazenta"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "immune",
+        "pokemon": " Zamazenta"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Tauros"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Palossand"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Shore Up",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Palossand"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Gunk Shot",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Gunk Shot",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Gunk Shot",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Gunk Shot",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Play Rough",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Play Rough",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Slowbro"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Fire Blast",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Slowbro"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Zamazenta"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Slowbro"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Sudowoodo"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Head Smash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Sudowoodo"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Head Smash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Sudowoodo"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Head Smash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Sudowoodo"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Head Smash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Sudowoodo"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Head Smash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Sudowoodo"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": false,
+      "battle_id": "unknown",
+      "turn_count": 37,
+      "game_number": 15,
+      "outcome": "WIN"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lilligant"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lumineon"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Latios"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Luster Purge",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Latios"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Luster Purge",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Latios"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dachsbun"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Play Rough",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dachsbun"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Play Rough",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dachsbun"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dachsbun"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dachsbun"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Dachsbun"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dachsbun"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Dachsbun"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lumineon"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Hydro Pump",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lumineon"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Hydro Pump",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lumineon"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Hydro Pump",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lumineon"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Latios"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Luster Purge",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Latios"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Luster Purge",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Latios"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Luster Purge",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Latios"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lilligant"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Close Combat",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lilligant"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Close Combat",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lilligant"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Vivillon"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Hurricane",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Vivillon"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Hurricane",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Vivillon"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lilligant"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Vivillon"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 30,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 31,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 32,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 33,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 34,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 35,
+        "player": "p2",
+        "action_chosen": "move:Salt Cure",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Garganacl"
+      },
+      {
+        "turn": 36,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Vivillon"
+      },
+      {
+        "turn": 37,
+        "player": "p2",
+        "action_chosen": "move:Hurricane",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Vivillon"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 32,
+      "game_number": 16,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Miraidon"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dragalge"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Dragon Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Dragon Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Hitmonchan"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Drain Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hitmonchan"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Drain Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hitmonchan"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Drain Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hitmonchan"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hitmonchan"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hitmonchan"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Hitmonchan"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Dragon Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Scrafty"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oranguru"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oranguru"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oranguru"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Miraidon"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Electro Drift",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "immune",
+        "pokemon": " Miraidon"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Electro Drift",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "immune",
+        "pokemon": " Miraidon"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "move:Electro Drift",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "immune",
+        "pokemon": " Miraidon"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 30,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dragalge"
+      },
+      {
+        "turn": 31,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Oricorio"
+      },
+      {
+        "turn": 31,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dragalge"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 18,
+      "game_number": 17,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Decidueye"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Magearna"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Ambipom"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Crawdaunt"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Crawdaunt"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Crawdaunt"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Crawdaunt"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Crawdaunt"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Crawdaunt"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Crawdaunt"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Decidueye"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Magearna"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Flash Cannon",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Magearna"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Ambipom"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Decidueye"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Eelektross"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Jolteon"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Eelektross"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Jolteon"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Magearna"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Decidueye"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Magearna"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": false,
+      "battle_id": "unknown",
+      "turn_count": 46,
+      "game_number": 18,
+      "outcome": "WIN"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Whimsicott"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Substitute",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Whimsicott"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Substitute",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Whimsicott"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dugtrio"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dugtrio"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dugtrio"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Whimsicott"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Moonblast",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Whimsicott"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Moonblast",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Whimsicott"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Moonblast",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Whimsicott"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Moonblast",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Whimsicott"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Brave Bird",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Brave Bird",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Brave Bird",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Brave Bird",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Fiery Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Fiery Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Fiery Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Fiery Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "move:Diamond Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 30,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 31,
+        "player": "p2",
+        "action_chosen": "move:Diamond Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 32,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 33,
+        "player": "p2",
+        "action_chosen": "move:Diamond Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 35,
+        "player": "p2",
+        "action_chosen": "move:Diamond Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 36,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 37,
+        "player": "p2",
+        "action_chosen": "move:Calm Mind",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 38,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 39,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 40,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 41,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 42,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 43,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 44,
+        "player": "p2",
+        "action_chosen": "move:Draining Kiss",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 45,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Swanna"
+      },
+      {
+        "turn": 46,
+        "player": "p2",
+        "action_chosen": "move:Brave Bird",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Swanna"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 22,
+      "game_number": 19,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Slither Wing"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Charizard"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Sableye"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Sableye"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Phione"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Take Heart",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Phione"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Scald",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Phione"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Take Heart",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Phione"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Scald",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Phione"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Charizard"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Slither Wing"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Probopass"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Slither Wing"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Probopass"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Slither Wing"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Phione"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Scald",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Phione"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Probopass"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Phione"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Probopass"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Eiscue"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Probopass"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Eiscue"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Ice Spinner",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Eiscue"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Ice Spinner",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Eiscue"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Ice Spinner",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Eiscue"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 39,
+      "game_number": 2,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Arcanine"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Body Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Florges"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kommo-o"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Close Combat",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Kommo-o"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Close Combat",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Kommo-o"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Florges"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Calm Mind",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Florges"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Calm Mind",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Florges"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Calm Mind",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Florges"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Seed Flare",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Seed Flare",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Shaymin"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Body Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 30,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 31,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 32,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Jirachi"
+      },
+      {
+        "turn": 32,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Arcanine"
+      },
+      {
+        "turn": 33,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dedenne"
+      },
+      {
+        "turn": 33,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Arcanine"
+      },
+      {
+        "turn": 34,
+        "player": "p2",
+        "action_chosen": "move:Flare Blitz",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Arcanine"
+      },
+      {
+        "turn": 35,
+        "player": "p2",
+        "action_chosen": "move:Extreme Speed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Arcanine"
+      },
+      {
+        "turn": 36,
+        "player": "p2",
+        "action_chosen": "move:Flare Blitz",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Arcanine"
+      },
+      {
+        "turn": 37,
+        "player": "p2",
+        "action_chosen": "move:Flare Blitz",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Arcanine"
+      },
+      {
+        "turn": 38,
+        "player": "p2",
+        "action_chosen": "move:Extreme Speed",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Arcanine"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 19,
+      "game_number": 20,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kleavor"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Great Tusk"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dedenne"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dedenne"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kleavor"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dedenne"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dedenne"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Thunderbolt",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dedenne"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Koraidon"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Koraidon"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Earth Power",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Fickle Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hydrapple"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Fickle Beam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Hydrapple"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 28,
+      "game_number": 3,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "move:Leaf Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Drednaw"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Araquanid"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Liquidation",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Araquanid"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Liquidation",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Araquanid"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Liquidation",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Araquanid"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Liquidation",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Araquanid"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Iron Thorns"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Stone Edge",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Iron Thorns"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Drednaw"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Araquanid"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Drednaw"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Drednaw"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Drednaw"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Drednaw"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Glalie"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Serperior"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Glalie"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Zapdos"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Close Combat",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Zapdos"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Glalie"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Glalie"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Glalie"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Zapdos"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Zapdos"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Zapdos"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Zapdos"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Iron Thorns"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Stone Edge",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Iron Thorns"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 77,
+      "game_number": 4,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Weavile"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Weavile"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Weavile"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Weavile"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Weavile"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Weavile"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Weavile"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Golurk"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Poltergeist",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Golurk"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Iron Defense",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 30,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 31,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 32,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 33,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "miss",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 34,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 35,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 36,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 37,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 38,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 39,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 40,
+        "player": "p2",
+        "action_chosen": "move:Roost",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 41,
+        "player": "p2",
+        "action_chosen": "move:Foul Play",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 42,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 43,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 44,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 45,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 46,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 47,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 48,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 50,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 51,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 52,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 53,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 54,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Golurk"
+      },
+      {
+        "turn": 55,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 56,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Mandibuzz"
+      },
+      {
+        "turn": 56,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 57,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Golurk"
+      },
+      {
+        "turn": 58,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 59,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Golurk"
+      },
+      {
+        "turn": 59,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 60,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 61,
+        "player": "p2",
+        "action_chosen": "move:Surf",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 62,
+        "player": "p2",
+        "action_chosen": "move:Surf",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 63,
+        "player": "p2",
+        "action_chosen": "move:Sludge Bomb",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 64,
+        "player": "p2",
+        "action_chosen": "move:Sludge Bomb",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 65,
+        "player": "p2",
+        "action_chosen": "move:Surf",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 66,
+        "player": "p2",
+        "action_chosen": "move:Surf",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 67,
+        "player": "p2",
+        "action_chosen": "move:Surf",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 68,
+        "player": "p2",
+        "action_chosen": "move:Surf",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 69,
+        "player": "p2",
+        "action_chosen": "move:Sludge Bomb",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 70,
+        "player": "p2",
+        "action_chosen": "move:Surf",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Tentacruel"
+      },
+      {
+        "turn": 70,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Yanmega"
+      },
+      {
+        "turn": 71,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Yanmega"
+      },
+      {
+        "turn": 72,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Yanmega"
+      },
+      {
+        "turn": 73,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Yanmega"
+      },
+      {
+        "turn": 74,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Yanmega"
+      },
+      {
+        "turn": 75,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Yanmega"
+      },
+      {
+        "turn": 76,
+        "player": "p2",
+        "action_chosen": "move:Air Slash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Yanmega"
+      },
+      {
+        "turn": 76,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Registeel"
+      },
+      {
+        "turn": 77,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Registeel"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 29,
+      "game_number": 5,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lycanroc"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Regirock"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Chimecho"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Dazzling Gleam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Chimecho"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Dazzling Gleam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Chimecho"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Dazzling Gleam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Chimecho"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Dazzling Gleam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Chimecho"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Dazzling Gleam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Chimecho"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Recover",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Chimecho"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Dazzling Gleam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Chimecho"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Quiver Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Sleep Powder",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "immune",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dondozo"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Curse",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dondozo"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Beartic"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Icicle Crash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Beartic"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Icicle Crash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Beartic"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Icicle Crash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Beartic"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Regirock"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Regirock"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Regirock"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Regirock"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Body Press",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Regirock"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Beartic"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Icicle Crash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Beartic"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Icicle Crash",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Beartic"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lycanroc"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Close Combat",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lycanroc"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Venomoth"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lycanroc"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "move:Close Combat",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lycanroc"
+      },
+      {
+        "turn": 28,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Beartic"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 24,
+      "game_number": 6,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Incineroar"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Passimian"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Passimian"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Incineroar"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Passimian"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Passimian"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Knock Off",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Passimian"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Draco Meteor",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Draco Meteor",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Donphan"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Conkeldurr"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Mach Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Conkeldurr"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Mach Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Conkeldurr"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Donphan"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Donphan"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Rapid Spin",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Donphan"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Donphan"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Heavy Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Draco Meteor",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Pyroar"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Hyper Voice",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Pyroar"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Hyper Voice",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Pyroar"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Heavy Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Heavy Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Heavy Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dialga"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Heavy Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Dialga"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": true,
+      "battle_id": "unknown",
+      "turn_count": 26,
+      "game_number": 7,
+      "outcome": "LOSS"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Haxorus"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Swords Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Haxorus"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Swords Dance",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Haxorus"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Iron Crown"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Psyshock",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Iron Crown"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Haxorus"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Mismagius"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Iron Crown"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Tachyon Cutter",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Iron Crown"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Tachyon Cutter",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Iron Crown"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Recover",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Sludge Bomb",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Iron Crown"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Golduck"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Hydro Pump",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Golduck"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Hydro Pump",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Golduck"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Recover",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Recover",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Earthquake",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Recover",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Recover",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Gastrodon"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Haxorus"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Iron Head",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Haxorus"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Sawsbuck"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Horn Leech",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Sawsbuck"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Horn Leech",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Sawsbuck"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Horn Leech",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Sawsbuck"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": false,
+      "battle_id": "unknown",
+      "turn_count": 26,
+      "game_number": 8,
+      "outcome": "WIN"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Krookodile"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Muk"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Gunk Shot",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Gunk Shot",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Gunk Shot",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Gunk Shot",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Fezandipiti"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Muk"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Krookodile"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Zamazenta"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Heatran"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Stealth Rock",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Heatran"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Stealth Rock",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Heatran"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Lava Plume",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Heatran"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Lava Plume",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Heatran"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Lava Plume",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Heatran"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Muk"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Leech Life",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Leech Life",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Leech Life",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "move:Leech Life",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "move:Leech Life",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "move:Leech Life",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Leech Life",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Leech Life",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Sucker Punch",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Lokix"
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "p1_won": false,
+      "battle_id": "unknown",
+      "turn_count": 36,
+      "game_number": 9,
+      "outcome": "WIN"
+    },
+    "decision_points": [
+      {
+        "turn": 0,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 1,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 2,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 3,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 4,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 5,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 6,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 7,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 8,
+        "player": "p2",
+        "action_chosen": "move:Toxic",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 9,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 10,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 11,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 12,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 13,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 14,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "move:Protect",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "failed",
+        "pokemon": " Umbreon"
+      },
+      {
+        "turn": 15,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Barraskewda"
+      },
+      {
+        "turn": 16,
+        "player": "p2",
+        "action_chosen": "move:Waterfall",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Barraskewda"
+      },
+      {
+        "turn": 17,
+        "player": "p2",
+        "action_chosen": "move:Waterfall",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Barraskewda"
+      },
+      {
+        "turn": 18,
+        "player": "p2",
+        "action_chosen": "move:Waterfall",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Barraskewda"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "move:Waterfall",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Barraskewda"
+      },
+      {
+        "turn": 19,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Zamazenta"
+      },
+      {
+        "turn": 20,
+        "player": "p2",
+        "action_chosen": "move:Heavy Slam",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Zamazenta"
+      },
+      {
+        "turn": 21,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kyogre"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Zamazenta"
+      },
+      {
+        "turn": 22,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kyogre"
+      },
+      {
+        "turn": 23,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 24,
+        "player": "p2",
+        "action_chosen": "move:Diamond Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 25,
+        "player": "p2",
+        "action_chosen": "move:Diamond Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 26,
+        "player": "p2",
+        "action_chosen": "move:Diamond Storm",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 27,
+        "player": "p2",
+        "action_chosen": "move:Moonblast",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Diancie"
+      },
+      {
+        "turn": 29,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Perrserker"
+      },
+      {
+        "turn": 30,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kyogre"
+      },
+      {
+        "turn": 31,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Perrserker"
+      },
+      {
+        "turn": 32,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kyogre"
+      },
+      {
+        "turn": 33,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Perrserker"
+      },
+      {
+        "turn": 33,
+        "player": "p2",
+        "action_chosen": "switch:*",
+        "legal_actions": [
+          "switch:*"
+        ],
+        "move_outcome": "switch",
+        "pokemon": " Kyogre"
+      },
+      {
+        "turn": 34,
+        "player": "p2",
+        "action_chosen": "move:Origin Pulse",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Kyogre"
+      },
+      {
+        "turn": 35,
+        "player": "p2",
+        "action_chosen": "move:Origin Pulse",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Kyogre"
+      },
+      {
+        "turn": 36,
+        "player": "p2",
+        "action_chosen": "move:Origin Pulse",
+        "legal_actions": [
+          "move:*"
+        ],
+        "move_outcome": "hit",
+        "pokemon": " Kyogre"
+      }
+    ]
+  }
+]

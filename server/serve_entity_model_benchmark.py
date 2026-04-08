@@ -94,6 +94,20 @@ def predict():
         legal_switches, switch_reason = filter_legal_switches(data, data.get("legal_switches", []) or [])
 
         logits = predict_logits(battle_state, perspective_player)
+
+        # Apply value-based switch gating if we have a value head
+        switch_logit_bias = float(SERVER_STATE.get("switch_logit_bias", 0.0))
+        if SERVER_STATE.get("has_value_head"):
+            value_estimate = SERVER_STATE.get("_last_value_estimate", 0.5)
+            # If winning (value > 0.5), strongly penalize switches
+            # If losing (value < 0.5), allow switches
+            if value_estimate > 0.5:
+                # Winning: penalize switches more (value 0.51 -> penalty 4.5, value 1.0 -> penalty 9)
+                switch_logit_bias += (value_estimate - 0.5) * 18
+            else:
+                # Losing: reduce penalty (value 0.5 -> penalty 0.2, value 0.0 -> penalty -1.0)
+                switch_logit_bias = max(-0.5, switch_logit_bias - (0.5 - value_estimate) * 3.4)
+
         if revive_targets:
             best_revive, best_prob = pick_best_slot_target(
                 SERVER_STATE["action_vocab"],
@@ -126,7 +140,7 @@ def predict():
             logits,
             legal_moves,
             legal_switches,
-            switch_logit_bias=float(SERVER_STATE.get("switch_logit_bias", 0.0)),
+            switch_logit_bias=switch_logit_bias,
         )
         if best_action is None:
             return jsonify(

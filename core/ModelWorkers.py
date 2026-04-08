@@ -102,6 +102,8 @@ def inference_worker_main(
     try:
         tensorflow_import_started = time.perf_counter()
         import tensorflow as tf
+        import keras
+        keras.config.enable_unsafe_deserialization()
         tensorflow_import_seconds = time.perf_counter() - tensorflow_import_started
 
         metadata_path = repo_path / str(model_entry["metadata_path"])

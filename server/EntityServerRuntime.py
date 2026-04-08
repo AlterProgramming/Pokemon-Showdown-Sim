@@ -6,6 +6,11 @@ from typing import Any
 
 import numpy as np
 
+try:
+    import keras
+except ImportError:
+    import tensorflow.keras as keras
+
 from EntityInvarianceModelV1 import build_entity_invariance_models
 from EntityInvarianceTensorization import to_numpy_invariance_inputs
 from EntityModelV1 import build_entity_action_models
@@ -32,7 +37,9 @@ def load_entity_runtime_artifacts(
     repo_path = repo_path.resolve() if repo_path is not None else metadata_path.parent.parent.resolve()
 
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    model_path = resolve_artifact_path(repo_path, metadata_path, str(metadata["policy_model_path"]))
+    # Use policy-value model if available for value-head gating
+    model_path_key = "policy_value_model_path" if "policy_value_model_path" in metadata else "policy_model_path"
+    model_path = resolve_artifact_path(repo_path, metadata_path, str(metadata[model_path_key]))
     policy_vocab_path = resolve_artifact_path(repo_path, metadata_path, str(metadata["policy_vocab_path"]))
     token_vocab_path = resolve_artifact_path(repo_path, metadata_path, str(metadata["entity_token_vocab_path"]))
 
@@ -42,23 +49,33 @@ def load_entity_runtime_artifacts(
         token_vocabs = json.load(handle)
 
     family_id = str(metadata.get("family_id") or "")
+    has_value_head = False
     try:
         if family_id == "entity_action_bc":
-            # The first entity family uses several Lambda helpers. Keras can train and save them
-            # fine, but whole-model deserialization is brittle across versions because output
-            # shapes are inferred through Python lambdas. For benchmarking we keep the bridge
-            # leaner and more reproducible by rebuilding the known family architecture from the
-            # saved metadata and then loading the policy weights from the saved artifact.
-            _, model, _ = build_entity_action_models(
-                vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
-                num_policy_classes=int(metadata["num_action_classes"]),
-                hidden_dim=int(metadata["hidden_dim"]),
-                depth=int(metadata["depth"]),
-                dropout=float(metadata["dropout"]),
-                learning_rate=float(metadata["learning_rate"]),
-                token_embed_dim=int(metadata.get("token_embed_dim", 24)),
-            )
-            input_mode = "entity_action"
+            # If using policy-value model, load it directly with unsafe deserialization
+            # (it has Lambda layers but we've trained and tested it)
+            if model_path_key == "policy_value_model_path":
+                keras.config.enable_unsafe_deserialization()
+                model = keras.models.load_model(model_path)
+                has_value_head = True
+                input_mode = "entity_action"
+            else:
+                # The first entity family uses several Lambda helpers. Keras can train and save them
+                # fine, but whole-model deserialization is brittle across versions because output
+                # shapes are inferred through Python lambdas. For benchmarking we keep the bridge
+                # leaner and more reproducible by rebuilding the known family architecture from the
+                # saved metadata and then loading the policy weights from the saved artifact.
+                _, model, _ = build_entity_action_models(
+                    vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
+                    num_policy_classes=int(metadata["num_action_classes"]),
+                    hidden_dim=int(metadata["hidden_dim"]),
+                    depth=int(metadata["depth"]),
+                    dropout=float(metadata["dropout"]),
+                    learning_rate=float(metadata["learning_rate"]),
+                    token_embed_dim=int(metadata.get("token_embed_dim", 24)),
+                )
+                model.load_weights(model_path)
+                input_mode = "entity_action"
         elif family_id == "entity_invariance_aux":
             _, model, _ = build_entity_invariance_models(
                 vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
@@ -73,6 +90,7 @@ def load_entity_runtime_artifacts(
                 action_context_vocab_size=None,
                 predict_value=False,
             )
+            model.load_weights(model_path)
             input_mode = "entity_invariance"
         else:
             raise SystemExit(
@@ -80,8 +98,6 @@ def load_entity_runtime_artifacts(
             )
     except ModuleNotFoundError as exc:
         raise SystemExit("TensorFlow is required to serve entity models.") from exc
-
-    model.load_weights(model_path)
     model_id = str(metadata.get("model_release_id") or metadata.get("model_name") or model_path.stem)
     family_default_switch_bias = 0.20 if family_id == "entity_action_bc" else 0.0
     return {
@@ -100,6 +116,7 @@ def load_entity_runtime_artifacts(
         "action_vocab": action_vocab,
         "token_vocabs": token_vocabs,
         "switch_logit_bias": resolve_switch_logit_bias(metadata, default=family_default_switch_bias),
+        "has_value_head": has_value_head,
     }
 
 
@@ -127,10 +144,22 @@ def predict_entity_logits(
     else:
         batched_inputs = to_single_example_entity_inputs(encoded)
     raw_output = runtime["model"].predict(batched_inputs, verbose=0)
+
+    # Handle policy-value model output (tuple of policy, value)
+    if runtime.get("has_value_head") and isinstance(raw_output, (list, tuple)) and len(raw_output) >= 2:
+        policy_logits = np.asarray(raw_output[0][0], dtype=np.float32)
+        value_estimate = np.asarray(raw_output[1][0][0], dtype=np.float32)
+        runtime["_last_value_estimate"] = value_estimate
+        return policy_logits
+
+    # Handle dict output (policy extracted)
     if isinstance(raw_output, dict):
         raw_output = raw_output.get("policy")
+
+    # Handle list/tuple output (first element is policy)
     if isinstance(raw_output, (list, tuple)):
         raw_output = raw_output[0]
+
     return np.asarray(raw_output[0], dtype=np.float32)
 
 

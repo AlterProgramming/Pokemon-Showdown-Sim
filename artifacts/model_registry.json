@@ -130,13 +130,13 @@
       "model_id": "model4",
       "model_name": null,
       "model_variant": "default",
-      "metadata_path": "artifacts\\training_metadata_4.json",
-      "policy_model_path": "artifacts\\model_4.keras",
-      "policy_vocab_path": "artifacts\\action_vocab_4.json",
-      "policy_value_model_path": "artifacts\\policy_value_model_4.keras",
-      "training_model_path": "artifacts\\training_model_4.keras",
-      "evaluation_summary_path": "artifacts\\evaluation_summary_4.json",
-      "run_manifest_path": "artifacts\\run_manifest_4.json",
+      "metadata_path": "artifacts/training_metadata_4.json",
+      "policy_model_path": "artifacts/model_4.keras",
+      "policy_vocab_path": "artifacts/action_vocab_4.json",
+      "policy_value_model_path": "artifacts/policy_value_model_4.keras",
+      "training_model_path": "artifacts/training_model_4.keras",
+      "evaluation_summary_path": "artifacts/evaluation_summary_4.json",
+      "run_manifest_path": "artifacts/run_manifest_4.json",
       "action_space": "joint",
       "predict_value": true,
       "predict_turn_outcome": true,
@@ -257,6 +257,38 @@
       "value_target_definition": "discounted_return_to_go",
       "transition_target_definition": null,
       "registry_visibility": "runnable_policy"
+    },
+    "entity_action_bc_v1_20260408_0428": {
+      "model_id": "entity_action_bc_v1_20260408_0428",
+      "model_name": "entity_action_bc_v1_20260408_0428",
+      "metadata_path": "artifacts/entity_action_bc_v1_20260408_0428/training_metadata_entity_action_bc_v1_20260408_0428.json",
+      "policy_model_path": "artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.keras",
+      "policy_vocab_path": "artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.policy_vocab.json",
+      "policy_value_model_path": "artifacts/entity_action_bc_v1_20260408_0428/policy_value_model_entity_action_bc_v1_20260408_0428.keras",
+      "training_model_path": "artifacts/entity_action_bc_v1_20260408_0428/training_model_entity_action_bc_v1_20260408_0428.keras",
+      "action_space": "joint",
+      "predict_value": true,
+      "predict_turn_outcome": true,
+      "num_action_classes": 357,
+      "model_release_id": "entity_action_bc_v1_20260408_0428",
+      "family_id": "entity_action_bc",
+      "family_version": 1,
+      "family_name": "entity_action_bc_v1",
+      "training_regime": "offline_entity_bc_aux_weighted",
+      "information_policy": "public_only",
+      "action_parameterization": "joint_vocab_scored_by_entity_encoder",
+      "objective_set": [
+        "policy",
+        "transition",
+        "value",
+        "sequence_auxiliary"
+      ],
+      "switch_logit_bias": 0.2,
+      "action_selection": {
+        "switch_logit_bias": 0.2,
+        "voluntary_switch_only": true
+      },
+      "registry_visibility": "runnable_policy_value"
     }
   }
 }
