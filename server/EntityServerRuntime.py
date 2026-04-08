@@ -52,19 +52,29 @@ def load_entity_runtime_artifacts(
     has_value_head = False
     try:
         if family_id == "entity_action_bc":
-            # If using policy-value model, load it directly with unsafe deserialization
-            # (it has Lambda layers but we've trained and tested it)
+            # Rebuild the model architecture from metadata, handling both policy-only and policy-value variants.
+            # The first entity family uses Lambda helpers that are unreliable to deserialize directly.
+            # Instead, we rebuild the known family architecture and load weights into it.
             if model_path_key == "policy_value_model_path":
-                keras.config.enable_unsafe_deserialization()
-                model = keras.models.load_model(model_path)
+                # Policy-value model: rebuild with value head enabled
+                _, policy_only_model, policy_value_model = build_entity_action_models(
+                    vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
+                    num_policy_classes=int(metadata["num_action_classes"]),
+                    hidden_dim=int(metadata["hidden_dim"]),
+                    depth=int(metadata["depth"]),
+                    dropout=float(metadata["dropout"]),
+                    learning_rate=float(metadata["learning_rate"]),
+                    token_embed_dim=int(metadata.get("token_embed_dim", 24)),
+                    predict_value=True,
+                    value_hidden_dim=int(metadata.get("value_hidden_dim", 128)),
+                    value_weight=float(metadata.get("value_weight", 0.25)),
+                )
+                policy_value_model.load_weights(model_path)
+                model = policy_value_model
                 has_value_head = True
                 input_mode = "entity_action"
             else:
-                # The first entity family uses several Lambda helpers. Keras can train and save them
-                # fine, but whole-model deserialization is brittle across versions because output
-                # shapes are inferred through Python lambdas. For benchmarking we keep the bridge
-                # leaner and more reproducible by rebuilding the known family architecture from the
-                # saved metadata and then loading the policy weights from the saved artifact.
+                # Policy-only model: rebuild without value head
                 _, model, _ = build_entity_action_models(
                     vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
                     num_policy_classes=int(metadata["num_action_classes"]),
