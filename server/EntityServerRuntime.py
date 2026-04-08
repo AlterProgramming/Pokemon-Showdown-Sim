@@ -155,6 +155,13 @@ def predict_entity_logits(
         batched_inputs = to_single_example_entity_inputs(encoded)
     raw_output = runtime["model"].predict(batched_inputs, verbose=0)
 
+    # Handle policy-value model output (dict with policy and value keys)
+    if runtime.get("has_value_head") and isinstance(raw_output, dict) and "value" in raw_output:
+        policy_logits = np.asarray(raw_output["policy"][0], dtype=np.float32)
+        value_estimate = np.asarray(raw_output["value"][0][0], dtype=np.float32)
+        runtime["_last_value_estimate"] = value_estimate
+        return policy_logits
+
     # Handle policy-value model output (tuple of policy, value)
     if runtime.get("has_value_head") and isinstance(raw_output, (list, tuple)) and len(raw_output) >= 2:
         policy_logits = np.asarray(raw_output[0][0], dtype=np.float32)
