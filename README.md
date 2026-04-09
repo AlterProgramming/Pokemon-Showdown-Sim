@@ -136,6 +136,28 @@ The matching runbook is here:
 
 - `BENCHMARK_RUNBOOK.md`
 
+## Desktop Utilities
+
+There are also a few Windows PowerShell utilities under `scripts/` for desktop-only workflows:
+
+- `scripts/get_codex_session_id.ps1`: prints the active Codex desktop conversation ID from the newest local app log
+- `scripts/broadcast_ble_value.ps1`: advertises a compact value over Bluetooth Low Energy, including the current Codex session ID
+- `scripts/scan_ble_value.ps1`: listens for the matching BLE broadcast format on another Windows device
+
+Broadcast the current Codex session ID for two minutes:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\broadcast_ble_value.ps1 -UseCodexSessionId
+```
+
+Listen for it on another Windows device:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\scan_ble_value.ps1 -FirstOnly
+```
+
+These utilities use BLE advertising rather than Bluetooth pairing. The payload is intentionally small, so text broadcasts must stay short.
+
 ## Local Setup
 
 These launchers are portable if you either keep standard sibling repos or set a
