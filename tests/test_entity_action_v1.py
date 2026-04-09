@@ -182,6 +182,84 @@ class EntityActionV1Tests(unittest.TestCase):
         move_tokens = {candidate["token"] for candidate in graph["action_candidates"] if candidate["action_type"] == "move"}
         self.assertEqual(move_tokens, {"move:flamethrower"})
 
+    def test_fallback_switch_candidates_include_chosen_switch_slot(self) -> None:
+        state = {
+            "turn_index": 1,
+            "field": {"weather": None, "global_conditions": []},
+            "p1": {
+                "active_uid": "p1a",
+                "slots": ["p1a", None, "p1c", None, None, None],
+                "side_conditions": {},
+            },
+            "p2": {
+                "active_uid": "p2a",
+                "slots": ["p2a", None, None, None, None, None],
+                "side_conditions": {},
+            },
+            "mons": {
+                "p1a": {
+                    "uid": "p1a",
+                    "player": "p1",
+                    "species": "Charmander",
+                    "hp_frac": 1.0,
+                    "status": None,
+                    "ability": None,
+                    "item": None,
+                    "tera_type": None,
+                    "terastallized": False,
+                    "public_revealed": True,
+                    "fainted": False,
+                    "boosts": make_boosts(),
+                    "observed_moves": ["ember"],
+                },
+                "p1c": {
+                    "uid": "p1c",
+                    "player": "p1",
+                    "species": "Squirtle",
+                    "hp_frac": 1.0,
+                    "status": None,
+                    "ability": None,
+                    "item": None,
+                    "tera_type": None,
+                    "terastallized": False,
+                    "public_revealed": True,
+                    "fainted": False,
+                    "boosts": make_boosts(),
+                    "observed_moves": [],
+                },
+                "p2a": {
+                    "uid": "p2a",
+                    "player": "p2",
+                    "species": "Eevee",
+                    "hp_frac": 1.0,
+                    "status": None,
+                    "ability": None,
+                    "item": None,
+                    "tera_type": None,
+                    "terastallized": False,
+                    "public_revealed": True,
+                    "fainted": False,
+                    "boosts": make_boosts(),
+                    "observed_moves": [],
+                },
+            },
+        }
+
+        graph = build_entity_action_graph(
+            state=state,
+            perspective_player="p1",
+            legal_switches=None,
+            chosen_action=("switch", "missing_uid_from_tracker_view"),
+            chosen_action_token="switch:2",
+        )
+
+        switch_tokens = {
+            candidate["token"]
+            for candidate in graph["action_candidates"]
+            if candidate["action_type"] == "switch"
+        }
+        self.assertIn("switch:2", switch_tokens)
+
 
 if __name__ == "__main__":
     unittest.main()

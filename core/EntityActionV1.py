@@ -93,8 +93,15 @@ def _fallback_switch_slots(
     state: dict[str, Any],
     *,
     player: str,
+    chosen_action: Optional[Tuple[str, str]] = None,
+    chosen_action_token: Optional[str] = None,
 ) -> list[int]:
-    """Recover plausible switch targets from side slots when request data is absent."""
+    """Recover plausible switch targets from side slots when request data is absent.
+
+    Like move fallback, we force the recorded chosen switch into the candidate
+    list so offline replay training does not fail when legality reconstruction
+    misses the logged switch target.
+    """
     side = state.get(player, {}) or {}
     active_uid = side.get("active_uid")
     mons = state.get("mons", {}) or {}
@@ -107,7 +114,23 @@ def _fallback_switch_slots(
         if mon is not None and mon.get("fainted"):
             continue
         switch_slots.append(idx)
-    return switch_slots
+
+    chosen_slot: int | None = None
+    if chosen_action is not None and chosen_action[0] == "switch":
+        chosen_uid = str(chosen_action[1])
+        for idx, uid in enumerate(slots, start=1):
+            if uid == chosen_uid:
+                chosen_slot = idx
+                break
+    if chosen_slot is None and chosen_action_token and str(chosen_action_token).startswith("switch:"):
+        try:
+            chosen_slot = int(str(chosen_action_token).split(":", 1)[1])
+        except ValueError:
+            chosen_slot = None
+
+    if chosen_slot is not None and chosen_slot not in switch_slots:
+        switch_slots.append(chosen_slot)
+    return sorted(dict.fromkeys(int(slot) for slot in switch_slots if int(slot) > 0))
 
 
 def _build_pokemon_entity(
@@ -386,7 +409,12 @@ def build_entity_action_graph(
             if isinstance(entry, dict) and entry.get("slot") is not None
         ]
     else:
-        switch_slots = _fallback_switch_slots(state, player=perspective_player)
+        switch_slots = _fallback_switch_slots(
+            state,
+            player=perspective_player,
+            chosen_action=chosen_action,
+            chosen_action_token=chosen_action_token,
+        )
     switch_action_candidates = _build_switch_action_candidates(
         state=state,
         perspective_player=perspective_player,
