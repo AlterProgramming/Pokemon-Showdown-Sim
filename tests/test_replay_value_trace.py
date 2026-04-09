@@ -13,7 +13,7 @@ from replay_value_trace import generate_battle_trace_rows
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLE_BATTLE_PATH = ROOT / "gen9randombattle-2390494424.json"
+SAMPLE_BATTLE_PATH = ROOT / "data" / "gen9randombattle-2390494424.json"
 
 
 class FakePolicyValueModel:
@@ -83,10 +83,27 @@ class ReplayValueTraceTests(unittest.TestCase):
         self.assertIn("reward_total", first)
         self.assertIn("cumulative_reward", first)
         self.assertIn("terminal_result", first)
+        self.assertIn("diagnostics", first)
         self.assertIsInstance(first["value_pre"], float)
         self.assertIsInstance(first["value_post"], float)
         self.assertIsInstance(first["value_delta"], float)
         self.assertIsInstance(first["policy_topk"], list)
+        self.assertIn("public", first["diagnostics"])
+        self.assertIn("retrospective", first["diagnostics"])
+        self.assertIn("action_family", first["diagnostics"]["public"])
+        self.assertIn("known_status_violation", first["diagnostics"]["public"])
+        self.assertIn("switch_chain", first["diagnostics"]["public"])
+        self.assertIn("same_action_streak", first["diagnostics"]["public"])
+        self.assertIn("same_move_spam", first["diagnostics"]["public"])
+        self.assertIn("move_effectiveness", first["diagnostics"]["retrospective"])
+        self.assertIn("used_not_super_effective_move", first["diagnostics"]["retrospective"])
+        self.assertIn("used_neutral_move", first["diagnostics"]["retrospective"])
+        self.assertIn("used_resisted_move", first["diagnostics"]["retrospective"])
+        self.assertIn("used_immune_move", first["diagnostics"]["retrospective"])
+        self.assertIsInstance(first["diagnostics"]["public"]["same_action_streak"], int)
+        self.assertIsInstance(first["diagnostics"]["public"]["same_move_spam"], bool)
+        self.assertIsInstance(first["diagnostics"]["retrospective"]["used_not_super_effective_move"], bool)
+        self.assertTrue(any(row["diagnostics"]["retrospective"]["used_super_effective_move"] for row in rows))
 
 
 if __name__ == "__main__":
