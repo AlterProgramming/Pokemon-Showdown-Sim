@@ -34,6 +34,23 @@ def _softmax(logits: np.ndarray) -> np.ndarray:
     return exp / denom
 
 
+def _entity_dummy_inputs() -> dict[str, np.ndarray]:
+    return {
+        "global_conditions":      np.zeros((1, 5),      dtype=np.int32),
+        "global_numeric":         np.zeros((1, 17),     dtype=np.float32),
+        "pokemon_ability":        np.zeros((1, 12),     dtype=np.int32),
+        "pokemon_item":           np.zeros((1, 12),     dtype=np.int32),
+        "pokemon_numeric":        np.zeros((1, 12, 13), dtype=np.float32),
+        "pokemon_observed_moves": np.zeros((1, 12, 4),  dtype=np.int32),
+        "pokemon_side":           np.zeros((1, 12),     dtype=np.int32),
+        "pokemon_slot":           np.zeros((1, 12),     dtype=np.int32),
+        "pokemon_species":        np.zeros((1, 12),     dtype=np.int32),
+        "pokemon_status":         np.zeros((1, 12),     dtype=np.int32),
+        "pokemon_tera":           np.zeros((1, 12),     dtype=np.int32),
+        "weather":                np.zeros((1, 1),      dtype=np.int32),
+    }
+
+
 def load_entity_runtime_artifacts(
     metadata_path: Path,
     *,
@@ -123,20 +140,7 @@ def load_entity_runtime_artifacts(
                 import tensorflow as tf
                 import tf2onnx
 
-                dummy = {
-                    "global_conditions":      np.zeros((1, 5),      dtype=np.int32),
-                    "global_numeric":         np.zeros((1, 17),     dtype=np.float32),
-                    "pokemon_ability":        np.zeros((1, 12),     dtype=np.int32),
-                    "pokemon_item":           np.zeros((1, 12),     dtype=np.int32),
-                    "pokemon_numeric":        np.zeros((1, 12, 13), dtype=np.float32),
-                    "pokemon_observed_moves": np.zeros((1, 12, 4),  dtype=np.int32),
-                    "pokemon_side":           np.zeros((1, 12),     dtype=np.int32),
-                    "pokemon_slot":           np.zeros((1, 12),     dtype=np.int32),
-                    "pokemon_species":        np.zeros((1, 12),     dtype=np.int32),
-                    "pokemon_status":         np.zeros((1, 12),     dtype=np.int32),
-                    "pokemon_tera":           np.zeros((1, 12),     dtype=np.int32),
-                    "weather":                np.zeros((1, 1),      dtype=np.int32),
-                }
+                dummy = _entity_dummy_inputs()
                 input_signature = {k: tf.TensorSpec(v.shape, dtype=v.dtype, name=k) for k, v in dummy.items()}
 
                 @tf.function(input_signature=[input_signature])
@@ -153,9 +157,16 @@ def load_entity_runtime_artifacts(
         if onnx_path and onnx_path.exists():
             try:
                 onnx_session = _ort.InferenceSession(str(onnx_path))
+                dummy = _entity_dummy_inputs()
+                _ = onnx_session.run(None, {i.name: dummy[i.name] for i in onnx_session.get_inputs()})
                 print(f"[runtime] ONNX session loaded — fast inference enabled (~0.4ms/request)")
             except Exception as exc:
                 print(f"[runtime] ONNX session load failed: {exc}")
+    if onnx_session is None:
+        try:
+            _ = model(_entity_dummy_inputs(), training=False)
+        except Exception as exc:
+            print(f"[runtime] Keras warmup failed: {exc}")
 
     model_id = str(metadata.get("model_release_id") or metadata.get("model_name") or model_path.stem)
     family_default_switch_bias = 0.20 if family_id == "entity_action_bc" else 0.0

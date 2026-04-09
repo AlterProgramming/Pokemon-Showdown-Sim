@@ -15,6 +15,11 @@ import numpy as np
 from .ModelRegistry import resolve_artifact_path
 
 
+MODEL_WORKER_DEBUG = os.environ.get("PS_MODEL_WORKER_DEBUG", "").strip().lower() in {
+    "1", "true", "yes", "on",
+}
+
+
 def parse_worker_count_overrides(raw_value: str | None) -> dict[str, int]:
     if raw_value is None or not raw_value.strip():
         return {}
@@ -57,6 +62,11 @@ def safe_connection_send(connection: Any, payload: dict[str, Any]) -> bool:
         return True
     except (BrokenPipeError, EOFError, OSError, KeyboardInterrupt):
         return False
+
+
+def debug_log(message: str) -> None:
+    if MODEL_WORKER_DEBUG:
+        print(message)
 
 
 def load_runtime_artifacts(repo_path: Path, model_entry: dict[str, Any]) -> dict[str, Any]:
@@ -116,6 +126,9 @@ def inference_worker_main(
             shape = model.input_shape
             if isinstance(shape, tuple) and len(shape) >= 2 and shape[-1] is not None:
                 expected_input_dim = int(shape[-1])
+        if expected_input_dim is not None and int(expected_input_dim) > 0:
+            warmup = np.zeros((1, int(expected_input_dim)), dtype=np.float32)
+            _ = model(warmup, training=False)
         if not safe_connection_send(
             connection,
             {
@@ -164,8 +177,11 @@ def inference_worker_main(
         request_id = str(message.get("request_id") or "")
         state_vector = message.get("state_vector")
         try:
-            arr = np.asarray([state_vector], dtype=np.float32)
-            logits = np.asarray(model.predict(arr, verbose=0)[0], dtype=np.float32)
+            arr = np.asarray(state_vector, dtype=np.float32)[None, :]
+            raw_output = model(arr, training=False)
+            if hasattr(raw_output, "numpy"):
+                raw_output = raw_output.numpy()
+            logits = np.asarray(raw_output[0], dtype=np.float32)
             if not safe_connection_send(
                 connection,
                 {
@@ -173,7 +189,7 @@ def inference_worker_main(
                     "request_id": request_id,
                     "pid": os.getpid(),
                     "model_id": model_id,
-                    "logits": logits.tolist(),
+                    "logits": logits,
                 }
             ):
                 return
@@ -517,7 +533,7 @@ class ModelWorkerPool:
         supervisor = self._supervisors[worker_index]
         worker_health = supervisor.health()
         logged_worker_pid = worker_health.get("pid")
-        print(
+        debug_log(
             "[predict-dispatch] "
             f"model_id={self.model_id} "
             f"worker_index={worker_index} "
@@ -538,7 +554,7 @@ class ModelWorkerPool:
             )
             logged_worker_pid = supervisor_metadata.get("worker_pid", logged_worker_pid)
             total_ms = queue_wait_ms + service_ms
-            print(
+            debug_log(
                 "[predict-complete] "
                 f"model_id={self.model_id} "
                 f"worker_index={worker_index} "
@@ -558,7 +574,7 @@ class ModelWorkerPool:
         except Exception as error:
             service_ms = (time.perf_counter() - request_started) * 1000.0 - queue_wait_ms
             total_ms = queue_wait_ms + service_ms
-            print(
+            debug_log(
                 "[predict-error] "
                 f"model_id={self.model_id} "
                 f"worker_index={worker_index} "
