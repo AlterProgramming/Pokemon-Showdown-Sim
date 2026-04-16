@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Dict, Any, List, Optional, Tuple
+from difflib import get_close_matches
 import json
 import os
 
@@ -32,6 +33,7 @@ class StaticDex:
     def __init__(self, pokedex: Dict[str, Any], vocab: DexVocab):
         self.pokedex = pokedex
         self.vocab = vocab
+        self.name_to_id = self._build_name_index(pokedex)
 
     @staticmethod
     def load_json_from_path(path: str) -> Dict[str, Any]:
@@ -75,6 +77,44 @@ class StaticDex:
 
         return DexVocab(species_to_idx=species_to_idx, type_to_idx=type_to_idx)
 
+    @staticmethod
+    def _build_name_index(pokedex: Dict[str, Any]) -> Dict[str, str]:
+        """Map normalized display names and ids back to canonical Showdown ids."""
+        name_to_id: Dict[str, str] = {}
+        for sid, entry in pokedex.items():
+            name_to_id[sid] = sid
+            display_name = to_id(entry.get("name", ""))
+            if display_name:
+                name_to_id[display_name] = sid
+        return name_to_id
+
+    def resolve_species_id(self, species_name: Optional[str]) -> Optional[str]:
+        """
+        Resolve a species to the best known Showdown id.
+
+        Prefers exact normalized matches. Falls back to a close match from known ids
+        and display names so slightly misspelled or partially formatted names still map
+        to a useful species instead of collapsing to unknown.
+        """
+        if not species_name:
+            return None
+
+        sid = to_id(species_name)
+        if not sid:
+            return None
+
+        if sid in self.pokedex:
+            return sid
+
+        exact_name_match = self.name_to_id.get(sid)
+        if exact_name_match:
+            return exact_name_match
+
+        candidate = get_close_matches(sid, self.name_to_id.keys(), n=1, cutoff=0.75)
+        if not candidate:
+            return None
+        return self.name_to_id[candidate[0]]
+
     def lookup(self, species_name: Optional[str]) -> Tuple[int, int, int, List[float]]:
         """
         Returns:
@@ -83,8 +123,8 @@ class StaticDex:
         if not species_name:
             return 0, 0, 0, [0.0] * 6
 
-        sid = to_id(species_name)
-        entry = self.pokedex.get(sid)
+        sid = self.resolve_species_id(species_name)
+        entry = self.pokedex.get(sid) if sid else None
         if not entry:
             return 0, 0, 0, [0.0] * 6
 
