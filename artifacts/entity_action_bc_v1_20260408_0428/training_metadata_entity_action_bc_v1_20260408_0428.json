@@ -1,0 +1,286 @@
+{
+  "policy_model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.keras",
+  "policy_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.policy_vocab.json",
+  "entity_token_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.entity_token_vocabs.json",
+  "metadata_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/training_metadata_entity_action_bc_v1_20260408_0428.json",
+  "reward_profile_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.move_reward_profile.json",
+  "training_history_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/training_history_entity_action_bc_v1_20260408_0428.json",
+  "epoch_metrics_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/training_metrics_entity_action_bc_v1_20260408_0428.csv",
+  "evaluation_summary_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/evaluation_summary_entity_action_bc_v1_20260408_0428.json",
+  "run_manifest_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/run_manifest_entity_action_bc_v1_20260408_0428.json",
+  "model_name": "entity_action_bc_v1_20260408_0428",
+  "model_release_id": "entity_action_bc_v1_20260408_0428",
+  "parent_release_id": null,
+  "family_id": "entity_action_bc",
+  "family_version": 1,
+  "family_name": "entity_action_bc_v1",
+  "training_regime": "offline_entity_bc_aux_weighted",
+  "information_policy": "public_only",
+  "state_schema_version": "entity_action_v1",
+  "entity_schema_version": "entity_action_v1",
+  "history_schema_version": null,
+  "entity_tensor_layout": [
+    {
+      "name": "pokemon_species",
+      "shape": [
+        12
+      ],
+      "description": "Per-slot species token ids for self slots 1-6 followed by opponent slots 1-6."
+    },
+    {
+      "name": "pokemon_item",
+      "shape": [
+        12
+      ],
+      "description": "Per-slot item token ids."
+    },
+    {
+      "name": "pokemon_ability",
+      "shape": [
+        12
+      ],
+      "description": "Per-slot ability token ids."
+    },
+    {
+      "name": "pokemon_tera",
+      "shape": [
+        12
+      ],
+      "description": "Per-slot tera-type token ids."
+    },
+    {
+      "name": "pokemon_status",
+      "shape": [
+        12
+      ],
+      "description": "Per-slot status token ids."
+    },
+    {
+      "name": "pokemon_side",
+      "shape": [
+        12
+      ],
+      "description": "Fixed side ids: self slots then opponent slots."
+    },
+    {
+      "name": "pokemon_slot",
+      "shape": [
+        12
+      ],
+      "description": "Fixed slot indices 1-6 repeated for both sides."
+    },
+    {
+      "name": "pokemon_observed_moves",
+      "shape": [
+        12,
+        4
+      ],
+      "description": "Per-slot observed move token ids, padded to a fixed width."
+    },
+    {
+      "name": "pokemon_numeric",
+      "shape": [
+        12,
+        13
+      ],
+      "description": "Per-slot explicit numeric public state: hp, reveal/activity/faint/tera flags, and boosts."
+    },
+    {
+      "name": "weather",
+      "shape": [
+        1
+      ],
+      "description": "Global weather token id."
+    },
+    {
+      "name": "global_conditions",
+      "shape": [
+        5
+      ],
+      "description": "Observed global conditions as token ids, padded to a fixed width."
+    },
+    {
+      "name": "global_numeric",
+      "shape": [
+        17
+      ],
+      "description": "Normalized turn index plus explicit self/opponent side condition levels."
+    }
+  ],
+  "feature_layout": null,
+  "num_action_classes": 357,
+  "policy_label_format": "action_tokens",
+  "action_space": "joint",
+  "action_parameterization": "joint_vocab_scored_by_entity_encoder",
+  "objective_set": [
+    "policy",
+    "transition",
+    "value",
+    "sequence_auxiliary"
+  ],
+  "train_examples": 185546,
+  "val_examples": 45996,
+  "epochs_requested": 30,
+  "epochs_completed": 27,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "hidden_dim": 256,
+  "depth": 3,
+  "dropout": 0.1,
+  "token_embed_dim": 24,
+  "min_move_count": 1,
+  "max_battles": 5000,
+  "val_ratio": 0.2,
+  "seed": 42,
+  "include_switches": true,
+  "predict_turn_outcome": true,
+  "predict_value": true,
+  "transition_weight": 0.25,
+  "value_weight": 0.25,
+  "value_hidden_dim": 128,
+  "value_target": "terminal_win_probability",
+  "value_target_definition": "terminal_win_probability",
+  "value_head_activation": "sigmoid",
+  "action_embed_dim": 16,
+  "transition_hidden_dim": 256,
+  "reward_config": {
+    "hp_weight": 0.25,
+    "ko_weight": 0.5,
+    "wasted_move_penalty": 0.1,
+    "redundant_setup_penalty": 0.25,
+    "wasted_setup_penalty": 1.0,
+    "terminal_weight": 1.0,
+    "return_discount": 1.0,
+    "offensive_move_min_uses": 20,
+    "offensive_move_min_damage_rate": 0.5
+  },
+  "reward_definition_id": "dense_reward_v2",
+  "policy_return_weighting": "exp",
+  "policy_return_weight_scale": 0.75,
+  "policy_return_weight_min": 0.25,
+  "policy_return_weight_max": 4.0,
+  "policy_weighting_definition": {
+    "mode": "exp",
+    "scale": 0.75,
+    "min_weight": 0.25,
+    "max_weight": 4.0
+  },
+  "switch_logit_bias": 0.2,
+  "action_selection": {
+    "switch_logit_bias": 0.2,
+    "voluntary_switch_only": true
+  },
+  "data_source_id": "explicit_paths",
+  "data_source_details": {
+    "used_default_kaggle_dataset": false,
+    "default_kaggle_dataset": null,
+    "raw_data_paths": [
+      "/root/.cache/kagglehub/datasets/thephilliplin/pokemon-showdown-battles-gen9-randbats/versions/1"
+    ],
+    "resolved_data_paths": [
+      "/root/.cache/kagglehub/datasets/thephilliplin/pokemon-showdown-battles-gen9-randbats/versions/1"
+    ],
+    "json_path_count": 13979
+  },
+  "split_definition": {
+    "method": "group_split_by_battle_id",
+    "val_ratio": 0.2,
+    "seed": 42
+  },
+  "environment_definition": {
+    "battle_log_source": "pokemon_showdown_json",
+    "observation_scope": "public_only",
+    "format_hint": "gen9randombattle"
+  },
+  "initialization_source": {
+    "mode": "scratch",
+    "relationship": "none",
+    "source": null,
+    "target": {
+      "family_id": "entity_action_bc",
+      "family_version": 1,
+      "model_release_id": "entity_action_bc_v1_20260408_0428",
+      "parent_release_id": null
+    },
+    "checkpoint_path": null,
+    "artifact_key": null,
+    "notes": [
+      "no source release supplied"
+    ]
+  },
+  "evaluation_bundle_id": "offline_validation_v1",
+  "registry_visibility": "runnable_policy_value",
+  "trace_schema_version": "1.1",
+  "num_reward_profiled_moves": 350,
+  "num_offensive_reward_moves": 240,
+  "entity_token_vocab_sizes": {
+    "species": 433,
+    "item": 33,
+    "ability": 108,
+    "tera": 22,
+    "status": 9,
+    "move": 352,
+    "weather": 7,
+    "global_condition": 6
+  },
+  "training_model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/training_model_entity_action_bc_v1_20260408_0428.keras",
+  "turn_outcome_dim": 127,
+  "turn_outcome_layout": [
+    {
+      "name": "my_pre_active_after",
+      "size": 17,
+      "description": "End-of-turn summary for my active that started the turn."
+    },
+    {
+      "name": "opponent_pre_active_after",
+      "size": 17,
+      "description": "End-of-turn summary for the opponent active that started the turn."
+    },
+    {
+      "name": "my_post_active",
+      "size": 33,
+      "description": "End-of-turn active on my side, including visible species hash."
+    },
+    {
+      "name": "opponent_post_active",
+      "size": 33,
+      "description": "End-of-turn active on the opponent side, including visible species hash."
+    },
+    {
+      "name": "active_changed_flags",
+      "size": 2,
+      "description": "Whether either side ended the turn with a different active."
+    },
+    {
+      "name": "field_after",
+      "size": 9,
+      "description": "Weather and global field conditions after the turn resolves."
+    },
+    {
+      "name": "my_side_conditions_after",
+      "size": 8,
+      "description": "My side conditions after the turn."
+    },
+    {
+      "name": "opponent_side_conditions_after",
+      "size": 8,
+      "description": "Opponent side conditions after the turn."
+    }
+  ],
+  "action_context_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/action_context_vocab_entity_action_bc_v1_20260408_0428.json",
+  "num_action_context_classes": 358,
+  "transition_target_definition": "public_turn_outcome_summary_v1",
+  "policy_value_model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/policy_value_model_entity_action_bc_v1_20260408_0428.keras",
+  "sequence_target_definition": "turn_events_v1_composite_key",
+  "sequence_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/sequence_vocab_entity_action_bc_v1_20260408_0428.json",
+  "sequence_vocab_size": 6325,
+  "sequence_hidden_dim": 128,
+  "sequence_weight": 0.1,
+  "max_seq_len": 32,
+  "policy_weight_stats": {
+    "count": 185546,
+    "mean": 1.0025172233581543,
+    "min": 0.25,
+    "max": 2.7044737339019775
+  }
+}
