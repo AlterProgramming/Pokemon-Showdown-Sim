@@ -23,6 +23,78 @@ The identity-invariance follow-on family contract lives in:
 
 `docs/ENTITY_INVARIANCE_AUX_V1.md`
 
+The current word-policy prototype and its design notes live in the sibling
+subproject:
+
+- `../word_prediction_model/README.md`
+- `../word_prediction_model/FINDINGS.md`
+- `../word_prediction_model/BENCHMARK_CHRONOLOGY.md`
+- `../word_prediction_model/PARAMETERS.md`
+- `../word_prediction_model/DECISION_FLOW.md`
+- `../word_prediction_model/RUNBOOK_7802_OF_10000.md`
+- `../word_prediction_model/THREAT_AWARE_NOTES.md`
+- `../word_prediction_model/ROADMAP_90_PERCENT.md`
+- `../word_prediction_model/RESEARCH_SNAPSHOT_2026_04_09.md`
+
+That track started as a typo-aware word prediction model and now serves as a
+compact battle-policy controller through a local policy server and simulator
+benchmark loop.
+
+Its implementation can be understood as a small spanning tree with one trunk
+and several branches:
+
+- Root trunk: the word-model core in `../word_prediction_model/`
+  (`text.py`, `lexicon.py`, `dataset.py`, `model.py`, `pipeline.py`) learns a
+  typo-aware embedding space where prompts and misspelled surface forms align to
+  canonical words.
+- First branch: battle-language specialization
+  (`battle_lexicon.py`, `battle_inquiry.py`) maps battle questions and battle
+  state into a compact prompt-token set and predicts ranked battle words such as
+  `attack`, `finish`, `switch`, or `stabilize`.
+- Second branch: action realization
+  (`policy_adapter.py`, `pokemon_type_utils.py`) turns the ranked word output
+  into legal move or switch choices using HP/state heuristics, legality checks,
+  and type-aware scoring.
+- Third branch: serving and simulator integration
+  (`policy_server.py` plus the sibling simulator's RL-agent path) exposes the
+  policy over HTTP to the battle runner.
+- Leaf evaluation path: the benchmark runner in the sibling simulator repo is
+  the ground-truth leaf of the tree, because it is where semantic word control
+  becomes real battle outcomes against random play.
+
+The practical reason this tree matters is that the model's strength does not
+come from the embedding layer alone. The trunk gives semantic control; the
+branches decide whether that control becomes legal, useful battle actions.
+
+The current frozen benchmark profile from that track is:
+
+- `7802 / 10000`
+- `78.02%` win rate
+- `0` failed games
+
+Reproduction steps for that exact profile are documented in:
+
+- `../word_prediction_model/RUNBOOK_7802_OF_10000.md`
+
+The next decoder iteration adds revealed-opponent threat modeling and has
+already qualified at:
+
+- `171 / 200`
+- `85.50%` win rate
+
+That architecture note is documented in:
+
+- `../word_prediction_model/THREAT_AWARE_NOTES.md`
+
+The next-ceiling plan toward `90%` is documented in:
+
+- `../word_prediction_model/ROADMAP_90_PERCENT.md`
+
+The latest stable research snapshot after the sticky-move decoder work is
+documented in:
+
+- `../word_prediction_model/RESEARCH_SNAPSHOT_2026_04_09.md`
+
 The runnable trainer and launcher for that family live in:
 
 - `train_entity_invariance.py`
@@ -133,28 +205,6 @@ Write-Host "Using server port $port"
 ```
 
 The matching runbook is here:
-
-## Desktop Utilities
-
-There are also a few Windows PowerShell utilities under `scripts/` for desktop-only workflows:
-
-- `scripts/get_codex_session_id.ps1`: prints the active Codex desktop conversation ID from the newest local app log
-- `scripts/broadcast_ble_value.ps1`: advertises a compact value over Bluetooth Low Energy, including the current Codex session ID
-- `scripts/scan_ble_value.ps1`: listens for the matching BLE broadcast format on another Windows device
-
-Broadcast the current Codex session ID for two minutes:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\broadcast_ble_value.ps1 -UseCodexSessionId
-```
-
-Listen for it on another Windows device:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\scan_ble_value.ps1 -FirstOnly
-```
-
-These utilities use BLE advertising rather than Bluetooth pairing. The payload is intentionally small, so text broadcasts must stay short.
 
 - `BENCHMARK_RUNBOOK.md`
 
