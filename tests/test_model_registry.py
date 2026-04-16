@@ -106,9 +106,45 @@ class ModelRegistryTests(unittest.TestCase):
             self.assertTrue(registry["models"]["model2_large"]["predict_value"])
 
             registry_path = write_model_registry(repo_path)
-            self.assertEqual(registry_path, artifacts_dir / REGISTRY_FILENAME)
+            self.assertEqual(registry_path.resolve(), (artifacts_dir / REGISTRY_FILENAME).resolve())
             persisted = json.loads(registry_path.read_text(encoding="utf-8"))
             self.assertEqual(sorted(persisted["models"].keys()), ["model1", "model2_large"])
+
+    def test_build_registry_discovers_nested_artifact_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_path = Path(tmpdir)
+            release_dir = repo_path / "artifacts" / "entity_action_v2_20260409_1811"
+            release_dir.mkdir(parents=True)
+
+            (release_dir / "entity_action_v2_20260409_1811.keras").write_text("m", encoding="utf-8")
+            (release_dir / "entity_action_v2_20260409_1811.entity_token_vocabs.json").write_text(
+                "{}",
+                encoding="utf-8",
+            )
+
+            nested_metadata = {
+                "model_name": "entity_action_v2_20260409_1811",
+                "model_release_id": "entity_action_v2_20260409_1811",
+                "family_id": "entity_action_v2",
+                "family_version": 1,
+                "family_name": "entity_action_v2",
+                "policy_model_path": "entity_action_v2_20260409_1811.keras",
+                "entity_token_vocab_path": "entity_action_v2_20260409_1811.entity_token_vocabs.json",
+                "action_space": "legal_candidates",
+                "predict_value": True,
+                "registry_visibility": "runnable_policy",
+            }
+            (release_dir / "training_metadata_entity_action_v2_20260409_1811.json").write_text(
+                json.dumps(nested_metadata),
+                encoding="utf-8",
+            )
+
+            registry = build_model_registry(repo_path)
+            self.assertIn("entity_action_v2_20260409_1811", registry["models"])
+            self.assertEqual(
+                registry["models"]["entity_action_v2_20260409_1811"]["metadata_path"],
+                "artifacts/entity_action_v2_20260409_1811/training_metadata_entity_action_v2_20260409_1811.json",
+            )
 
 
 if __name__ == "__main__":

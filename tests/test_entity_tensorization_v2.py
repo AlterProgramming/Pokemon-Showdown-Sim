@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from unittest import mock
 
 from BattleStateTracker import STAT_ORDER
 from EntityTensorizationV2 import (
@@ -9,6 +10,7 @@ from EntityTensorizationV2 import (
     MAX_LEGAL_ACTIONS,
     build_entity_v2_training_bundle,
     encode_entity_state_with_candidates,
+    to_single_example_entity_v2_inputs,
     vectorize_entity_v2_policy_dataset,
 )
 
@@ -164,6 +166,53 @@ class EntityTensorizationV2Tests(unittest.TestCase):
         self.assertEqual(targets["value"], [1.0])
         self.assertEqual(X["candidate_mask"][0][:4], [1.0, 1.0, 1.0, 1.0])
         self.assertTrue(all(value == 0.0 for value in X["candidate_mask"][0][4:]))
+
+    def test_single_example_inputs_use_int32_for_integer_tensors(self) -> None:
+        examples = make_examples()
+        bundle = build_entity_v2_training_bundle(examples)
+        encoded = encode_entity_state_with_candidates(
+            examples[0]["state"],
+            perspective_player="p1",
+            token_vocabs=bundle["token_vocabs"],
+            legal_moves=examples[0]["legal_moves"],
+            legal_switches=examples[0]["legal_switches"],
+        )
+
+        batched = to_single_example_entity_v2_inputs(encoded)
+        self.assertEqual(str(batched["pokemon_species"].dtype), "int32")
+        self.assertEqual(str(batched["pokemon_observed_moves"].dtype), "int32")
+        self.assertEqual(str(batched["candidate_type"].dtype), "int32")
+        self.assertEqual(str(batched["candidate_switch_slot"].dtype), "int32")
+        self.assertEqual(str(batched["candidate_mask"].dtype), "float32")
+
+    def test_encode_entity_state_with_candidates_reuses_state_view_once(self) -> None:
+        examples = make_examples()
+        bundle = build_entity_v2_training_bundle(examples)
+        state_view_calls = 0
+
+        original_build = encode_entity_state_with_candidates.__globals__["build_entity_state_view"]
+
+        def counting_build(*args, **kwargs):
+            nonlocal state_view_calls
+            state_view_calls += 1
+            return original_build(*args, **kwargs)
+
+        with mock.patch(
+            "core.EntityTensorizationV2.build_entity_state_view",
+            side_effect=counting_build,
+        ), mock.patch(
+            "core.EntityActionV1.build_entity_state_view",
+            side_effect=AssertionError("candidate encoding should reuse the prebuilt state view"),
+        ):
+            encode_entity_state_with_candidates(
+                examples[0]["state"],
+                perspective_player="p1",
+                token_vocabs=bundle["token_vocabs"],
+                legal_moves=examples[0]["legal_moves"],
+                legal_switches=examples[0]["legal_switches"],
+            )
+
+        self.assertEqual(state_view_calls, 1)
 
 
 if __name__ == "__main__":

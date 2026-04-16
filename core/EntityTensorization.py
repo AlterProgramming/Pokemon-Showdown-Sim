@@ -199,12 +199,24 @@ def encode_entity_state(
     perspective_player: str,
     token_vocabs: Dict[str, Dict[str, int]],
 ) -> Dict[str, Any]:
-    # The entity view gives us the minimal symbolic state; tensorization turns that into
-    # learned token ids plus a small explicit numeric slice for public battle state.
-    state_view = build_entity_state_view(
+    state_view = build_entity_state_view(state=state, perspective_player=perspective_player)
+    return encode_entity_state_from_view(
+        state_view,
         state=state,
         perspective_player=perspective_player,
+        token_vocabs=token_vocabs,
     )
+
+
+def encode_entity_state_from_view(
+    state_view: Dict[str, Any],
+    *,
+    state: Dict[str, Any],
+    perspective_player: str,
+    token_vocabs: Dict[str, Dict[str, int]],
+) -> Dict[str, Any]:
+    # The entity view gives us the minimal symbolic state; tensorization turns that into
+    # learned token ids plus a small explicit numeric slice for public battle state.
     pokemon_entities = list(state_view["pokemon_entities"])
     global_entity = dict(state_view["global_entity"])
 
@@ -285,7 +297,7 @@ def to_numpy_entity_inputs(raw_inputs: Dict[str, Any]) -> Dict[str, np.ndarray]:
     """
     out: Dict[str, np.ndarray] = {}
     for key, values in raw_inputs.items():
-        dtype = np.int64 if key in ENTITY_INT_INPUT_KEYS else np.float32
+        dtype = np.int32 if key in ENTITY_INT_INPUT_KEYS else np.float32
         out[key] = np.asarray(values, dtype=dtype)
     return out
 

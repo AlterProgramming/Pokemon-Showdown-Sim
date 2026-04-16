@@ -341,6 +341,7 @@ def build_entity_action_graph(
     *,
     state: dict[str, Any],
     perspective_player: str,
+    state_view: dict[str, Any] | None = None,
     legal_moves: Optional[Sequence[dict[str, Any]]] = None,
     legal_switches: Optional[Sequence[dict[str, Any]]] = None,
     chosen_action: Optional[Tuple[str, str]] = None,
@@ -369,10 +370,8 @@ def build_entity_action_graph(
         else:
             chosen_action_token = _normalize_action_token(chosen_action)
 
-    state_view = build_entity_state_view(
-        state=state,
-        perspective_player=perspective_player,
-    )
+    if state_view is None:
+        state_view = build_entity_state_view(state=state, perspective_player=perspective_player)
     pokemon_entities = list(state_view["pokemon_entities"])
     global_entity = dict(state_view["global_entity"])
     my_active_entity_id = next(

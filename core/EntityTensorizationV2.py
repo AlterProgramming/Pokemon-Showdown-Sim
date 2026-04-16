@@ -14,8 +14,9 @@ import numpy as np
 from .EntityActionV1 import build_entity_action_graph
 from .EntityTensorization import (
     PAD_TOKEN,
-    encode_entity_state,
+    encode_entity_state_from_view,
     entity_tensor_layout,
+    build_entity_state_view,
     vocab_lookup,
 )
 
@@ -77,6 +78,7 @@ def encode_entity_candidates(
     *,
     perspective_player: str,
     token_vocabs: Dict[str, Dict[str, int]],
+    state_view: Dict[str, Any] | None = None,
     legal_moves: Sequence[Dict[str, Any]] | None = None,
     legal_switches: Sequence[Dict[str, Any]] | None = None,
     chosen_action: Tuple[str, str] | None = None,
@@ -87,6 +89,7 @@ def encode_entity_candidates(
     graph = build_entity_action_graph(
         state=state,
         perspective_player=perspective_player,
+        state_view=state_view,
         legal_moves=legal_moves,
         legal_switches=legal_switches,
         chosen_action=chosen_action,
@@ -140,8 +143,10 @@ def encode_entity_state_with_candidates(
     max_candidates: int = MAX_LEGAL_ACTIONS,
 ) -> Dict[str, Any]:
     """Combine v1 state inputs with v2 legal-action candidate inputs."""
-    encoded_state = encode_entity_state(
-        state,
+    state_view = build_entity_state_view(state=state, perspective_player=perspective_player)
+    encoded_state = encode_entity_state_from_view(
+        state_view,
+        state=state,
         perspective_player=perspective_player,
         token_vocabs=token_vocabs,
     )
@@ -149,6 +154,7 @@ def encode_entity_state_with_candidates(
         state,
         perspective_player=perspective_player,
         token_vocabs=token_vocabs,
+        state_view=state_view,
         legal_moves=legal_moves,
         legal_switches=legal_switches,
         chosen_action=chosen_action,
@@ -175,12 +181,12 @@ def to_single_example_entity_v2_inputs(raw_inputs: Dict[str, Any]) -> Dict[str, 
     }
     out: Dict[str, np.ndarray] = {}
     for key, values in batched.items():
-        dtype = np.int64 if key in ENTITY_V2_INT_INPUT_KEYS else np.float32
+        dtype = np.int32 if key in ENTITY_V2_INT_INPUT_KEYS else np.float32
         if key not in ENTITY_V2_INT_INPUT_KEYS and key != "candidate_mask":
             from .EntityTensorization import ENTITY_INT_INPUT_KEYS
 
             if key in ENTITY_INT_INPUT_KEYS:
-                dtype = np.int64
+                dtype = np.int32
         out[key] = np.asarray(values, dtype=dtype)
     return out
 
