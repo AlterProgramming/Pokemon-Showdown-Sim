@@ -9,7 +9,7 @@ REGISTRY_FILENAME = "model_registry.json"
 
 
 def metadata_file_candidates(artifacts_dir: Path) -> list[Path]:
-    return sorted(artifacts_dir.glob("training_metadata*.json"))
+    return sorted(artifacts_dir.rglob("training_metadata*.json"))
 
 
 def parse_model_id_list(raw_value: str | None) -> list[str]:
@@ -160,6 +160,8 @@ def enrich_training_metadata_recipe_fields(metadata: dict[str, Any]) -> dict[str
     # baselines remain benchmarkable alongside newer families.
     payload.setdefault("policy_model_path", payload.get("model_path"))
     payload.setdefault("policy_vocab_path", payload.get("vocab_path"))
+    if not payload.get("policy_vocab_path") and payload.get("entity_token_vocab_path"):
+        payload["policy_vocab_path"] = payload.get("entity_token_vocab_path")
 
     family_id, family_version = infer_family_identity(payload)
     payload["family_id"] = family_id

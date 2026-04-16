@@ -5,6 +5,13 @@ from dataclasses import dataclass, field
 from typing import Any, DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
 
 from .RewardSignals import battle_winner, terminal_result_for_player
+from .TurnEventV1 import (
+    TurnEventV1, hp_delta_to_bin,
+    EVENT_MOVE, EVENT_SWITCH, EVENT_DAMAGE, EVENT_HEAL,
+    EVENT_STATUS_START, EVENT_STATUS_END, EVENT_BOOST, EVENT_UNBOOST,
+    EVENT_FAINT, EVENT_WEATHER, EVENT_FIELD, EVENT_SIDE_CONDITION,
+    EVENT_FORME_CHANGE, EVENT_TURN_END,
+)
 
 
 # Shared ordering for boosts. Vectorization should import this from here
@@ -90,6 +97,7 @@ class BattleStateTracker:
     def __init__(self, form_change_species: Optional[Set[str]] = None):
         # Species that can appear under multiple battle UIDs but should share a slot.
         self.form_change_species: Set[str] = form_change_species or {"Palafin"}
+        self._current_turn_events: list = []
         self.reset()
 
     def reset(self) -> None:
@@ -347,7 +355,22 @@ class BattleStateTracker:
         return None
 
     # ---------- Event application ----------
+    def _side_from_uid(self, uid: str) -> str:
+        """Extract player side ('p1' or 'p2') from a UID string.
+
+        Returns '' for None, empty, or unrecognised UIDs (e.g. moves with no
+        target such as Encore whose target_uid is null in the battle log).
+        """
+        if not uid:
+            return ""
+        if uid.startswith("p1"):
+            return "p1"
+        if uid.startswith("p2"):
+            return "p2"
+        return ""
+
     def apply_turn(self, turn_obj: Dict[str, Any]) -> None:
+        self._current_turn_events = []
         self.turn_index = int(turn_obj.get("turn_number", self.turn_index + 1))
         for ev in (turn_obj.get("events", []) or []):
             et = ev.get("type")
@@ -369,6 +392,7 @@ class BattleStateTracker:
                 self._apply_form_change(ev)
             elif et == "effect":
                 self._apply_effect(ev)
+        self._current_turn_events.append(TurnEventV1(event_type=EVENT_TURN_END))
 
     def _apply_move(self, ev: Dict[str, Any]) -> None:
         uid = ev.get("pokemon_uid")
@@ -385,6 +409,15 @@ class BattleStateTracker:
             if self.sides[target_player].active_uid is None:
                 self._observe_mon(target_uid, public=True, assume_active=True)
 
+        actor = self._side_from_uid(ev.get("pokemon_uid", ""))
+        target = self._side_from_uid(ev.get("target_uid", ""))
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_MOVE,
+            actor_side=actor,
+            target_side=target,
+            move_id=ev.get("move_id", ""),
+        ))
+
     def _apply_switch(self, ev: Dict[str, Any]) -> None:
         player = ev.get("player")
         uid = ev.get("into_uid") or ev.get("pokemon_uid")
@@ -393,12 +426,31 @@ class BattleStateTracker:
 
         self._observe_mon(uid, public=True, assume_active=True)
 
+        species = ""
+        ms = self.mons.get(uid)
+        if ms:
+            species = ms.species or ""
+        slot = 0
+        side = self.sides.get(player)
+        if side and uid in side.slot_uids:
+            slot = side.slot_uids.index(uid) + 1
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_SWITCH,
+            actor_side=player,
+            species_id=species,
+            slot_index=slot,
+        ))
+
     def _apply_hp_change(self, ev: Dict[str, Any]) -> None:
         target = ev.get("target_uid")
         if not target:
             return
 
         ms = self._observe_mon(target, public=True)
+
+        # Capture HP fraction BEFORE mutation
+        before_frac = (ms.hp / ms.max_hp) if (ms.hp is not None and ms.max_hp and ms.max_hp > 0) else None
+
         hp_after = ev.get("hp_after")
         max_hp = ev.get("max_hp")
 
@@ -409,6 +461,16 @@ class BattleStateTracker:
 
         if self.sides[ms.player].active_uid is None:
             self._set_active_uid(ms.player, target)
+
+        # Capture HP fraction AFTER mutation
+        after_frac = (ms.hp / ms.max_hp) if (ms.hp is not None and ms.max_hp and ms.max_hp > 0) else None
+        event_type = EVENT_HEAL if (after_frac is not None and before_frac is not None and after_frac > before_frac) else EVENT_DAMAGE
+        target_side = self._side_from_uid(ev.get("target_uid", ""))
+        self._current_turn_events.append(TurnEventV1(
+            event_type=event_type,
+            target_side=target_side,
+            hp_delta_bin=hp_delta_to_bin(before_frac, after_frac),
+        ))
 
     def _apply_status_start(self, ev: Dict[str, Any]) -> None:
         target = ev.get("target_uid")
@@ -422,6 +484,13 @@ class BattleStateTracker:
         if self.sides[ms.player].active_uid is None:
             self._set_active_uid(ms.player, target)
 
+        target_side = self._side_from_uid(ev.get("target_uid", ""))
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_STATUS_START,
+            target_side=target_side,
+            status=ev.get("status", ""),
+        ))
+
     def _apply_status_end(self, ev: Dict[str, Any]) -> None:
         target = ev.get("target_uid")
         status = ev.get("status")
@@ -431,6 +500,13 @@ class BattleStateTracker:
         ms = self._observe_mon(target, public=True)
         if status is None or ms.status == status:
             ms.status = None
+
+        target_side = self._side_from_uid(ev.get("target_uid", ""))
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_STATUS_END,
+            target_side=target_side,
+            status=ev.get("status", ""),
+        ))
 
     def _apply_stat_change(self, ev: Dict[str, Any]) -> None:
         target = ev.get("target_uid")
@@ -447,6 +523,16 @@ class BattleStateTracker:
         if self.sides[ms.player].active_uid is None:
             self._set_active_uid(ms.player, target)
 
+        target_side = self._side_from_uid(ev.get("target_uid", ""))
+        int_amount = ev.get("amount", 0)
+        event_type = EVENT_BOOST if int_amount > 0 else EVENT_UNBOOST
+        self._current_turn_events.append(TurnEventV1(
+            event_type=event_type,
+            target_side=target_side,
+            boost_stat=ev.get("stat", ""),
+            boost_delta=int_amount,
+        ))
+
     def _apply_faint(self, ev: Dict[str, Any]) -> None:
         target = ev.get("target_uid")
         if not target:
@@ -458,6 +544,12 @@ class BattleStateTracker:
 
         if self.sides[ms.player].active_uid == target:
             self.sides[ms.player].active_uid = None
+
+        target_side = self._side_from_uid(ev.get("target_uid", ""))
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_FAINT,
+            target_side=target_side,
+        ))
 
     def _apply_form_change(self, ev: Dict[str, Any]) -> None:
         target = ev.get("target_uid")
@@ -473,6 +565,14 @@ class BattleStateTracker:
 
         if self.sides[ms.player].active_uid is None:
             self._set_active_uid(ms.player, target)
+
+        target_side = self._side_from_uid(ev.get("target_uid", ""))
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_FORME_CHANGE,
+            target_side=target_side,
+            forme_change_kind="tera",
+            status=tera_type or "",
+        ))
 
     def _apply_effect(self, ev: Dict[str, Any]) -> None:
         effect_type = ev.get("effect_type")
@@ -506,8 +606,16 @@ class BattleStateTracker:
             return
         if weather == "none":
             self.weather = None
+            self._current_turn_events.append(TurnEventV1(
+                event_type=EVENT_WEATHER,
+                weather="none",
+            ))
             return
         self.weather = weather
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_WEATHER,
+            weather=weather,
+        ))
 
     def _apply_side_condition(self, raw_parts: List[Any], *, add: bool) -> None:
         if len(raw_parts) < 3:
@@ -527,6 +635,13 @@ class BattleStateTracker:
         else:
             self.sides[player].side_conditions.pop(condition, None)
 
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_SIDE_CONDITION,
+            actor_side=player,
+            side_condition=condition,
+            is_removal=not add,
+        ))
+
     def _apply_field_condition(self, raw_parts: List[Any], *, add: bool) -> None:
         if len(raw_parts) < 2:
             return
@@ -539,6 +654,12 @@ class BattleStateTracker:
             self.global_conditions.add(condition)
         else:
             self.global_conditions.discard(condition)
+
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_FIELD,
+            terrain=condition,
+            is_removal=not add,
+        ))
 
     def _apply_revealed_ability(self, raw_parts: List[Any]) -> None:
         if len(raw_parts) < 3:
@@ -580,6 +701,14 @@ class BattleStateTracker:
 
         ms = self._observe_mon(uid, public=True)
         ms.species = new_species
+
+        target_side = self._side_from_uid(uid)
+        self._current_turn_events.append(TurnEventV1(
+            event_type=EVENT_FORME_CHANGE,
+            target_side=target_side,
+            forme_change_kind="species",
+            species_id=new_species,
+        ))
 
     def _backfill_visible_actives(self, turn_obj: Dict[str, Any]) -> None:
         events = turn_obj.get("events", []) or []
@@ -670,4 +799,5 @@ class BattleStateTracker:
                 "opponent_action_token": opponent_action_token,
                 "winner": winner,
                 "terminal_result": terminal_result,
+                "turn_events_v1": [ev.to_dict() for ev in self._current_turn_events],
             }

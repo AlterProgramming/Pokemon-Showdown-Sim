@@ -1,0 +1,16 @@
+# Core ML stack
+# Requires Python 3.12 (project standard).
+# Note: tensorflow==2.20.0 / keras==3.13.2 used in production (Windows/Linux).
+# On macOS Intel the latest available versions are pinned below.
+tensorflow==2.16.2
+keras==3.10.0
+numpy
+
+# Kaggle dataset download (public datasets — no credentials required)
+kagglehub
+
+# Model server (used by server/ and EntityServerRuntime)
+Flask==3.1.3
+
+# Testing
+pytest

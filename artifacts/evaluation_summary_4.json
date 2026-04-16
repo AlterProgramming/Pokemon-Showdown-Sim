@@ -1,0 +1,9 @@
+{
+  "status": "backfilled_without_training_history",
+  "created_at_utc": "2026-03-27T06:04:39.322348+00:00",
+  "epochs_completed": 11,
+  "train_examples": 185546,
+  "val_examples": 45996,
+  "metrics": {},
+  "note": "Historical run did not save per-epoch history. This summary was backfilled from available metadata only."
+}

@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 import numpy as np
 
@@ -14,6 +14,21 @@ from RewardSignals import (
     compute_reward_targets,
 )
 from StateVectorization import encode_state_v0
+
+
+MAJOR_STATUS_MOVES: Dict[str, str] = {
+    "glare": "par",
+    "hypnosis": "slp",
+    "poisonpowder": "psn",
+    "sleeppowder": "slp",
+    "spore": "slp",
+    "stunspore": "par",
+    "thunderwave": "par",
+    "toxic": "tox",
+    "toxicthread": "psn",
+    "willowisp": "brn",
+    "yawn": "slp",
+}
 
 
 def discover_json_paths(inputs: Sequence[str]) -> List[Path]:
@@ -92,6 +107,184 @@ def build_policy_topk(
     return rows
 
 
+def action_family(action_token: str) -> str:
+    if action_token.startswith("move:"):
+        return "move"
+    if action_token.startswith("switch:"):
+        return "switch"
+    return "other"
+
+
+def is_forced_switch_state(state: Dict[str, Any], player: str) -> bool:
+    side = state.get(player, {}) or {}
+    active_uid = side.get("active_uid")
+    if not active_uid:
+        return True
+    mon = (state.get("mons", {}) or {}).get(active_uid, {}) or {}
+    return bool(mon.get("fainted"))
+
+
+def get_opponent_active_uid(state: Dict[str, Any], player: str) -> Optional[str]:
+    other = "p2" if player == "p1" else "p1"
+    side = state.get(other, {}) or {}
+    active_uid = side.get("active_uid")
+    return str(active_uid) if active_uid else None
+
+
+def get_mon_status(state: Dict[str, Any], uid: Optional[str]) -> Optional[str]:
+    if not uid:
+        return None
+    mon = (state.get("mons", {}) or {}).get(uid, {}) or {}
+    status = mon.get("status")
+    return str(status) if status else None
+
+
+def get_mon_species(state: Dict[str, Any], uid: Optional[str]) -> Optional[str]:
+    if not uid:
+        return None
+    mon = (state.get("mons", {}) or {}).get(uid, {}) or {}
+    species = mon.get("species")
+    return str(species) if species else None
+
+
+def build_turn_lookup(battle: Dict[str, Any]) -> Dict[int, Dict[str, Any]]:
+    lookup: Dict[int, Dict[str, Any]] = {}
+    for turn in battle.get("turns", []) or []:
+        turn_number = turn.get("turn_number")
+        if turn_number is None:
+            continue
+        lookup[int(turn_number)] = turn
+    return lookup
+
+
+def find_first_decision_event_index(turn_events: Sequence[Dict[str, Any]], player: str) -> Optional[int]:
+    for idx, ev in enumerate(turn_events):
+        if ev.get("player") != player:
+            continue
+        if ev.get("type") in {"move", "switch"}:
+            return idx
+    return None
+
+
+def infer_move_effectiveness(
+    turn_events: Sequence[Dict[str, Any]],
+    *,
+    move_index: Optional[int],
+    actor_player: str,
+    target_uid: Optional[str],
+) -> Optional[str]:
+    if move_index is None or not target_uid:
+        return None
+    if target_uid.startswith(actor_player):
+        return None
+
+    saw_damage_to_target = False
+    for ev in turn_events[move_index + 1 :]:
+        if ev.get("type") == "move":
+            break
+
+        if ev.get("type") == "damage" and ev.get("target_uid") == target_uid and ev.get("source") == "move":
+            saw_damage_to_target = True
+
+        if ev.get("type") != "effect":
+            continue
+
+        effect_type = ev.get("effect_type")
+        if effect_type == "immune":
+            return "immune"
+        if effect_type == "supereffective":
+            return "super"
+        if effect_type == "resisted":
+            return "resisted"
+
+    if saw_damage_to_target:
+        return "neutral"
+    return None
+
+
+def build_turn_diagnostics(
+    ex: Dict[str, Any],
+    turn_lookup: Dict[int, Dict[str, Any]],
+    *,
+    previous_action_token: Optional[str],
+    previous_move_target_uid: Optional[str],
+    previous_opponent_active_uid: Optional[str],
+    previous_move_target_streak: int,
+    previous_voluntary_switch: bool,
+) -> Dict[str, Any]:
+    state_before = ex["state"]
+    player = str(ex["player"])
+    action_token = str(ex["action_token"])
+    family = action_family(action_token)
+    forced_switch = is_forced_switch_state(state_before, player)
+    opponent_active_uid_before = get_opponent_active_uid(state_before, player)
+    opponent_active_species_before = get_mon_species(state_before, opponent_active_uid_before)
+
+    turn_obj = turn_lookup.get(int(ex["turn_number"]), {}) or {}
+    turn_events = turn_obj.get("events", []) or []
+    decision_idx = find_first_decision_event_index(turn_events, player)
+    decision_event = turn_events[decision_idx] if decision_idx is not None else {}
+
+    move_id = decision_event.get("move_id") if family == "move" else None
+    target_uid = decision_event.get("target_uid") if family == "move" else None
+    target_status_before = get_mon_status(state_before, target_uid)
+    expected_major_status = MAJOR_STATUS_MOVES.get(move_id or "")
+
+    status_move_into_already_statused_target = bool(expected_major_status and target_status_before)
+    known_status_violation = status_move_into_already_statused_target
+
+    move_effectiveness = infer_move_effectiveness(
+        turn_events,
+        move_index=decision_idx if family == "move" else None,
+        actor_player=player,
+        target_uid=target_uid,
+    )
+
+    targets_opponent = bool(target_uid and not str(target_uid).startswith(player))
+    if family == "move" and targets_opponent:
+        if (
+            previous_action_token == action_token
+            and previous_move_target_uid == target_uid
+            and previous_opponent_active_uid == opponent_active_uid_before
+        ):
+            same_move_target_streak = previous_move_target_streak + 1
+        else:
+            same_move_target_streak = 1
+    else:
+        same_move_target_streak = 0
+
+    switch_chain = bool(
+        family == "switch"
+        and not forced_switch
+        and previous_voluntary_switch
+    )
+
+    return {
+        "public": {
+            "action_family": family,
+            "forced_switch_state": forced_switch,
+            "opponent_active_uid_before": opponent_active_uid_before,
+            "opponent_active_species_before": opponent_active_species_before,
+            "target_uid": target_uid,
+            "target_status_before": target_status_before,
+            "status_move_into_already_statused_target": status_move_into_already_statused_target,
+            "known_status_violation": known_status_violation,
+            "switch_chain": switch_chain,
+            "same_action_streak": 0,
+            "same_move_target_streak": same_move_target_streak,
+            "same_move_spam": bool(family == "move" and same_move_target_streak >= 3),
+        },
+        "retrospective": {
+            "move_effectiveness": move_effectiveness,
+            "used_super_effective_move": move_effectiveness == "super",
+            "used_not_super_effective_move": move_effectiveness in {"neutral", "resisted", "immune"},
+            "used_neutral_move": move_effectiveness == "neutral",
+            "used_resisted_move": move_effectiveness == "resisted",
+            "used_immune_move": move_effectiveness == "immune",
+        },
+    }
+
+
 def generate_battle_trace_rows(
     battle: Dict[str, Any],
     *,
@@ -106,6 +299,7 @@ def generate_battle_trace_rows(
 ) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
     per_player_rows: List[Dict[str, Any]] = []
+    turn_lookup = build_turn_lookup(battle)
 
     for player in ("p1", "p2"):
         examples = list(tracker.iter_turn_examples(battle, player=player, include_switches=include_switches))
@@ -134,10 +328,31 @@ def generate_battle_trace_rows(
         )
 
         cumulative_reward = 0.0
+        previous_action_token: Optional[str] = None
+        previous_move_target_uid: Optional[str] = None
+        previous_opponent_active_uid: Optional[str] = None
+        previous_move_target_streak = 0
+        previous_voluntary_switch = False
+        previous_same_action_streak = 0
         for idx, ex in enumerate(player_examples):
             reward_components = reward_components_seq[idx]
             reward_total = reward_totals[idx]
             cumulative_reward += reward_total
+            diagnostics = build_turn_diagnostics(
+                ex,
+                turn_lookup,
+                previous_action_token=previous_action_token,
+                previous_move_target_uid=previous_move_target_uid,
+                previous_opponent_active_uid=previous_opponent_active_uid,
+                previous_move_target_streak=previous_move_target_streak,
+                previous_voluntary_switch=previous_voluntary_switch,
+            )
+
+            public_diag = diagnostics["public"]
+            if previous_action_token == ex["action_token"]:
+                public_diag["same_action_streak"] = previous_same_action_streak + 1
+            else:
+                public_diag["same_action_streak"] = 1
 
             per_player_rows.append(
                 {
@@ -159,8 +374,18 @@ def generate_battle_trace_rows(
                     "cumulative_reward": float(cumulative_reward),
                     "return_to_go": float(returns_to_go[idx]),
                     "terminal_result": ex.get("terminal_result"),
+                    "diagnostics": diagnostics,
                 }
             )
+
+            previous_action_token = ex["action_token"]
+            previous_move_target_uid = public_diag["target_uid"]
+            previous_opponent_active_uid = public_diag["opponent_active_uid_before"]
+            previous_move_target_streak = int(public_diag["same_move_target_streak"])
+            previous_voluntary_switch = bool(
+                public_diag["action_family"] == "switch" and not public_diag["forced_switch_state"]
+            )
+            previous_same_action_streak = int(public_diag["same_action_streak"])
 
     rows.extend(sorted(per_player_rows, key=lambda row: (row["turn_number"], row["player"])))
     return rows

@@ -151,6 +151,97 @@ class TrainEntityActionTransferTests(unittest.TestCase):
                     init_from_release="entity_action_bc_v1",
                 )
 
+    def test_make_training_metadata_includes_sequence_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_path = Path(tmpdir)
+            artifacts_dir = repo_path / "artifacts"
+            artifacts_dir.mkdir()
+
+            artifact_paths = {
+                "policy_model": artifacts_dir / "entity_model.keras",
+                "policy_vocab": artifacts_dir / "policy_vocab.json",
+                "entity_token_vocabs": artifacts_dir / "entity_token_vocabs.json",
+                "metadata": artifacts_dir / "training_metadata_entity.json",
+                "reward_profile": artifacts_dir / "reward_profile.json",
+                "training_history": artifacts_dir / "training_history_entity.json",
+                "epoch_metrics": artifacts_dir / "epoch_metrics_entity.csv",
+                "evaluation_summary": artifacts_dir / "evaluation_summary_entity.json",
+                "run_manifest": artifacts_dir / "run_manifest_entity.json",
+                "training_model": artifacts_dir / "training_model_entity.keras",
+                "action_context_vocab": artifacts_dir / "action_context_vocab_entity.json",
+                "sequence_vocab": artifacts_dir / "sequence_vocab_entity.json",
+            }
+            history = SimpleNamespace(history={"loss": [1.0, 0.75]})
+            args = SimpleNamespace(
+                predict_turn_outcome=False,
+                predict_value=False,
+                predict_turn_sequence=True,
+                move_only=False,
+                policy_return_weighting="none",
+                policy_return_weight_scale=0.75,
+                policy_return_weight_min=0.25,
+                policy_return_weight_max=4.0,
+                switch_logit_bias=0.2,
+                epochs=2,
+                batch_size=8,
+                learning_rate=1e-3,
+                hidden_dim=64,
+                depth=2,
+                dropout=0.1,
+                token_embed_dim=24,
+                min_move_count=1,
+                max_battles=0,
+                val_ratio=0.2,
+                seed=7,
+                action_embed_dim=16,
+                transition_hidden_dim=64,
+                transition_weight=0.25,
+                value_weight=0.25,
+                value_hidden_dim=32,
+                sequence_hidden_dim=128,
+                sequence_weight=0.1,
+                max_seq_len=32,
+            )
+            sequence_vocab = {"<PAD>": 0, "<BOS>": 1, "<EOS>": 2, "<UNK>": 3, "move:p1:tackle:p2": 4}
+            action_context_vocab = {"<NONE>": 0, "<UNK>": 1, "move:tackle": 2}
+            metadata = make_training_metadata(
+                args,
+                model_name="entity_action_bc_seq_test",
+                train_size=10,
+                val_size=2,
+                history=history,
+                artifact_paths=artifact_paths,
+                policy_vocab={"<UNK>": 0, "move:tackle": 1},
+                action_context_vocab=action_context_vocab,
+                token_vocabs={
+                    "species": {"<UNK>": 0, "bulbasaur": 1},
+                    "move": {"<UNK>": 0, "tackle": 1},
+                },
+                sequence_vocab=sequence_vocab,
+                reward_config=RewardConfig(),
+                move_reward_profile={},
+                policy_weight_stats=None,
+                raw_data_paths=["/tmp/raw.json"],
+                resolved_data_paths=["/tmp/resolved.json"],
+                json_paths=["/tmp/battles.json"],
+            )
+
+            self.assertIn("sequence_target_definition", metadata)
+            self.assertEqual(metadata["sequence_target_definition"], "turn_events_v1_composite_key")
+            self.assertIn("sequence_vocab_path", metadata)
+            self.assertIn("sequence_vocab_size", metadata)
+            self.assertEqual(metadata["sequence_vocab_size"], len(sequence_vocab))
+            self.assertIn("sequence_hidden_dim", metadata)
+            self.assertEqual(metadata["sequence_hidden_dim"], 128)
+            self.assertIn("sequence_weight", metadata)
+            self.assertAlmostEqual(metadata["sequence_weight"], 0.1)
+            self.assertIn("max_seq_len", metadata)
+            self.assertEqual(metadata["max_seq_len"], 32)
+            # When sequence is on but transition is off, action_context_vocab_path should be saved
+            self.assertIn("action_context_vocab_path", metadata)
+            self.assertIn("num_action_context_classes", metadata)
+            self.assertEqual(metadata["num_action_context_classes"], len(action_context_vocab))
+
 
 @unittest.skipIf(keras is None, "TensorFlow is not installed in this test environment")
 class KerasWarmStartTests(unittest.TestCase):

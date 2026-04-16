@@ -8,7 +8,14 @@ from pathlib import Path
 
 import numpy as np
 
-from ModelWorkers import ModelWorkerPool, ModelWorkerSupervisor, parse_worker_count_overrides, softmax
+from ModelWorkers import (
+    ModelWorkerPool,
+    ModelWorkerSupervisor,
+    decode_float32_payload,
+    encode_float32_payload,
+    parse_worker_count_overrides,
+    softmax,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,10 +50,18 @@ def fake_worker_main(repo_path_str: str, model_entry: dict, connection) -> None:
             continue
 
         request_id = message["request_id"]
-        state_vector = list(message["state_vector"])
+        if "state_vector_bytes" in message:
+            state_vector = decode_float32_payload(
+                message["state_vector_bytes"],
+                tuple(message.get("state_vector_shape") or ()),
+            ).tolist()
+        else:
+            state_vector = list(message["state_vector"])
         if state_vector and state_vector[0] == -999.0:
             time.sleep(1.0)
             continue
+
+        logits_bytes, logits_shape = encode_float32_payload(state_vector)
 
         connection.send(
             {
@@ -54,7 +69,8 @@ def fake_worker_main(repo_path_str: str, model_entry: dict, connection) -> None:
                 "request_id": request_id,
                 "pid": os.getpid(),
                 "model_id": model_entry["model_id"],
-                "logits": [float(value) for value in state_vector],
+                "logits_bytes": logits_bytes,
+                "logits_shape": logits_shape,
             }
         )
 
@@ -79,6 +95,15 @@ class FakeSupervisor:
             time.sleep(self.delay_seconds)
         return np.asarray([float(self.worker_index)], dtype=np.float32)
 
+    def predict_batch(self, state_vectors: list[list[float]]) -> np.ndarray:
+        self.predict_calls += len(state_vectors)
+        if self.delay_seconds > 0:
+            time.sleep(self.delay_seconds)
+        return np.asarray(
+            [[float(self.worker_index)] for _ in state_vectors],
+            dtype=np.float32,
+        )
+
     def predict_with_metadata(self, state_vector: list[float]) -> tuple[np.ndarray, dict[str, object]]:
         started = time.perf_counter()
         logits = self.predict(state_vector)
@@ -86,6 +111,16 @@ class FakeSupervisor:
             "worker_index": self.worker_index,
             "worker_pid": 1000 + self.worker_index,
             "service_ms": (time.perf_counter() - started) * 1000.0,
+        }
+
+    def predict_batch_with_metadata(self, state_vectors: list[list[float]]) -> tuple[np.ndarray, dict[str, object]]:
+        started = time.perf_counter()
+        logits = self.predict_batch(state_vectors)
+        return logits, {
+            "worker_index": self.worker_index,
+            "worker_pid": 1000 + self.worker_index,
+            "service_ms": (time.perf_counter() - started) * 1000.0,
+            "batch_size": len(state_vectors),
         }
 
     def health(self) -> dict[str, object]:
@@ -132,6 +167,12 @@ class ModelWorkerSupervisorTests(unittest.TestCase):
         probs = softmax(np.asarray([1.0, 2.0, 3.0], dtype=np.float32))
         self.assertAlmostEqual(float(np.sum(probs)), 1.0, places=6)
         self.assertGreater(float(probs[2]), float(probs[1]))
+
+    def test_float32_payload_round_trip(self) -> None:
+        values = [1.5, 2.5, 3.5]
+        payload, shape = encode_float32_payload(values)
+        decoded = decode_float32_payload(payload, shape)
+        np.testing.assert_allclose(decoded, np.asarray(values, dtype=np.float32))
 
     def start_or_skip(self, supervisor: ModelWorkerSupervisor) -> None:
         try:
@@ -256,6 +297,25 @@ class ModelWorkerPoolTests(unittest.TestCase):
         first.join(timeout=1.0)
         second.join(timeout=1.0)
         self.assertTrue(finished.is_set())
+
+    def test_pool_predict_batch_with_metadata_reports_batch_size(self) -> None:
+        pool = ModelWorkerPool(
+            repo_path=ROOT,
+            model_entry={"model_id": "fake", "feature_dim": 1},
+            worker_count=1,
+            request_timeout_seconds=0.1,
+            max_requests_before_recycle=0,
+            max_worker_age_seconds=0.0,
+            supervisor_factory=lambda worker_index: FakeSupervisor(worker_index),
+        )
+        pool.start()
+        self.addCleanup(pool.close)
+
+        logits, metadata = pool.predict_batch_with_metadata([[1.0], [2.0], [3.0]])
+        np.testing.assert_allclose(logits, np.asarray([[0.0], [0.0], [0.0]], dtype=np.float32))
+        self.assertEqual(metadata["worker_index"], 0)
+        self.assertEqual(metadata["worker_pid"], 1000)
+        self.assertEqual(metadata["batch_size"], 3)
 
 
 if __name__ == "__main__":

@@ -28,6 +28,7 @@ from .StateVectorization import (
     build_action_vocab,
     encode_turn_outcome,
 )
+from .TurnEventTokenizer import build_sequence_vocab, encode_turn_event_sequence
 
 
 PAD_TOKEN = "<PAD>"
@@ -198,12 +199,24 @@ def encode_entity_state(
     perspective_player: str,
     token_vocabs: Dict[str, Dict[str, int]],
 ) -> Dict[str, Any]:
-    # The entity view gives us the minimal symbolic state; tensorization turns that into
-    # learned token ids plus a small explicit numeric slice for public battle state.
-    state_view = build_entity_state_view(
+    state_view = build_entity_state_view(state=state, perspective_player=perspective_player)
+    return encode_entity_state_from_view(
+        state_view,
         state=state,
         perspective_player=perspective_player,
+        token_vocabs=token_vocabs,
     )
+
+
+def encode_entity_state_from_view(
+    state_view: Dict[str, Any],
+    *,
+    state: Dict[str, Any],
+    perspective_player: str,
+    token_vocabs: Dict[str, Dict[str, int]],
+) -> Dict[str, Any]:
+    # The entity view gives us the minimal symbolic state; tensorization turns that into
+    # learned token ids plus a small explicit numeric slice for public battle state.
     pokemon_entities = list(state_view["pokemon_entities"])
     global_entity = dict(state_view["global_entity"])
 
@@ -284,7 +297,7 @@ def to_numpy_entity_inputs(raw_inputs: Dict[str, Any]) -> Dict[str, np.ndarray]:
     """
     out: Dict[str, np.ndarray] = {}
     for key, values in raw_inputs.items():
-        dtype = np.int64 if key in ENTITY_INT_INPUT_KEYS else np.float32
+        dtype = np.int32 if key in ENTITY_INT_INPUT_KEYS else np.float32
         out[key] = np.asarray(values, dtype=dtype)
     return out
 
@@ -303,6 +316,9 @@ def vectorize_entity_multitask_dataset(
     include_switches: bool,
     include_transition: bool = False,
     include_value: bool = False,
+    include_sequence: bool = False,
+    sequence_vocab: Dict[str, int] | None = None,
+    max_seq_len: int = 32,
 ) -> Tuple[Dict[str, List[Any]], Dict[str, List[Any]]]:
     """Convert entity examples into raw tensor lists for supervised multitask training.
 
@@ -311,6 +327,7 @@ def vectorize_entity_multitask_dataset(
         - policy target = chosen action token
         - transition target = public next-state summary
         - value target = terminal result for the acting player
+        - sequence target = turn event token sequence (when include_sequence=True)
     """
     X: Dict[str, List[Any]] = {
         "pokemon_species": [],
@@ -329,12 +346,16 @@ def vectorize_entity_multitask_dataset(
     y_policy: List[int] = []
     y_transition: List[List[float]] = []
     y_value: List[float] = []
+    y_sequence: List[List[int]] = []
     X_my_action: List[int] = []
     X_opp_action: List[int] = []
 
     policy_unk = policy_vocab.get(UNK_TOKEN, 1)
     ctx_none = action_context_vocab.get(ACTION_CONTEXT_NONE, 0) if action_context_vocab else 0
     ctx_unk = action_context_vocab.get(ACTION_CONTEXT_UNK, ctx_none) if action_context_vocab else ctx_none
+
+    if include_sequence and sequence_vocab is None:
+        raise ValueError("include_sequence requires sequence_vocab")
 
     for ex in examples:
         action = ex.get("action")
@@ -354,17 +375,20 @@ def vectorize_entity_multitask_dataset(
 
         y_policy.append(int(policy_vocab.get(str(action_token), policy_unk)))
 
-        if include_transition:
+        if include_transition or include_sequence:
             if action_context_vocab is None:
-                raise ValueError("include_transition requires action_context_vocab")
-            # Transition prediction is conditioned on both sides' chosen actions so the
-            # auxiliary head can learn short-horizon battle mechanics from public logs.
+                raise ValueError("include_transition and include_sequence both require action_context_vocab")
+            # Action context is used by both the transition head and the sequence head.
             X_my_action.append(int(action_context_vocab.get(str(action_token), ctx_unk)))
             opp_action_token = ex.get("opponent_action_token")
             if opp_action_token is None:
                 X_opp_action.append(int(ctx_none))
             else:
                 X_opp_action.append(int(action_context_vocab.get(str(opp_action_token), ctx_unk)))
+
+        if include_transition:
+            # Transition prediction is conditioned on both sides' chosen actions so the
+            # auxiliary head can learn short-horizon battle mechanics from public logs.
             y_transition.append(
                 encode_turn_outcome(
                     ex["state"],
@@ -380,7 +404,13 @@ def vectorize_entity_multitask_dataset(
             # Value stays aligned to terminal outcome probability, not shaped return.
             y_value.append(float(terminal_result))
 
-    if include_transition:
+        if include_sequence:
+            turn_events = ex.get("turn_events_v1") or []
+            y_sequence.append(
+                encode_turn_event_sequence(turn_events, sequence_vocab, max_seq_len)
+            )
+
+    if include_transition or include_sequence:
         X["my_action"] = X_my_action
         X["opp_action"] = X_opp_action
 
@@ -389,6 +419,8 @@ def vectorize_entity_multitask_dataset(
         targets["transition"] = y_transition
     if include_value:
         targets["value"] = y_value
+    if include_sequence:
+        targets["sequence"] = y_sequence
     return X, targets
 
 
@@ -399,6 +431,8 @@ def build_entity_training_bundle(
     min_move_count: int,
     include_transition: bool,
     include_value: bool,
+    include_sequence: bool = False,
+    max_seq_len: int = 32,
 ) -> Dict[str, Any]:
     """Build the vocabulary bundle that defines a concrete entity-family release."""
     policy_vocab = build_action_vocab(
@@ -406,11 +440,16 @@ def build_entity_training_bundle(
         min_count=min_move_count,
         include_switches=include_switches,
     )
-    action_context_vocab = build_action_context_vocab(examples) if include_transition else None
+    # action_context_vocab is needed by both the transition head and the sequence head.
+    need_action_context = include_transition or include_sequence
+    action_context_vocab = build_action_context_vocab(examples) if need_action_context else None
     token_vocabs = build_entity_token_vocabs(examples)
-    return {
+    bundle: Dict[str, Any] = {
         "policy_vocab": policy_vocab,
         "action_context_vocab": action_context_vocab,
         "token_vocabs": token_vocabs,
         "entity_tensor_layout": entity_tensor_layout(),
     }
+    if include_sequence:
+        bundle["sequence_vocab"] = build_sequence_vocab(examples)
+    return bundle

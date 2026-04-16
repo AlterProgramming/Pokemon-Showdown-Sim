@@ -25,9 +25,14 @@ if str(REPO_PATH) not in sys.path:
     sys.path.insert(0, str(REPO_PATH))
 
 from ActionLegality import filter_legal_revive_targets, filter_legal_switches
-from EntityServerRuntime import load_entity_runtime_artifacts, predict_entity_logits
+from EntityServerRuntime import (
+    load_entity_runtime_artifacts,
+    predict_entity_candidate_logits,
+    predict_entity_logits,
+)
 from core.ActionSelection import pick_best_action as select_best_action
 from core.ActionSelection import pick_best_slot_target
+from core.ActionSelection import FORCED_SWITCH_REASONS, softmax
 
 
 APP = Flask(__name__)
@@ -52,6 +57,54 @@ def load_server_state(metadata_path: Path) -> dict[str, Any]:
 
 def predict_logits(battle_state: dict[str, Any], perspective_player: str) -> np.ndarray:
     return predict_entity_logits(SERVER_STATE, battle_state, perspective_player)
+
+
+def select_best_v2_candidate(
+    logits: np.ndarray,
+    candidate_tokens: list[str],
+    *,
+    legal_moves: list[dict[str, Any]],
+    legal_switches: list[dict[str, Any]],
+    switch_reason: str | None,
+    switch_logit_bias: float,
+) -> tuple[dict[str, Any] | None, float]:
+    adjusted = np.asarray(logits, dtype=np.float32).copy()
+    if (
+        switch_logit_bias > 0
+        and switch_reason not in FORCED_SWITCH_REASONS
+        and legal_moves
+        and legal_switches
+    ):
+        for idx, token in enumerate(candidate_tokens):
+            if token.startswith("switch:"):
+                adjusted[idx] -= float(switch_logit_bias)
+
+    probs = softmax(adjusted)
+    best_idx = -1
+    best_prob = -1.0
+    for idx, token in enumerate(candidate_tokens):
+        if not token:
+            continue
+        probability = float(probs[idx])
+        if probability > best_prob:
+            best_prob = probability
+            best_idx = idx
+
+    if best_idx < 0:
+        return None, -1.0
+
+    token = candidate_tokens[best_idx]
+    if token.startswith("move:"):
+        move_id = token.split(":", 1)[1]
+        for move in legal_moves:
+            if str(move.get("id") or move.get("move") or "").lower().replace(" ", "") == move_id:
+                return {"type": "move", "payload": move, "token": token}, best_prob
+    elif token.startswith("switch:"):
+        slot = int(token.split(":", 1)[1])
+        for switch in legal_switches:
+            if int(switch.get("slot") or 0) == slot:
+                return {"type": "switch", "payload": switch, "token": token}, best_prob
+    return None, best_prob
 
 
 @APP.route("/health", methods=["GET"])
@@ -93,7 +146,31 @@ def predict():
         )
         legal_switches, switch_reason = filter_legal_switches(data, data.get("legal_switches", []) or [])
 
-        logits = predict_logits(battle_state, perspective_player)
+        # Apply value-based switch gating if we have a value head
+        switch_logit_bias = float(SERVER_STATE.get("switch_logit_bias", 0.0))
+        if SERVER_STATE.get("has_value_head"):
+            value_estimate = SERVER_STATE.get("_last_value_estimate", 0.5)
+            if value_estimate > 0.5:
+                # Winning: strongly penalize switches
+                switch_logit_bias += (value_estimate - 0.5) * 18
+            # Losing: keep base penalty unchanged (don't boost switches)
+
+        # Hard cooldown: block switches entirely if last action was a switch
+        if SERVER_STATE.get("_last_action_was_switch"):
+            switch_logit_bias += 999.0
+
+        if SERVER_STATE.get("input_mode") == "entity_action_v2":
+            logits, candidate_tokens = predict_entity_candidate_logits(
+                SERVER_STATE,
+                battle_state,
+                perspective_player,
+                legal_moves=legal_moves,
+                legal_switches=legal_switches,
+            )
+        else:
+            logits = predict_logits(battle_state, perspective_player)
+            candidate_tokens = []
+
         if revive_targets:
             best_revive, best_prob = pick_best_slot_target(
                 SERVER_STATE["action_vocab"],
@@ -121,13 +198,23 @@ def predict():
                 switch_logit_bias=float(SERVER_STATE.get("switch_logit_bias", 0.0)),
             )
 
-        best_action, best_prob = select_best_action(
-            SERVER_STATE["action_vocab"],
-            logits,
-            legal_moves,
-            legal_switches,
-            switch_logit_bias=float(SERVER_STATE.get("switch_logit_bias", 0.0)),
-        )
+        if SERVER_STATE.get("input_mode") == "entity_action_v2":
+            best_action, best_prob = select_best_v2_candidate(
+                logits,
+                candidate_tokens,
+                legal_moves=legal_moves,
+                legal_switches=legal_switches,
+                switch_reason=switch_reason,
+                switch_logit_bias=switch_logit_bias,
+            )
+        else:
+            best_action, best_prob = select_best_action(
+                SERVER_STATE["action_vocab"],
+                logits,
+                legal_moves,
+                legal_switches,
+                switch_logit_bias=switch_logit_bias,
+            )
         if best_action is None:
             return jsonify(
                 best_action=None,
@@ -142,6 +229,7 @@ def predict():
             )
 
         if best_action["type"] == "move":
+            SERVER_STATE["_last_action_was_switch"] = False
             return jsonify(
                 best_move=best_action["payload"],
                 type="move",
@@ -152,6 +240,7 @@ def predict():
                 switch_logit_bias=float(SERVER_STATE.get("switch_logit_bias", 0.0)),
             )
 
+        SERVER_STATE["_last_action_was_switch"] = True
         return jsonify(
             best_switch=best_action["payload"],
             slot=best_action["payload"].get("slot"),

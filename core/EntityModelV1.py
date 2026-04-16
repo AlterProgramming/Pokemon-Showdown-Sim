@@ -23,6 +23,142 @@ POKEMON_NUMERIC_DIM = 6 + len(STAT_ORDER)
 GLOBAL_NUMERIC_DIM = 1 + 2 * len(SIDE_CONDITION_ORDER)
 
 
+# ---------------------------------------------------------------------------
+# Registered serialisable layers — replacing all Lambda layers so that
+# keras.models.load_model() can reconstruct the graph without safe_mode=False.
+# ---------------------------------------------------------------------------
+
+def _keras():
+    import keras
+    return keras
+
+def _tf():
+    import tensorflow as tf
+    return tf
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class MaskedAverage(_keras().layers.Layer):
+    """Average-pool embeddings over `axis`, ignoring PAD (id==0) entries."""
+
+    def __init__(self, axis: int, **kwargs):
+        super().__init__(**kwargs)
+        self.axis = axis
+
+    def call(self, inputs):
+        tf = _tf()
+        embeddings, token_ids = inputs
+        mask = tf.cast(tf.not_equal(token_ids, 0), tf.float32)
+        while len(mask.shape) < len(embeddings.shape):
+            mask = tf.expand_dims(mask, axis=-1)
+        numer = tf.reduce_sum(embeddings * mask, axis=self.axis)
+        denom = tf.maximum(tf.reduce_sum(mask, axis=self.axis), 1.0)
+        return numer / denom
+
+    def get_config(self):
+        cfg = super().get_config()
+        cfg["axis"] = self.axis
+        return cfg
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class MaskedPool(_keras().layers.Layer):
+    """Average-pool slot embeddings over axis=1 using a float mask."""
+
+    def call(self, inputs):
+        tf = _tf()
+        values, mask = inputs
+        mask = tf.cast(mask, tf.float32)
+        if len(mask.shape) < len(values.shape):
+            mask = tf.expand_dims(mask, axis=-1)
+        numer = tf.reduce_sum(values * mask, axis=1)
+        denom = tf.maximum(tf.reduce_sum(mask, axis=1), 1.0)
+        return numer / denom
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class SlotSlice(_keras().layers.Layer):
+    """Slice `inputs[:, start:end, :]` — replaces non-serialisable slice Lambdas."""
+
+    def __init__(self, start: int, end: int, **kwargs):
+        super().__init__(**kwargs)
+        self.start = start
+        self.end = end
+
+    def call(self, inputs):
+        return inputs[:, self.start:self.end, :]
+
+    def get_config(self):
+        cfg = super().get_config()
+        cfg.update({"start": self.start, "end": self.end})
+        return cfg
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class ReduceMean1(_keras().layers.Layer):
+    """tf.reduce_mean(x, axis=1) — replaces the all_slot_pool Lambda."""
+
+    def call(self, inputs):
+        return _tf().reduce_mean(inputs, axis=1)
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class ExtractColumn(_keras().layers.Layer):
+    """Extract one column from a 3-D tensor: (batch, slots, features) -> (batch, slots)."""
+
+    def __init__(self, col_idx: int, **kwargs):
+        super().__init__(**kwargs)
+        self.col_idx = col_idx
+
+    def call(self, inputs):
+        return inputs[:, :, self.col_idx]
+
+    def get_config(self):
+        cfg = super().get_config()
+        cfg["col_idx"] = self.col_idx
+        return cfg
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class BenchMask(_keras().layers.Layer):
+    """Bench mask: slots that are neither active (col 3) nor fainted (col 4)."""
+
+    def call(self, inputs):
+        numeric = inputs  # shape (batch, slots, POKEMON_NUMERIC_DIM)
+        active  = numeric[:, :, 3]
+        fainted = numeric[:, :, 4]
+        return (1.0 - active) * (1.0 - fainted)
+
+
+# ---------------------------------------------------------------------------
+# Registered loss / metric functions — plain Python functions saved as Lambdas
+# by Keras unless decorated with register_keras_serializable.
+# ---------------------------------------------------------------------------
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+def masked_sequence_loss(y_true, y_pred):
+    """SparseCategoricalCrossentropy that ignores PAD_ID=0 positions."""
+    tf = _tf()
+    keras = _keras()
+    loss_fn = keras.losses.SparseCategoricalCrossentropy(from_logits=False, reduction="none")
+    per_token_loss = loss_fn(y_true, y_pred)
+    mask = tf.cast(tf.not_equal(y_true, 0), dtype=per_token_loss.dtype)
+    masked = per_token_loss * mask
+    denom = tf.maximum(tf.reduce_sum(mask, axis=-1), 1.0)
+    return tf.reduce_mean(tf.reduce_sum(masked, axis=-1) / denom)
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+def masked_token_accuracy(y_true, y_pred):
+    """Token accuracy that ignores PAD_ID=0 positions."""
+    tf = _tf()
+    predicted = tf.argmax(y_pred, axis=-1, output_type=y_true.dtype)
+    correct = tf.cast(tf.equal(predicted, y_true), dtype=tf.float32)
+    mask = tf.cast(tf.not_equal(y_true, 0), dtype=tf.float32)
+    denom = tf.maximum(tf.reduce_sum(mask), 1.0)
+    return tf.reduce_sum(correct * mask) / denom
+
+
 def build_entity_action_models(
     *,
     vocab_sizes: Dict[str, int],
@@ -40,6 +176,11 @@ def build_entity_action_models(
     predict_value: bool = False,
     value_hidden_dim: int | None = None,
     value_weight: float = 0.25,
+    predict_sequence: bool = False,
+    sequence_vocab_size: int | None = None,
+    sequence_hidden_dim: int = 128,
+    sequence_weight: float = 0.1,
+    max_seq_len: int = 32,
 ):
     """Build the multitask entity-action models.
 
@@ -52,27 +193,8 @@ def build_entity_action_models(
     from tensorflow import keras
     from tensorflow.keras import layers
 
-    def masked_average(sequence_embeddings, token_ids, axis: int):
-        # Pools variable-length token lists such as observed moves while ignoring PAD ids.
-        mask = tf.cast(tf.not_equal(token_ids, 0), tf.float32)
-        while len(mask.shape) < len(sequence_embeddings.shape):
-            mask = tf.expand_dims(mask, axis=-1)
-        masked = sequence_embeddings * mask
-        denom = tf.reduce_sum(mask, axis=axis, keepdims=False)
-        denom = tf.maximum(denom, 1.0)
-        numer = tf.reduce_sum(masked, axis=axis, keepdims=False)
-        return numer / denom
-
-    def masked_pool(values, mask):
-        # Reused for active/bench pooling so we can keep the first entity family simple
-        # without committing to a full message-passing graph yet.
-        mask = tf.cast(mask, tf.float32)
-        if len(mask.shape) < len(values.shape):
-            mask = tf.expand_dims(mask, axis=-1)
-        numer = tf.reduce_sum(values * mask, axis=1)
-        denom = tf.reduce_sum(mask, axis=1)
-        denom = tf.maximum(denom, 1.0)
-        return numer / denom
+    # Pooling and slicing are handled by the registered layer classes above;
+    # no local closures needed here.
 
     inputs: Dict[str, Any] = {
         # The tensor contract mirrors EntityTensorization.entity_tensor_layout().
@@ -125,17 +247,15 @@ def build_entity_action_models(
     # Observed moves arrive as a short token list per slot. We embed each move and then
     # average only the non-pad entries to get one learned "observed move summary" vector.
     move_embedded = move_embedding(inputs["pokemon_observed_moves"])
-    move_pooled = layers.Lambda(
-        lambda tensors: masked_average(tensors[0], tensors[1], axis=2),
-        name="observed_move_pool",
-    )([move_embedded, inputs["pokemon_observed_moves"]])
+    move_pooled = MaskedAverage(axis=2, name="observed_move_pool")(
+        [move_embedded, inputs["pokemon_observed_moves"]]
+    )
 
     weather_x = layers.Flatten(name="weather_flat")(weather_embedding(inputs["weather"]))
     global_condition_embedded = global_condition_embedding(inputs["global_conditions"])
-    global_condition_x = layers.Lambda(
-        lambda tensors: masked_average(tensors[0], tensors[1], axis=1),
-        name="global_condition_pool",
-    )([global_condition_embedded, inputs["global_conditions"]])
+    global_condition_x = MaskedAverage(axis=1, name="global_condition_pool")(
+        [global_condition_embedded, inputs["global_conditions"]]
+    )
 
     pokemon_x = layers.Concatenate(axis=-1, name="pokemon_concat")(
         [
@@ -157,10 +277,10 @@ def build_entity_action_models(
         pokemon_x = layers.Dropout(dropout, name="pokemon_dropout_0")(pokemon_x)
     pokemon_x = layers.Dense(hidden_dim, activation="relu", name="pokemon_dense_1")(pokemon_x)
 
-    self_slots = layers.Lambda(lambda x: x[:, :6, :], name="self_slots")(pokemon_x)
-    opp_slots = layers.Lambda(lambda x: x[:, 6:, :], name="opp_slots")(pokemon_x)
-    self_numeric = layers.Lambda(lambda x: x[:, :6, :], name="self_numeric")(inputs["pokemon_numeric"])
-    opp_numeric = layers.Lambda(lambda x: x[:, 6:, :], name="opp_numeric")(inputs["pokemon_numeric"])
+    self_slots   = SlotSlice(0, 6,  name="self_slots")(pokemon_x)
+    opp_slots    = SlotSlice(6, 12, name="opp_slots")(pokemon_x)
+    self_numeric = SlotSlice(0, 6,  name="self_numeric")(inputs["pokemon_numeric"])
+    opp_numeric  = SlotSlice(6, 12, name="opp_numeric")(inputs["pokemon_numeric"])
 
     # These pooled summaries are the key simplification in v1:
     #   - one summary for my active
@@ -168,23 +288,19 @@ def build_entity_action_models(
     #   - one summary for my bench
     #   - one summary for opponent bench
     # This keeps the model entity-centric without requiring a full graph library yet.
-    self_active = layers.Lambda(
-        lambda tensors: masked_pool(tensors[0], tensors[1][:, :, 3]),
-        name="self_active_pool",
-    )([self_slots, self_numeric])
-    opp_active = layers.Lambda(
-        lambda tensors: masked_pool(tensors[0], tensors[1][:, :, 3]),
-        name="opp_active_pool",
-    )([opp_slots, opp_numeric])
-    self_bench = layers.Lambda(
-        lambda tensors: masked_pool(tensors[0], (1.0 - tensors[1][:, :, 3]) * (1.0 - tensors[1][:, :, 4])),
-        name="self_bench_pool",
-    )([self_slots, self_numeric])
-    opp_bench = layers.Lambda(
-        lambda tensors: masked_pool(tensors[0], (1.0 - tensors[1][:, :, 3]) * (1.0 - tensors[1][:, :, 4])),
-        name="opp_bench_pool",
-    )([opp_slots, opp_numeric])
-    all_slots = layers.Lambda(lambda x: tf.reduce_mean(x, axis=1), name="all_slot_pool")(pokemon_x)
+    self_active = MaskedPool(name="self_active_pool")(
+        [self_slots, ExtractColumn(3, name="self_active_flag")(self_numeric)]
+    )
+    opp_active = MaskedPool(name="opp_active_pool")(
+        [opp_slots, ExtractColumn(3, name="opp_active_flag")(opp_numeric)]
+    )
+    self_bench = MaskedPool(name="self_bench_pool")(
+        [self_slots, BenchMask(name="self_bench_mask")(self_numeric)]
+    )
+    opp_bench = MaskedPool(name="opp_bench_pool")(
+        [opp_slots, BenchMask(name="opp_bench_mask")(opp_numeric)]
+    )
+    all_slots = ReduceMean1(name="all_slot_pool")(pokemon_x)
 
     global_x = layers.Concatenate(name="global_concat")(
         [
@@ -216,7 +332,8 @@ def build_entity_action_models(
         policy_metrics.append(keras.metrics.SparseTopKCategoricalAccuracy(k=3, name="top3"))
 
     use_transition = transition_dim is not None and action_context_vocab_size is not None
-    if not use_transition and not predict_value:
+    use_sequence = predict_sequence and sequence_vocab_size is not None
+    if not use_transition and not predict_value and not use_sequence:
         policy_model.compile(
             optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
             loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -252,7 +369,13 @@ def build_entity_action_models(
         )
 
     model_inputs: Dict[str, Any] = dict(inputs)
-    if use_transition:
+    # Both the transition head and the sequence head are conditioned on action embeddings.
+    # We create shared action inputs and a shared embedding layer whenever either head is on.
+    need_action_inputs = use_transition or use_sequence
+    my_action_input = None
+    opp_action_input = None
+    action_embedding = None
+    if need_action_inputs:
         my_action_input = layers.Input(shape=(), dtype="int32", name="my_action")
         opp_action_input = layers.Input(shape=(), dtype="int32", name="opp_action")
         action_embedding = layers.Embedding(
@@ -260,6 +383,10 @@ def build_entity_action_models(
             output_dim=max(8, action_embed_dim),
             name="action_embedding",
         )
+        model_inputs["my_action"] = my_action_input
+        model_inputs["opp_action"] = opp_action_input
+
+    if use_transition:
         transition_x = layers.Concatenate(name="transition_features")(
             [
                 shared,
@@ -277,8 +404,27 @@ def build_entity_action_models(
         losses["transition"] = keras.losses.MeanSquaredError()
         loss_weights["transition"] = transition_weight
         metrics["transition"] = [keras.metrics.MeanAbsoluteError(name="mae")]
-        model_inputs["my_action"] = my_action_input
-        model_inputs["opp_action"] = opp_action_input
+
+    if use_sequence:
+        # Non-autoregressive sequence head: concatenate trunk + action embeddings,
+        # repeat across time steps, then apply LSTM to produce per-step distributions.
+        sequence_context = layers.Concatenate(name="sequence_context")(
+            [
+                shared,
+                action_embedding(my_action_input),
+                action_embedding(opp_action_input),
+            ]
+        )
+        sequence_repeated = layers.RepeatVector(max_seq_len, name="sequence_repeat")(sequence_context)
+        sequence_lstm = layers.LSTM(sequence_hidden_dim, return_sequences=True, name="sequence_lstm")(sequence_repeated)
+        sequence_out = layers.TimeDistributed(
+            layers.Dense(sequence_vocab_size, activation="softmax"),
+            name="sequence",
+        )(sequence_lstm)
+        outputs["sequence"] = sequence_out
+        losses["sequence"] = masked_sequence_loss
+        loss_weights["sequence"] = sequence_weight
+        metrics["sequence"] = [masked_token_accuracy]
 
     # The training artifact is the richest object because it includes every enabled
     # auxiliary head. The policy and policy+value artifacts stay serving-friendly.

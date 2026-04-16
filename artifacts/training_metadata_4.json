@@ -1,0 +1,161 @@
+{
+  "policy_model_path": "artifacts/model_4.keras",
+  "policy_vocab_path": "artifacts/action_vocab_4.json",
+  "metadata_path": "artifacts/training_metadata_4.json",
+  "reward_profile_path": "artifacts/move_reward_profile_4.json",
+  "feature_dim": 582,
+  "feature_layout": [
+    {
+      "name": "my_active",
+      "size": 116,
+      "description": "My active mon: hp, knowledge flags, boosts, status, tera/item/ability flags, revealed moves hash, visible species hash."
+    },
+    {
+      "name": "opponent_active",
+      "size": 116,
+      "description": "Opponent active mon with the same feature template, masked to public information."
+    },
+    {
+      "name": "my_bench",
+      "size": 162,
+      "description": "Six bench slots: revealed flag, hp/fainted/tera, bench status, visible species hash."
+    },
+    {
+      "name": "opponent_bench",
+      "size": 162,
+      "description": "Opponent bench slots with the same bench template, masked to public information."
+    },
+    {
+      "name": "field",
+      "size": 9,
+      "description": "Weather plus global field conditions such as terrain or Trick Room."
+    },
+    {
+      "name": "my_side_conditions",
+      "size": 8,
+      "description": "My side's public side conditions such as rocks, spikes, screens, veil, and Tailwind."
+    },
+    {
+      "name": "opponent_side_conditions",
+      "size": 8,
+      "description": "Opponent side's public side conditions."
+    },
+    {
+      "name": "turn_index",
+      "size": 1,
+      "description": "Normalized capped turn number."
+    }
+  ],
+  "num_action_classes": 357,
+  "policy_label_format": "action_tokens",
+  "action_space": "joint",
+  "train_examples": 185546,
+  "val_examples": 45996,
+  "epochs_requested": 30,
+  "epochs_completed": 11,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "hidden_dim": 256,
+  "depth": 3,
+  "dropout": 0.1,
+  "min_move_count": 1,
+  "max_battles": 5000,
+  "val_ratio": 0.2,
+  "seed": 42,
+  "include_switches": true,
+  "predict_turn_outcome": true,
+  "predict_value": true,
+  "transition_weight": 0.25,
+  "value_weight": 0.25,
+  "value_hidden_dim": 128,
+  "action_embed_dim": 32,
+  "transition_hidden_dim": 256,
+  "model_variant": "default",
+  "model_name": null,
+  "reward_config": {
+    "hp_weight": 0.25,
+    "ko_weight": 0.5,
+    "wasted_move_penalty": 0.1,
+    "terminal_weight": 1.0,
+    "offensive_move_min_uses": 20,
+    "offensive_move_min_damage_rate": 0.5
+  },
+  "trace_schema_version": "1.0",
+  "num_reward_profiled_moves": 350,
+  "num_offensive_reward_moves": 240,
+  "policy_param_count": 372581,
+  "training_param_count": 531877,
+  "training_model_path": "artifacts/training_model_4.keras",
+  "turn_outcome_dim": 127,
+  "turn_outcome_layout": [
+    {
+      "name": "my_pre_active_after",
+      "size": 17,
+      "description": "End-of-turn summary for my active that started the turn."
+    },
+    {
+      "name": "opponent_pre_active_after",
+      "size": 17,
+      "description": "End-of-turn summary for the opponent active that started the turn."
+    },
+    {
+      "name": "my_post_active",
+      "size": 33,
+      "description": "End-of-turn active on my side, including visible species hash."
+    },
+    {
+      "name": "opponent_post_active",
+      "size": 33,
+      "description": "End-of-turn active on the opponent side, including visible species hash."
+    },
+    {
+      "name": "active_changed_flags",
+      "size": 2,
+      "description": "Whether either side ended the turn with a different active."
+    },
+    {
+      "name": "field_after",
+      "size": 9,
+      "description": "Weather and global field conditions after the turn resolves."
+    },
+    {
+      "name": "my_side_conditions_after",
+      "size": 8,
+      "description": "My side conditions after the turn."
+    },
+    {
+      "name": "opponent_side_conditions_after",
+      "size": 8,
+      "description": "Opponent side conditions after the turn."
+    }
+  ],
+  "action_context_vocab_path": "artifacts/action_context_vocab_4.json",
+  "num_action_context_classes": 358,
+  "policy_value_model_path": "artifacts/policy_value_model_4.keras",
+  "family_id": "vector_joint_bc_transition_value",
+  "family_version": 1,
+  "family_name": "vector_joint_bc_transition_value_v1",
+  "model_release_id": "model4",
+  "parent_release_id": null,
+  "training_regime": "offline_bc_aux",
+  "information_policy": "public_only",
+  "state_schema_version": "flat_public_v1",
+  "entity_schema_version": null,
+  "history_schema_version": null,
+  "action_parameterization": "joint_vocab",
+  "objective_set": [
+    "policy",
+    "transition",
+    "value"
+  ],
+  "reward_definition_id": "dense_reward_v1",
+  "value_target_definition": "terminal_win_probability",
+  "transition_target_definition": "public_turn_outcome_summary_v1",
+  "initialization_source": {
+    "type": "scratch"
+  },
+  "evaluation_bundle_id": "offline_validation_v1",
+  "registry_visibility": "runnable_policy",
+  "evaluation_summary_path": "artifacts/evaluation_summary_4.json",
+  "run_manifest_path": "artifacts/run_manifest_4.json"
+}

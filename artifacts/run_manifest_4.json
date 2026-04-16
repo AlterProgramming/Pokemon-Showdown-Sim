@@ -1,0 +1,60 @@
+{
+  "manifest_version": "1.0",
+  "created_at_utc": "2026-03-27T06:04:39.328366+00:00",
+  "model_release_id": "model4",
+  "family_id": "vector_joint_bc_transition_value",
+  "family_version": 1,
+  "family_name": "vector_joint_bc_transition_value_v1",
+  "training_regime": "offline_bc_aux",
+  "registry_visibility": "runnable_policy",
+  "metadata_path": "artifacts\\training_metadata_4.json",
+  "evaluation_summary_path": "artifacts\\evaluation_summary_4.json",
+  "registry_path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\model_registry.json",
+  "artifacts": {
+    "action_context_vocab": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\action_context_vocab_4.json",
+      "exists": true
+    },
+    "evaluation_summary": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\evaluation_summary_4.json",
+      "exists": true
+    },
+    "metadata": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\training_metadata_4.json",
+      "exists": true
+    },
+    "policy_model": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\model_4.keras",
+      "exists": true
+    },
+    "policy_value_model": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\policy_value_model_4.keras",
+      "exists": true
+    },
+    "policy_vocab": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\action_vocab_4.json",
+      "exists": true
+    },
+    "reward_profile": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\move_reward_profile_4.json",
+      "exists": true
+    },
+    "run_manifest": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\run_manifest_4.json",
+      "exists": false
+    },
+    "training_model": {
+      "path": "C:\\Users\\jeanj\\Documents\\School - Research\\CSCI 8590 Introduction to Deep Learning\\Pokemon Showdown Agent\\artifacts\\training_model_4.keras",
+      "exists": true
+    }
+  },
+  "evaluation_snapshot": {
+    "status": "backfilled_without_training_history",
+    "created_at_utc": "2026-03-27T06:04:39.322348+00:00",
+    "epochs_completed": 11,
+    "train_examples": 185546,
+    "val_examples": 45996,
+    "metrics": {},
+    "note": "Historical run did not save per-epoch history. This summary was backfilled from available metadata only."
+  }
+}
