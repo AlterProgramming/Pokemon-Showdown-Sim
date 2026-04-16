@@ -69,6 +69,18 @@ def debug_log(message: str) -> None:
         print(message)
 
 
+def encode_float32_payload(values: Any) -> tuple[bytes, tuple[int, ...]]:
+    arr = np.asarray(values, dtype=np.float32)
+    return arr.tobytes(), tuple(int(dim) for dim in arr.shape)
+
+
+def decode_float32_payload(payload: bytes, shape: tuple[int, ...]) -> np.ndarray:
+    arr = np.frombuffer(payload, dtype=np.float32)
+    if shape:
+        arr = arr.reshape(shape)
+    return arr
+
+
 def load_runtime_artifacts(repo_path: Path, model_entry: dict[str, Any]) -> dict[str, Any]:
     model_id = str(model_entry["model_id"])
     metadata_path = repo_path / str(model_entry["metadata_path"])
@@ -171,25 +183,42 @@ def inference_worker_main(
         message_type = message.get("type")
         if message_type == "shutdown":
             return
-        if message_type != "predict":
+        if message_type not in {"predict", "predict_batch"}:
             continue
 
         request_id = str(message.get("request_id") or "")
-        state_vector = message.get("state_vector")
         try:
-            arr = np.asarray(state_vector, dtype=np.float32)[None, :]
+            if message_type == "predict_batch":
+                arr = decode_float32_payload(
+                    message["state_batch_bytes"],
+                    tuple(message.get("state_batch_shape") or ()),
+                )
+            elif "state_vector_bytes" in message:
+                arr = decode_float32_payload(
+                    message["state_vector_bytes"],
+                    tuple(message.get("state_vector_shape") or ()),
+                )
+            else:
+                arr = np.asarray(message.get("state_vector"), dtype=np.float32)
+            arr = np.asarray(arr, dtype=np.float32)
+            if arr.ndim == 1:
+                arr = arr[None, :]
             raw_output = model(arr, training=False)
             if hasattr(raw_output, "numpy"):
                 raw_output = raw_output.numpy()
-            logits = np.asarray(raw_output[0], dtype=np.float32)
+            logits = np.asarray(raw_output, dtype=np.float32)
+            if logits.ndim == 1:
+                logits = logits[None, :]
+            logits_bytes, logits_shape = encode_float32_payload(logits)
             if not safe_connection_send(
                 connection,
                 {
-                    "type": "prediction",
+                    "type": "prediction_batch" if message_type == "predict_batch" else "prediction",
                     "request_id": request_id,
                     "pid": os.getpid(),
                     "model_id": model_id,
-                    "logits": logits,
+                    "logits_bytes": logits_bytes,
+                    "logits_shape": logits_shape,
                 }
             ):
                 return
@@ -269,17 +298,23 @@ class ModelWorkerSupervisor:
         logits, _ = self.predict_with_metadata(state_vector)
         return logits
 
+    def predict_batch(self, state_vectors: list[list[float]]) -> np.ndarray:
+        logits, _ = self.predict_batch_with_metadata(state_vectors)
+        return logits
+
     def predict_with_metadata(self, state_vector: list[float]) -> tuple[np.ndarray, dict[str, Any]]:
         with self._lock:
             self._ensure_running_locked()
             request_id = uuid.uuid4().hex
             self.last_request_time = time.time()
             service_started = time.perf_counter()
+            state_vector_bytes, state_vector_shape = encode_float32_payload(state_vector)
             self._parent_conn.send(
                 {
                     "type": "predict",
                     "request_id": request_id,
-                    "state_vector": list(state_vector),
+                    "state_vector_bytes": state_vector_bytes,
+                    "state_vector_shape": state_vector_shape,
                 }
             )
             if not self._parent_conn.poll(timeout=self.request_timeout_seconds):
@@ -298,7 +333,15 @@ class ModelWorkerSupervisor:
                 self._restart_locked("protocol_error")
                 raise RuntimeError(self.last_error)
 
-            logits = np.asarray(message["logits"], dtype=np.float32)
+            if "logits_bytes" in message:
+                logits = decode_float32_payload(
+                    message["logits_bytes"],
+                    tuple(message.get("logits_shape") or ()),
+                )
+            else:
+                logits = np.asarray(message["logits"], dtype=np.float32)
+            if logits.ndim > 1 and logits.shape[0] == 1:
+                logits = logits[0]
             service_ms = (time.perf_counter() - service_started) * 1000.0
             self.total_completed_requests += 1
             self.requests_since_start += 1
@@ -310,6 +353,55 @@ class ModelWorkerSupervisor:
                 "worker_index": self.worker_index,
                 "worker_pid": message.get("pid"),
                 "service_ms": service_ms,
+            }
+
+    def predict_batch_with_metadata(self, state_vectors: list[list[float]]) -> tuple[np.ndarray, dict[str, Any]]:
+        with self._lock:
+            self._ensure_running_locked()
+            request_id = uuid.uuid4().hex
+            self.last_request_time = time.time()
+            service_started = time.perf_counter()
+            state_batch_bytes, state_batch_shape = encode_float32_payload(state_vectors)
+            self._parent_conn.send(
+                {
+                    "type": "predict_batch",
+                    "request_id": request_id,
+                    "state_batch_bytes": state_batch_bytes,
+                    "state_batch_shape": state_batch_shape,
+                }
+            )
+            if not self._parent_conn.poll(timeout=self.request_timeout_seconds):
+                self.last_error = (
+                    f"prediction timed out after {self.request_timeout_seconds:.2f}s for {self.model_id}"
+                )
+                self._restart_locked("timeout")
+                raise TimeoutError(self.last_error)
+            message = self._parent_conn.recv()
+
+            if message.get("type") == "prediction_error":
+                self.last_error = str(message.get("error") or "worker prediction error")
+                raise RuntimeError(self.last_error)
+            if message.get("type") != "prediction_batch" or message.get("request_id") != request_id:
+                self.last_error = f"unexpected worker response for {self.model_id}: {message!r}"
+                self._restart_locked("protocol_error")
+                raise RuntimeError(self.last_error)
+
+            logits_batch = decode_float32_payload(
+                message["logits_bytes"],
+                tuple(message.get("logits_shape") or ()),
+            )
+            service_ms = (time.perf_counter() - service_started) * 1000.0
+            self.total_completed_requests += len(state_vectors)
+            self.requests_since_start += len(state_vectors)
+            self.last_success_time = time.time()
+            recycle_reason = self._recycle_reason_locked()
+            if recycle_reason is not None:
+                self._restart_locked(recycle_reason, graceful=True)
+            return logits_batch, {
+                "worker_index": self.worker_index,
+                "worker_pid": message.get("pid"),
+                "service_ms": service_ms,
+                "batch_size": len(state_vectors),
             }
 
     def health(self) -> dict[str, Any]:
@@ -516,6 +608,10 @@ class ModelWorkerPool:
         logits, _ = self.predict_with_metadata(state_vector)
         return logits
 
+    def predict_batch(self, state_vectors: list[list[float]]) -> np.ndarray:
+        logits, _ = self.predict_batch_with_metadata(state_vectors)
+        return logits
+
     def predict_with_metadata(self, state_vector: list[float]) -> tuple[np.ndarray, dict[str, Any]]:
         request_started = time.perf_counter()
         with self._condition:
@@ -585,6 +681,59 @@ class ModelWorkerPool:
                 f"error={error}"
             )
             raise
+        finally:
+            with self._condition:
+                self._idle_worker_indices.append(worker_index)
+                self._condition.notify()
+
+    def predict_batch_with_metadata(self, state_vectors: list[list[float]]) -> tuple[np.ndarray, dict[str, Any]]:
+        request_started = time.perf_counter()
+        with self._condition:
+            while not self._idle_worker_indices:
+                self.waiting_requests += 1
+                try:
+                    self._condition.wait()
+                finally:
+                    self.waiting_requests -= 1
+            worker_index = self._idle_worker_indices.popleft()
+            self.total_assigned_requests += len(state_vectors)
+            waiting_requests = self.waiting_requests
+            queue_wait_ms = (time.perf_counter() - request_started) * 1000.0
+
+        supervisor = self._supervisors[worker_index]
+        worker_health = supervisor.health()
+        logged_worker_pid = worker_health.get("pid")
+        debug_log(
+            "[predict-batch-dispatch] "
+            f"model_id={self.model_id} "
+            f"worker_index={worker_index} "
+            f"worker_pid={logged_worker_pid} "
+            f"batch_size={len(state_vectors)} "
+            f"waiting_requests={waiting_requests} "
+            f"queue_wait_ms={queue_wait_ms:.2f} "
+            f"total_assigned_requests={self.total_assigned_requests}"
+        )
+        try:
+            service_started = time.perf_counter()
+            if hasattr(supervisor, "predict_batch_with_metadata"):
+                logits, supervisor_metadata = supervisor.predict_batch_with_metadata(state_vectors)
+            else:
+                logits = supervisor.predict_batch(state_vectors)
+                supervisor_metadata = {}
+            service_ms = float(
+                supervisor_metadata.get("service_ms", (time.perf_counter() - service_started) * 1000.0)
+            )
+            logged_worker_pid = supervisor_metadata.get("worker_pid", logged_worker_pid)
+            total_ms = queue_wait_ms + service_ms
+            return logits, {
+                "worker_index": worker_index,
+                "worker_pid": logged_worker_pid,
+                "queue_wait_ms": queue_wait_ms,
+                "service_ms": service_ms,
+                "total_ms": total_ms,
+                "waiting_requests_at_dispatch": waiting_requests,
+                "batch_size": len(state_vectors),
+            }
         finally:
             with self._condition:
                 self._idle_worker_indices.append(worker_index)

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import argparse
 import atexit
+from collections import deque
 import sys
+import threading
 import time
 from pathlib import Path
 from typing import Any
@@ -67,6 +69,18 @@ def parse_args() -> argparse.Namespace:
         default=30.0,
         help="Maximum time to wait for a spawned worker process to boot and signal that it started running.",
     )
+    parser.add_argument(
+        "--batch-window-ms",
+        type=float,
+        default=0.0,
+        help="Optional micro-batch collection window per model request. Set 0 to disable waiting.",
+    )
+    parser.add_argument(
+        "--batch-max-size",
+        type=int,
+        default=1,
+        help="Maximum micro-batch size per model worker call. Set 1 to disable batching.",
+    )
     return parser.parse_args()
 
 
@@ -110,6 +124,88 @@ def build_switch_tokens(action_vocab: dict[str, int], slot: int) -> list[str]:
     return []
 
 
+class InferenceBatcher:
+    def __init__(self, worker_pool: ModelWorkerPool, *, batch_window_ms: float, batch_max_size: int) -> None:
+        self.worker_pool = worker_pool
+        self.batch_window_ms = max(0.0, float(batch_window_ms))
+        self.batch_max_size = max(1, int(batch_max_size))
+        self._condition = threading.Condition()
+        self._closed = False
+        self._pending: deque[dict[str, Any]] = deque()
+        self._thread = threading.Thread(target=self._run, daemon=True, name=f"{worker_pool.model_id}_batcher")
+        self._thread.start()
+
+    def close(self) -> None:
+        with self._condition:
+            self._closed = True
+            self._condition.notify_all()
+        self._thread.join(timeout=2.0)
+
+    def predict_with_metadata(self, state_vector: list[float]) -> tuple[np.ndarray, dict[str, Any]]:
+        record = {
+            "state_vector": state_vector,
+            "event": threading.Event(),
+            "result": None,
+            "error": None,
+            "metadata": None,
+        }
+        with self._condition:
+            if self._closed:
+                raise RuntimeError("inference batcher is closed")
+            self._pending.append(record)
+            self._condition.notify()
+        record["event"].wait()
+        if record["error"] is not None:
+            raise record["error"]
+        return record["result"], record["metadata"]
+
+    def _collect_batch_locked(self) -> list[dict[str, Any]]:
+        while not self._pending and not self._closed:
+            self._condition.wait()
+        if self._closed and not self._pending:
+            return []
+        batch = [self._pending.popleft()]
+        if self.batch_max_size <= 1:
+            return batch
+        deadline = time.perf_counter() + (self.batch_window_ms / 1000.0)
+        while len(batch) < self.batch_max_size:
+            remaining = deadline - time.perf_counter()
+            if remaining <= 0:
+                break
+            if not self._pending:
+                self._condition.wait(timeout=remaining)
+                continue
+            batch.append(self._pending.popleft())
+        while self._pending and len(batch) < self.batch_max_size:
+            batch.append(self._pending.popleft())
+        return batch
+
+    def _run(self) -> None:
+        while True:
+            with self._condition:
+                batch = self._collect_batch_locked()
+            if not batch:
+                return
+            try:
+                if len(batch) == 1:
+                    logits, metadata = self.worker_pool.predict_with_metadata(batch[0]["state_vector"])
+                    batch[0]["result"] = logits
+                    batch[0]["metadata"] = metadata
+                else:
+                    logits_batch, metadata = self.worker_pool.predict_batch_with_metadata(
+                        [record["state_vector"] for record in batch]
+                    )
+                    for index, record in enumerate(batch):
+                        record["result"] = np.asarray(logits_batch[index], dtype=np.float32)
+                        record["metadata"] = dict(metadata)
+            except Exception as error:
+                for record in batch:
+                    record["error"] = error
+            finally:
+                for record in batch:
+                    record["event"].set()
+
+
 def load_models(mode: str) -> tuple[dict[str, dict[str, Any]], str]:
     registry = build_model_registry(REPO_PATH)
     registered_models = registry["models"]
@@ -141,6 +237,12 @@ def load_models(mode: str) -> tuple[dict[str, dict[str, Any]], str]:
         )
         worker_pool.start()
         artifact["worker_pool"] = worker_pool
+        if ARGS.batch_max_size > 1:
+            artifact["batcher"] = InferenceBatcher(
+                worker_pool,
+                batch_window_ms=ARGS.batch_window_ms,
+                batch_max_size=ARGS.batch_max_size,
+            )
 
     default_model_id = (
         str(registry["default_model_id"])
@@ -156,6 +258,9 @@ APP = Flask(__name__)
 
 def shutdown_workers() -> None:
     for artifact in MODEL_ARTIFACTS.values():
+        batcher = artifact.get("batcher")
+        if batcher is not None:
+            batcher.close()
         worker_pool = artifact.get("worker_pool")
         if worker_pool is not None:
             worker_pool.close()
@@ -171,6 +276,8 @@ def log_loaded_models() -> None:
     print(f"[startup] model_worker_overrides={ARGS.model_worker_overrides or '(none)'}")
     print(f"[startup] worker_bootstrap_timeout_seconds={ARGS.worker_bootstrap_timeout_seconds}")
     print(f"[startup] worker_startup_timeout_seconds={ARGS.worker_startup_timeout_seconds}")
+    print(f"[startup] batch_window_ms={ARGS.batch_window_ms}")
+    print(f"[startup] batch_max_size={ARGS.batch_max_size}")
     print(f"[startup] requested_model_ids={ARGS.model_ids or '(auto)'}")
     print(f"[startup] supported_model_ids={', '.join(sorted(MODEL_ARTIFACTS.keys()))}")
     for model_id in sorted(MODEL_ARTIFACTS.keys()):
@@ -219,6 +326,9 @@ def predict_logits(
     model_artifacts: dict[str, Any],
     state_vector: list[float],
 ) -> tuple[np.ndarray, dict[str, Any]]:
+    batcher = model_artifacts.get("batcher")
+    if batcher is not None:
+        return batcher.predict_with_metadata(state_vector)
     worker_pool = model_artifacts["worker_pool"]
     if hasattr(worker_pool, "predict_with_metadata"):
         return worker_pool.predict_with_metadata(state_vector)
@@ -359,11 +469,13 @@ def predict():
         worker_pid = worker_metrics.get("worker_pid")
         queue_wait_ms = worker_metrics.get("queue_wait_ms")
         service_ms = worker_metrics.get("service_ms")
+        batch_size = worker_metrics.get("batch_size", 1)
         print(
             "[predict] "
             f"model_id={model_artifacts['model_id']} "
             f"worker_index={worker_index} "
             f"worker_pid={worker_pid} "
+            f"batch_size={batch_size} "
             f"state_len={len(state_vector)} "
             f"queue_wait_ms={0.0 if queue_wait_ms is None else float(queue_wait_ms):.2f} "
             f"service_ms={0.0 if service_ms is None else float(service_ms):.2f} "
