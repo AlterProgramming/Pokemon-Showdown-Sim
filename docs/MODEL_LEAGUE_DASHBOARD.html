@@ -70,7 +70,6 @@
         border: 1px solid var(--border);
         font-size: 12px;
       }
-      .timeline-row td { font-size: 13px; }
       .small { font-size: 13px; }
       code { font-family: inherit; }
     </style>
@@ -78,7 +77,7 @@
   <body>
     <main>
       <h1>Model League Dashboard</h1>
-      <p class="muted">Canonical league reporting for standings, stability, and run history.</p>
+      <p class="muted">Canonical league reporting for standings, stability, and service health.</p>
 
       <div class="grid">
         <section class="panel">
@@ -99,7 +98,7 @@
         <section class="panel">
           <h2>Reliability Shift</h2>
           <div class="metric ok">140 → 0</div>
-          <p class="muted">failures from the pre-stabilization long run to the current baseline</p>
+          <p class="muted">failures from the pre-stabilization long run to the current validated baseline</p>
         </section>
       </div>
 
@@ -116,11 +115,30 @@
           </thead>
           <tbody>
             <tr><td>1</td><td><code>word_policy_v1</code></td><td>1751</td><td>424-76</td></tr>
-            <tr><td>2</td><td><code>entity_action_bc_v1_20260408_0428</code></td><td>1521</td><td>271-229</td></tr>
-            <tr><td>3</td><td><code>model5</code></td><td>1437</td><td>205-295</td></tr>
-            <tr><td>4</td><td><code>model2</code></td><td>1434</td><td>203-297</td></tr>
-            <tr><td>5</td><td><code>model4</code></td><td>1430</td><td>200-300</td></tr>
-            <tr><td>6</td><td><code>model1</code></td><td>1427</td><td>197-303</td></tr>
+<tr><td>2</td><td><code>entity_action_bc_v1_20260408_0428</code></td><td>1521</td><td>271-229</td></tr>
+<tr><td>3</td><td><code>model5</code></td><td>1437</td><td>205-295</td></tr>
+<tr><td>4</td><td><code>model2</code></td><td>1434</td><td>203-297</td></tr>
+<tr><td>5</td><td><code>model4</code></td><td>1430</td><td>200-300</td></tr>
+<tr><td>6</td><td><code>model1</code></td><td>1427</td><td>197-303</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel section">
+        <h2>Service Health</h2>
+        <p class="muted">Latest snapshot: 2026-04-17 · no snapshot</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Latency ms</th>
+              <th>Models</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan='5' class='muted'>No service snapshot recorded yet. Run <code>python scripts/collect_model_service_health.py</code>.</td></tr>
           </tbody>
         </table>
       </section>
@@ -138,31 +156,10 @@
               <th>Notes</th>
             </tr>
           </thead>
-          <tbody class="timeline-row">
-            <tr>
-              <td><code>2026-04-09_long_full_attempt</code></td>
-              <td><span class="pill bad">invalid</span></td>
-              <td>15000 scheduled, 12000 completed</td>
-              <td class="bad">140</td>
-              <td><code>word_policy_v1</code> 1738</td>
-              <td>Pre-stabilization long run degraded under sustained vector-serving load.</td>
-            </tr>
-            <tr>
-              <td><code>2026-04-17_vector_soak</code></td>
-              <td><span class="pill ok">validated</span></td>
-              <td>1200 vector-only games</td>
-              <td class="ok">0</td>
-              <td><code>model2</code> 1512</td>
-              <td>Used to validate shared vector serving after the worker/logging changes.</td>
-            </tr>
-            <tr>
-              <td><code>2026-04-17_medium_full</code></td>
-              <td><span class="pill ok">validated</span></td>
-              <td>1500 mixed-model games</td>
-              <td class="ok">0</td>
-              <td><code>word_policy_v1</code> 1751</td>
-              <td>Current canonical mixed-model baseline.</td>
-            </tr>
+          <tbody>
+            <tr><td><code>2026-04-09_long_full_attempt</code></td><td><span class='pill bad'>invalid</span></td><td>15000 scheduled, 12000 completed</td><td class='bad'>140</td><td><code>word_policy_v1</code> 1738</td><td>Pre-stabilization 1000-games-per-pair mixed-model league. Run degraded under sustained shared vector-server load and was stopped before completion. Keep for reliability comparison, not as canonical rankings.</td></tr>
+<tr><td><code>2026-04-17_vector_soak</code></td><td><span class='pill ok'>validated</span></td><td>1200 scheduled, 1200 completed</td><td class='ok'>0</td><td><code>model2</code> 1512</td><td>Post-stabilization soak for model1/model2/model4/model5 only. Used to verify shared vector serving before rerunning mixed-model leagues.</td></tr>
+<tr><td><code>2026-04-17_medium_full</code></td><td><span class='pill ok'>validated</span></td><td>1500 scheduled, 1500 completed</td><td class='ok'>0</td><td><code>word_policy_v1</code> 1751</td><td>First clean mixed-model league after vector-serving stabilization. This is the current canonical league baseline.</td></tr>
           </tbody>
         </table>
       </section>
@@ -170,17 +167,18 @@
       <section class="grid section">
         <section class="panel">
           <h2>Storage Contract</h2>
-          <p class="small">Latest pointer: <code>docs/model_league_latest.json</code></p>
-          <p class="small">Historical ledger: <code>docs/model_league_history.json</code></p>
-          <p class="small">Current summary: <code>docs/MODEL_LEAGUE.md</code></p>
+          <p class="small">Latest league pointer: <code>docs/model_league_latest.json</code></p>
+          <p class="small">League history: <code>docs/model_league_history.json</code></p>
+          <p class="small">Latest service snapshot: <code>docs/model_service_health_latest.json</code></p>
+          <p class="small">Service history: <code>docs/model_service_health_history.json</code></p>
         </section>
         <section class="panel">
           <h2>Operational Use</h2>
           <p class="small">Record both clean runs and failed runs. Reliability regressions are part of the benchmark signal.</p>
         </section>
         <section class="panel">
-          <h2>Next Layer</h2>
-          <p class="small">If the serving fleet grows beyond one HTTP point, add per-service snapshots alongside league runs and render them in this same dashboard.</p>
+          <h2>Maintenance</h2>
+          <p class="small">After new league data or service data arrives, regenerate this file with <code>python scripts/render_model_dashboard.py</code>.</p>
         </section>
       </section>
     </main>

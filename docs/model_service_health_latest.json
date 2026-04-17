@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-04-17",
+  "status": "no_snapshot",
+  "summary": {
+    "totalServices": 0,
+    "healthyServices": 0,
+    "degradedServices": 0
+  },
+  "services": []
+}

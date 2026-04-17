@@ -7,6 +7,7 @@ Use these paths:
 - Latest machine-readable snapshot: [model_league_latest.json](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/model_league_latest.json)
 - Run-history ledger: [model_league_history.json](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/model_league_history.json)
 - Static dashboard: [MODEL_LEAGUE_DASHBOARD.html](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/MODEL_LEAGUE_DASHBOARD.html)
+- Latest service snapshot: [model_service_health_latest.json](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/model_service_health_latest.json)
 - Historical snapshots: `docs/model_league_*.json`
 
 ## Current Validated League
