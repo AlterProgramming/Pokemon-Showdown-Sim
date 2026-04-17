@@ -1,0 +1,114 @@
+{
+  "generated_at": "2026-04-17",
+  "latest_snapshot_path": "docs/model_league_latest.json",
+  "runs": [
+    {
+      "run_id": "2026-04-09_long_full_attempt",
+      "label": "full_league_pre_stabilization",
+      "status": "invalid",
+      "run_type": "mixed",
+      "notes": [
+        "Pre-stabilization 1000-games-per-pair mixed-model league.",
+        "Run degraded under sustained shared vector-server load and was stopped before completion.",
+        "Keep for reliability comparison, not as canonical rankings."
+      ],
+      "models": [
+        "word_policy_v1",
+        "entity_action_bc_v1_20260408_0428",
+        "model1",
+        "model2",
+        "model4",
+        "model5"
+      ],
+      "perPairGames": 1000,
+      "scheduledGames": 15000,
+      "completed": 12000,
+      "failures": 140,
+      "concurrency": 10,
+      "wallSeconds": 74531.994,
+      "ranking": [
+        {"model": "word_policy_v1", "elo": 1738},
+        {"model": "entity_action_bc_v1_20260408_0428", "elo": 1500},
+        {"model": "model5", "elo": 1449},
+        {"model": "model4", "elo": 1445},
+        {"model": "model1", "elo": 1440},
+        {"model": "model2", "elo": 1428}
+      ],
+      "reliability": {
+        "failureRate": 0.011667,
+        "servedCleanly": false,
+        "failureMode": "long-horizon vector-serving degradation"
+      }
+    },
+    {
+      "run_id": "2026-04-17_vector_soak",
+      "label": "vector_only_post_stabilization",
+      "status": "validated",
+      "run_type": "vector_only",
+      "notes": [
+        "Post-stabilization soak for model1/model2/model4/model5 only.",
+        "Used to verify shared vector serving before rerunning mixed-model leagues."
+      ],
+      "models": [
+        "model1",
+        "model2",
+        "model4",
+        "model5"
+      ],
+      "perPairGames": 200,
+      "scheduledGames": 1200,
+      "completed": 1200,
+      "failures": 0,
+      "concurrency": 10,
+      "wallSeconds": 368.609,
+      "ranking": [
+        {"model": "model2", "wins": 314, "losses": 286, "elo": 1512},
+        {"model": "model5", "wins": 297, "losses": 303, "elo": 1497},
+        {"model": "model4", "wins": 295, "losses": 305, "elo": 1496},
+        {"model": "model1", "wins": 294, "losses": 306, "elo": 1495}
+      ],
+      "reliability": {
+        "failureRate": 0.0,
+        "servedCleanly": true,
+        "failureMode": null
+      }
+    },
+    {
+      "run_id": "2026-04-17_medium_full",
+      "label": "mixed_full_post_stabilization",
+      "status": "validated",
+      "run_type": "mixed",
+      "notes": [
+        "First clean mixed-model league after vector-serving stabilization.",
+        "This is the current canonical league baseline."
+      ],
+      "models": [
+        "word_policy_v1",
+        "entity_action_bc_v1_20260408_0428",
+        "model1",
+        "model2",
+        "model4",
+        "model5"
+      ],
+      "perPairGames": 100,
+      "scheduledGames": 1500,
+      "completed": 1500,
+      "failures": 0,
+      "concurrency": 10,
+      "wallSeconds": 390.685,
+      "ranking": [
+        {"model": "word_policy_v1", "wins": 424, "losses": 76, "elo": 1751},
+        {"model": "entity_action_bc_v1_20260408_0428", "wins": 271, "losses": 229, "elo": 1521},
+        {"model": "model5", "wins": 205, "losses": 295, "elo": 1437},
+        {"model": "model2", "wins": 203, "losses": 297, "elo": 1434},
+        {"model": "model4", "wins": 200, "losses": 300, "elo": 1430},
+        {"model": "model1", "wins": 197, "losses": 303, "elo": 1427}
+      ],
+      "reliability": {
+        "failureRate": 0.0,
+        "servedCleanly": true,
+        "failureMode": null
+      }
+    }
+  ]
+}

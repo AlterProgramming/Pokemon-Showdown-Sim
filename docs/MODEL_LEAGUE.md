@@ -5,6 +5,8 @@ This file is the canonical landing page for cross-model league results.
 Use these paths:
 
 - Latest machine-readable snapshot: [model_league_latest.json](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/model_league_latest.json)
+- Run-history ledger: [model_league_history.json](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/model_league_history.json)
+- Static dashboard: [MODEL_LEAGUE_DASHBOARD.html](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/MODEL_LEAGUE_DASHBOARD.html)
 - Historical snapshots: `docs/model_league_*.json`
 
 ## Current Validated League
@@ -48,5 +50,21 @@ Pool:
 When a league run is considered valid:
 
 1. Copy the raw result JSON into a dated `docs/model_league_*.json` snapshot.
-2. Update [model_league_latest.json](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/model_league_latest.json) to match the newest validated run.
-3. Refresh this file's summary if the pool, ranking, or benchmark shape changes.
+2. Register the run with `scripts/register_model_league_run.py`.
+3. Update [model_league_latest.json](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/model_league_latest.json) when the new run becomes canonical.
+4. Append the run to [model_league_history.json](/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/docs/model_league_history.json), including failed or invalid runs.
+5. Refresh this file's summary if the pool, ranking, or benchmark shape changes.
+
+Example:
+
+```bash
+python scripts/register_model_league_run.py \
+  --result-json /tmp/model_league_full_medium.json \
+  --run-id 2026-04-17_medium_full \
+  --label mixed_full_post_stabilization \
+  --status validated \
+  --run-type mixed \
+  --generated-at 2026-04-17 \
+  --note "First clean mixed-model league after vector-serving stabilization." \
+  --set-latest
+```
