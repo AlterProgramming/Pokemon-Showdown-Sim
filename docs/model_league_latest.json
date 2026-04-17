@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-04-17",
+  "label": "medium_full_stabilized",
+  "status": "validated",
+  "snapshot_path": "docs/model_league_2026-04-17_medium_full.json",
+  "totalGames": 1500,
+  "completed": 1500,
+  "failures": 0,
+  "wallSeconds": 390.685,
+  "perPairGames": 100,
+  "concurrency": 10,
+  "models": [
+    "word_policy_v1",
+    "entity_action_bc_v1_20260408_0428",
+    "model1",
+    "model2",
+    "model4",
+    "model5"
+  ],
+  "ranking": [
+    {
+      "model": "word_policy_v1",
+      "wins": 424,
+      "losses": 76,
+      "elo": 1751
+    },
+    {
+      "model": "entity_action_bc_v1_20260408_0428",
+      "wins": 271,
+      "losses": 229,
+      "elo": 1521
+    },
+    {
+      "model": "model5",
+      "wins": 205,
+      "losses": 295,
+      "elo": 1437
+    },
+    {
+      "model": "model2",
+      "wins": 203,
+      "losses": 297,
+      "elo": 1434
+    },
+    {
+      "model": "model4",
+      "wins": 200,
+      "losses": 300,
+      "elo": 1430
+    },
+    {
+      "model": "model1",
+      "wins": 197,
+      "losses": 303,
+      "elo": 1427
+    }
+  ]
+}

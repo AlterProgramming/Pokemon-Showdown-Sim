@@ -8,5 +8,6 @@ in the repo root.
 - `ENTITY_INVARIANCE_AUX_V1.md`: follow-on identity-invariance contract
 - `INTEL_MAC_CONTAINER_RUNBOOK.md`: container-first operator flow for the Intel Mac handoff
 - `benchmark.md`: benchmark notes and observations
+- `MODEL_LEAGUE.md`: canonical landing page for cross-model league standings and latest snapshot paths
 - `useful.md`: short reference notes
 - `journal-2026-03-27-entity-benchmark-worker-sweep.md`: run journal
