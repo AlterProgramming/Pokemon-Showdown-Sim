@@ -18,6 +18,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scheduled-games", type=int, help="Expected total scheduled games when different from completed.")
     parser.add_argument("--note", action="append", default=[], help="Repeatable note to attach to the run.")
     parser.add_argument("--failure-mode", help="Optional failure mode summary.")
+    parser.add_argument("--raw-result-path", help="Optional stable path to the raw result JSON artifact.")
+    parser.add_argument("--failure-log-path", help="Optional path to the failure log artifact.")
+    parser.add_argument("--service-health-before-path", help="Optional path to the pre-run service health snapshot.")
+    parser.add_argument("--service-health-after-path", help="Optional path to the post-run service health snapshot.")
+    parser.add_argument("--run-dir", help="Optional run directory that groups the artifacts.")
     parser.add_argument("--history-path", default="docs/model_league_history.json")
     parser.add_argument("--latest-path", default="docs/model_league_latest.json")
     parser.add_argument("--set-latest", action="store_true", help="Promote this run to model_league_latest.json.")
@@ -39,7 +44,15 @@ def build_run_entry(args: argparse.Namespace, result_payload: dict[str, Any]) ->
     failures = int(result_payload.get("failures", 0))
     scheduled_games = int(args.scheduled_games or completed)
     failure_rate = (failures / scheduled_games) if scheduled_games else 0.0
+    artifacts = {
+        "runDir": args.run_dir,
+        "rawResultPath": args.raw_result_path or args.result_json,
+        "failureLogPath": args.failure_log_path,
+        "serviceHealthBeforePath": args.service_health_before_path,
+        "serviceHealthAfterPath": args.service_health_after_path,
+    }
     return {
+        "generatedAt": args.generated_at,
         "run_id": args.run_id,
         "label": args.label,
         "status": args.status,
@@ -54,6 +67,7 @@ def build_run_entry(args: argparse.Namespace, result_payload: dict[str, Any]) ->
         "wallSeconds": float(result_payload.get("wallSeconds", 0.0)),
         "ranking": ranking,
         "pairings": list(result_payload.get("pairings") or []),
+        "artifacts": artifacts,
         "reliability": {
             "failureRate": round(failure_rate, 6),
             "servedCleanly": failures == 0 and completed == scheduled_games,
@@ -68,13 +82,13 @@ def upsert_run(history_payload: dict[str, Any], run_entry: dict[str, Any]) -> di
     filtered.append(run_entry)
     filtered.sort(key=lambda entry: str(entry.get("run_id")))
     history_payload["runs"] = filtered
-    history_payload["generated_at"] = run_entry["run_id"].split("_", 1)[0]
+    history_payload["generated_at"] = run_entry["generatedAt"]
     return history_payload
 
 
 def build_latest_payload(run_entry: dict[str, Any], history_path: Path) -> dict[str, Any]:
     return {
-        "generated_at": run_entry["run_id"].split("_", 1)[0],
+        "generated_at": run_entry["generatedAt"],
         "label": run_entry["label"],
         "status": run_entry["status"],
         "snapshot_path": str(history_path),
@@ -87,6 +101,7 @@ def build_latest_payload(run_entry: dict[str, Any], history_path: Path) -> dict[
         "concurrency": run_entry["concurrency"],
         "models": run_entry["models"],
         "ranking": run_entry["ranking"],
+        "artifacts": run_entry["artifacts"],
     }
 
 
