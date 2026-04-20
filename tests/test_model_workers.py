@@ -259,6 +259,10 @@ class ModelWorkerPoolTests(unittest.TestCase):
         self.assertGreaterEqual(float(metadata["queue_wait_ms"]), 0.0)
         self.assertGreater(float(metadata["service_ms"]), 0.0)
         self.assertGreaterEqual(float(metadata["total_ms"]), float(metadata["service_ms"]))
+        health = pool.health()
+        self.assertEqual(health["request_metrics"]["prediction_calls"], 1)
+        self.assertEqual(health["request_metrics"]["batch_prediction_calls"], 0)
+        self.assertGreaterEqual(float(health["request_metrics"]["avg_total_ms"]), float(metadata["service_ms"]))
 
     def test_pool_reports_waiting_requests_when_all_workers_busy(self) -> None:
         pool = ModelWorkerPool(
@@ -316,6 +320,11 @@ class ModelWorkerPoolTests(unittest.TestCase):
         self.assertEqual(metadata["worker_index"], 0)
         self.assertEqual(metadata["worker_pid"], 1000)
         self.assertEqual(metadata["batch_size"], 3)
+        health = pool.health()
+        self.assertEqual(health["request_metrics"]["prediction_calls"], 1)
+        self.assertEqual(health["request_metrics"]["batch_prediction_calls"], 1)
+        self.assertEqual(health["total_assigned_requests"], 3)
+        self.assertEqual(health["request_metrics"]["avg_batch_size"], 3.0)
 
 
 if __name__ == "__main__":

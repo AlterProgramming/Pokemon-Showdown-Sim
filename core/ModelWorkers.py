@@ -577,6 +577,15 @@ class ModelWorkerPool:
         self._idle_worker_indices = deque(range(self.worker_count))
         self.waiting_requests = 0
         self.total_assigned_requests = 0
+        self.total_prediction_calls = 0
+        self.total_batch_prediction_calls = 0
+        self.total_prediction_errors = 0
+        self.total_queue_wait_ms = 0.0
+        self.total_service_ms = 0.0
+        self.total_total_ms = 0.0
+        self.max_queue_wait_ms = 0.0
+        self.max_service_ms = 0.0
+        self.max_total_ms = 0.0
 
         if supervisor_factory is None:
             self._supervisors = [
@@ -650,6 +659,12 @@ class ModelWorkerPool:
             )
             logged_worker_pid = supervisor_metadata.get("worker_pid", logged_worker_pid)
             total_ms = queue_wait_ms + service_ms
+            self._record_timing_stats_locked(
+                batch_size=1,
+                queue_wait_ms=queue_wait_ms,
+                service_ms=service_ms,
+                total_ms=total_ms,
+            )
             debug_log(
                 "[predict-complete] "
                 f"model_id={self.model_id} "
@@ -670,6 +685,15 @@ class ModelWorkerPool:
         except Exception as error:
             service_ms = (time.perf_counter() - request_started) * 1000.0 - queue_wait_ms
             total_ms = queue_wait_ms + service_ms
+            with self._condition:
+                self.total_prediction_calls += 1
+                self.total_prediction_errors += 1
+                self.total_queue_wait_ms += queue_wait_ms
+                self.total_service_ms += service_ms
+                self.total_total_ms += total_ms
+                self.max_queue_wait_ms = max(self.max_queue_wait_ms, queue_wait_ms)
+                self.max_service_ms = max(self.max_service_ms, service_ms)
+                self.max_total_ms = max(self.max_total_ms, total_ms)
             debug_log(
                 "[predict-error] "
                 f"model_id={self.model_id} "
@@ -725,6 +749,12 @@ class ModelWorkerPool:
             )
             logged_worker_pid = supervisor_metadata.get("worker_pid", logged_worker_pid)
             total_ms = queue_wait_ms + service_ms
+            self._record_timing_stats_locked(
+                batch_size=len(state_vectors),
+                queue_wait_ms=queue_wait_ms,
+                service_ms=service_ms,
+                total_ms=total_ms,
+            )
             return logits, {
                 "worker_index": worker_index,
                 "worker_pid": logged_worker_pid,
@@ -743,14 +773,72 @@ class ModelWorkerPool:
         with self._condition:
             idle_workers = len(self._idle_worker_indices)
             waiting_requests = self.waiting_requests
+            total_prediction_calls = self.total_prediction_calls
+            total_batch_prediction_calls = self.total_batch_prediction_calls
+            total_prediction_errors = self.total_prediction_errors
+            total_queue_wait_ms = self.total_queue_wait_ms
+            total_service_ms = self.total_service_ms
+            total_total_ms = self.total_total_ms
+            max_queue_wait_ms = self.max_queue_wait_ms
+            max_service_ms = self.max_service_ms
+            max_total_ms = self.max_total_ms
+            total_assigned_requests = self.total_assigned_requests
         worker_health = [supervisor.health() for supervisor in self._supervisors]
+        avg_batch_size = (
+            float(total_assigned_requests) / float(total_prediction_calls)
+            if total_prediction_calls
+            else 0.0
+        )
         return {
             "model_id": self.model_id,
             "worker_count": self.worker_count,
             "busy_workers": self.worker_count - idle_workers,
             "idle_workers": idle_workers,
             "waiting_requests": waiting_requests,
-            "total_assigned_requests": self.total_assigned_requests,
+            "total_assigned_requests": total_assigned_requests,
             "alive": all(entry.get("alive") for entry in worker_health),
+            "request_metrics": {
+                "prediction_calls": total_prediction_calls,
+                "batch_prediction_calls": total_batch_prediction_calls,
+                "prediction_errors": total_prediction_errors,
+                "avg_batch_size": avg_batch_size,
+                "avg_queue_wait_ms": (
+                    total_queue_wait_ms / float(total_prediction_calls)
+                    if total_prediction_calls
+                    else 0.0
+                ),
+                "avg_service_ms": (
+                    total_service_ms / float(total_prediction_calls)
+                    if total_prediction_calls
+                    else 0.0
+                ),
+                "avg_total_ms": (
+                    total_total_ms / float(total_prediction_calls)
+                    if total_prediction_calls
+                    else 0.0
+                ),
+                "max_queue_wait_ms": max_queue_wait_ms,
+                "max_service_ms": max_service_ms,
+                "max_total_ms": max_total_ms,
+            },
             "workers": worker_health,
         }
+
+    def _record_timing_stats_locked(
+        self,
+        *,
+        batch_size: int,
+        queue_wait_ms: float,
+        service_ms: float,
+        total_ms: float,
+    ) -> None:
+        with self._condition:
+            self.total_prediction_calls += 1
+            if batch_size > 1:
+                self.total_batch_prediction_calls += 1
+            self.total_queue_wait_ms += queue_wait_ms
+            self.total_service_ms += service_ms
+            self.total_total_ms += total_ms
+            self.max_queue_wait_ms = max(self.max_queue_wait_ms, queue_wait_ms)
+            self.max_service_ms = max(self.max_service_ms, service_ms)
+            self.max_total_ms = max(self.max_total_ms, total_ms)

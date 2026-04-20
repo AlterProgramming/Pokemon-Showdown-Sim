@@ -4,7 +4,7 @@ import unittest
 
 import numpy as np
 
-from core.ActionSelection import pick_best_action
+from core.ActionSelection import pick_best_action, pick_best_slot_target
 
 
 class ActionSelectionTests(unittest.TestCase):
@@ -50,6 +50,20 @@ class ActionSelectionTests(unittest.TestCase):
 
         self.assertIsNotNone(best_action)
         self.assertEqual(best_action["type"], "switch")
+
+    def test_slot_target_without_action_vocab_falls_back_to_first_target(self) -> None:
+        logits = np.asarray([0.1, 0.9], dtype=np.float32)
+        targets = [{"slot": 4, "fainted": True}, {"slot": 2, "fainted": True}]
+
+        best_target, best_prob = pick_best_slot_target(
+            None,
+            logits,
+            targets,
+            "revive",
+        )
+
+        self.assertEqual(best_target, {"type": "revive", "payload": {"slot": 4, "fainted": True}, "token": None})
+        self.assertIsNone(best_prob)
 
 
 if __name__ == "__main__":
