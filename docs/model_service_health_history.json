@@ -1,4 +1,2263 @@
 {
-  "generated_at": "2026-04-17",
-  "snapshots": []
+  "generated_at": "2026-04-18T12:21:28Z",
+  "snapshots": [
+    {
+      "generated_at": "2026-04-17T18:40:27Z",
+      "status": "ok",
+      "summary": {
+        "totalServices": 3,
+        "healthyServices": 3,
+        "degradedServices": 0
+      },
+      "services": [
+        {
+          "name": "entity_action_bc_v1_20260408_0428",
+          "url": "http://127.0.0.1:5001/health",
+          "httpStatus": 200,
+          "latencyMs": 20.741,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_bc_v1_20260408_0428",
+            "model_name": "entity_action_bc_v1_20260408_0428",
+            "status": "ok",
+            "switch_logit_bias": 0.2
+          },
+          "error": null
+        },
+        {
+          "name": "entity_action_v2_20260409_1811",
+          "url": "http://127.0.0.1:5002/health",
+          "httpStatus": 200,
+          "latencyMs": 3.598,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_v2_20260409_1811",
+            "model_name": "entity_action_v2_20260409_1811",
+            "status": "ok",
+            "switch_logit_bias": 0.0
+          },
+          "error": null
+        },
+        {
+          "name": "model5",
+          "url": "http://127.0.0.1:5000/health",
+          "httpStatus": 200,
+          "latencyMs": 3.638,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "default_model_id": "model1",
+            "mode": "multi",
+            "status": "ok",
+            "supported_model_ids": [
+              "model1",
+              "model2",
+              "model4",
+              "model5"
+            ],
+            "worker_health": {
+              "model1": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model1",
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451145.397892,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.28903423198789824,
+                      "process_bootstrap_seconds": 0.9635891070065554,
+                      "tensorflow_import_seconds": 8.781764637999004,
+                      "total_startup_seconds": 10.052447912996286,
+                      "worker_ready_seconds": 9.089404612008366
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model1",
+                    "pid": 65166,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451155.2377532,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.22383904000162147,
+                      "process_bootstrap_seconds": 1.0051574399985839,
+                      "tensorflow_import_seconds": 7.461310968006728,
+                      "total_startup_seconds": 8.707868340992718,
+                      "worker_ready_seconds": 7.703411551992758
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model1",
+                    "pid": 65270,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model2": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model2",
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451163.944557,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.14301322000392247,
+                      "process_bootstrap_seconds": 0.6562907160114264,
+                      "tensorflow_import_seconds": 7.293542640996748,
+                      "total_startup_seconds": 8.112381326005561,
+                      "worker_ready_seconds": 7.456819129991345
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model2",
+                    "pid": 65365,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451172.0567849,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10975393900298513,
+                      "process_bootstrap_seconds": 0.7853055150044383,
+                      "tensorflow_import_seconds": 7.526537547004409,
+                      "total_startup_seconds": 8.438799044000916,
+                      "worker_ready_seconds": 7.653978210000787
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model2",
+                    "pid": 65454,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model4": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model4",
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451180.496398,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.11008521899930201,
+                      "process_bootstrap_seconds": 0.802339171001222,
+                      "tensorflow_import_seconds": 7.796972773998277,
+                      "total_startup_seconds": 8.723490878008306,
+                      "worker_ready_seconds": 7.921668451992446
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model4",
+                    "pid": 65542,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451189.220472,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1099373269971693,
+                      "process_bootstrap_seconds": 0.673092896991875,
+                      "tensorflow_import_seconds": 7.06718146399362,
+                      "total_startup_seconds": 7.864629229996353,
+                      "worker_ready_seconds": 7.192001622010139
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model4",
+                    "pid": 65654,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model5": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model5",
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451197.086266,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.11850306599808391,
+                      "process_bootstrap_seconds": 0.6554489699919941,
+                      "tensorflow_import_seconds": 6.866208174993517,
+                      "total_startup_seconds": 7.656636574000004,
+                      "worker_ready_seconds": 7.001685477007413
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model5",
+                    "pid": 65744,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451204.743969,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1068229149968829,
+                      "process_bootstrap_seconds": 0.6516102150053484,
+                      "tensorflow_import_seconds": 6.637563458003569,
+                      "total_startup_seconds": 7.410349141006009,
+                      "worker_ready_seconds": 6.759247135007172
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model5",
+                    "pid": 65846,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              }
+            }
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "generated_at": "2026-04-17T18:40:51Z",
+      "status": "ok",
+      "summary": {
+        "totalServices": 3,
+        "healthyServices": 3,
+        "degradedServices": 0
+      },
+      "services": [
+        {
+          "name": "entity_action_bc_v1_20260408_0428",
+          "url": "http://127.0.0.1:5001/health",
+          "httpStatus": 200,
+          "latencyMs": 13.238,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_bc_v1_20260408_0428",
+            "model_name": "entity_action_bc_v1_20260408_0428",
+            "status": "ok",
+            "switch_logit_bias": 0.2
+          },
+          "error": null
+        },
+        {
+          "name": "entity_action_v2_20260409_1811",
+          "url": "http://127.0.0.1:5002/health",
+          "httpStatus": 200,
+          "latencyMs": 1.452,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_v2_20260409_1811",
+            "model_name": "entity_action_v2_20260409_1811",
+            "status": "ok",
+            "switch_logit_bias": 0.0
+          },
+          "error": null
+        },
+        {
+          "name": "model5",
+          "url": "http://127.0.0.1:5000/health",
+          "httpStatus": 200,
+          "latencyMs": 1.559,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "default_model_id": "model1",
+            "mode": "multi",
+            "status": "ok",
+            "supported_model_ids": [
+              "model1",
+              "model2",
+              "model4",
+              "model5"
+            ],
+            "worker_health": {
+              "model1": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model1",
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451145.397892,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.28903423198789824,
+                      "process_bootstrap_seconds": 0.9635891070065554,
+                      "tensorflow_import_seconds": 8.781764637999004,
+                      "total_startup_seconds": 10.052447912996286,
+                      "worker_ready_seconds": 9.089404612008366
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model1",
+                    "pid": 65166,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451155.2377532,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.22383904000162147,
+                      "process_bootstrap_seconds": 1.0051574399985839,
+                      "tensorflow_import_seconds": 7.461310968006728,
+                      "total_startup_seconds": 8.707868340992718,
+                      "worker_ready_seconds": 7.703411551992758
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model1",
+                    "pid": 65270,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model2": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model2",
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451163.944557,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.14301322000392247,
+                      "process_bootstrap_seconds": 0.6562907160114264,
+                      "tensorflow_import_seconds": 7.293542640996748,
+                      "total_startup_seconds": 8.112381326005561,
+                      "worker_ready_seconds": 7.456819129991345
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model2",
+                    "pid": 65365,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451172.0567849,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10975393900298513,
+                      "process_bootstrap_seconds": 0.7853055150044383,
+                      "tensorflow_import_seconds": 7.526537547004409,
+                      "total_startup_seconds": 8.438799044000916,
+                      "worker_ready_seconds": 7.653978210000787
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model2",
+                    "pid": 65454,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model4": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model4",
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451180.496398,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.11008521899930201,
+                      "process_bootstrap_seconds": 0.802339171001222,
+                      "tensorflow_import_seconds": 7.796972773998277,
+                      "total_startup_seconds": 8.723490878008306,
+                      "worker_ready_seconds": 7.921668451992446
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model4",
+                    "pid": 65542,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451189.220472,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1099373269971693,
+                      "process_bootstrap_seconds": 0.673092896991875,
+                      "tensorflow_import_seconds": 7.06718146399362,
+                      "total_startup_seconds": 7.864629229996353,
+                      "worker_ready_seconds": 7.192001622010139
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model4",
+                    "pid": 65654,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model5": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model5",
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451197.086266,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.11850306599808391,
+                      "process_bootstrap_seconds": 0.6554489699919941,
+                      "tensorflow_import_seconds": 6.866208174993517,
+                      "total_startup_seconds": 7.656636574000004,
+                      "worker_ready_seconds": 7.001685477007413
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model5",
+                    "pid": 65744,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451204.743969,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1068229149968829,
+                      "process_bootstrap_seconds": 0.6516102150053484,
+                      "tensorflow_import_seconds": 6.637563458003569,
+                      "total_startup_seconds": 7.410349141006009,
+                      "worker_ready_seconds": 6.759247135007172
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model5",
+                    "pid": 65846,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              }
+            }
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "generated_at": "2026-04-17T18:43:10Z",
+      "status": "ok",
+      "summary": {
+        "totalServices": 1,
+        "healthyServices": 1,
+        "degradedServices": 0
+      },
+      "services": [
+        {
+          "name": "entity_action_v2_20260409_1811",
+          "url": "http://127.0.0.1:5002/health",
+          "httpStatus": 200,
+          "latencyMs": 21.465,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_v2_20260409_1811",
+            "model_name": "entity_action_v2_20260409_1811",
+            "status": "ok",
+            "switch_logit_bias": 0.0
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "generated_at": "2026-04-17T18:43:13Z",
+      "status": "ok",
+      "summary": {
+        "totalServices": 1,
+        "healthyServices": 1,
+        "degradedServices": 0
+      },
+      "services": [
+        {
+          "name": "entity_action_v2_20260409_1811",
+          "url": "http://127.0.0.1:5002/health",
+          "httpStatus": 200,
+          "latencyMs": 16.939,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_v2_20260409_1811",
+            "model_name": "entity_action_v2_20260409_1811",
+            "status": "ok",
+            "switch_logit_bias": 0.0
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "generated_at": "2026-04-17T18:43:28Z",
+      "status": "ok",
+      "summary": {
+        "totalServices": 3,
+        "healthyServices": 3,
+        "degradedServices": 0
+      },
+      "services": [
+        {
+          "name": "entity_action_bc_v1_20260408_0428",
+          "url": "http://127.0.0.1:5001/health",
+          "httpStatus": 200,
+          "latencyMs": 13.901,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_bc_v1_20260408_0428",
+            "model_name": "entity_action_bc_v1_20260408_0428",
+            "status": "ok",
+            "switch_logit_bias": 0.2
+          },
+          "error": null
+        },
+        {
+          "name": "entity_action_v2_20260409_1811",
+          "url": "http://127.0.0.1:5002/health",
+          "httpStatus": 200,
+          "latencyMs": 1.487,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_v2_20260409_1811",
+            "model_name": "entity_action_v2_20260409_1811",
+            "status": "ok",
+            "switch_logit_bias": 0.0
+          },
+          "error": null
+        },
+        {
+          "name": "model5",
+          "url": "http://127.0.0.1:5000/health",
+          "httpStatus": 200,
+          "latencyMs": 1.518,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "default_model_id": "model1",
+            "mode": "multi",
+            "status": "ok",
+            "supported_model_ids": [
+              "model1",
+              "model2",
+              "model4",
+              "model5"
+            ],
+            "worker_health": {
+              "model1": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model1",
+                "total_assigned_requests": 2823,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776451323.786668,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451145.397892,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.28903423198789824,
+                      "process_bootstrap_seconds": 0.9635891070065554,
+                      "tensorflow_import_seconds": 8.781764637999004,
+                      "total_startup_seconds": 10.052447912996286,
+                      "worker_ready_seconds": 9.089404612008366
+                    },
+                    "last_success_time": 1776451323.800769,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model1",
+                    "pid": 65166,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 1396,
+                    "restart_count": 0,
+                    "total_completed_requests": 1396,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776451323.834338,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451155.2377532,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.22383904000162147,
+                      "process_bootstrap_seconds": 1.0051574399985839,
+                      "tensorflow_import_seconds": 7.461310968006728,
+                      "total_startup_seconds": 8.707868340992718,
+                      "worker_ready_seconds": 7.703411551992758
+                    },
+                    "last_success_time": 1776451323.861303,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model1",
+                    "pid": 65270,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 1427,
+                    "restart_count": 0,
+                    "total_completed_requests": 1427,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model2": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model2",
+                "total_assigned_requests": 3798,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776451408.47535,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451163.944557,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.14301322000392247,
+                      "process_bootstrap_seconds": 0.6562907160114264,
+                      "tensorflow_import_seconds": 7.293542640996748,
+                      "total_startup_seconds": 8.112381326005561,
+                      "worker_ready_seconds": 7.456819129991345
+                    },
+                    "last_success_time": 1776451408.4840739,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model2",
+                    "pid": 65365,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 1871,
+                    "restart_count": 0,
+                    "total_completed_requests": 1871,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776451408.458978,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451172.0567849,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10975393900298513,
+                      "process_bootstrap_seconds": 0.7853055150044383,
+                      "tensorflow_import_seconds": 7.526537547004409,
+                      "total_startup_seconds": 8.438799044000916,
+                      "worker_ready_seconds": 7.653978210000787
+                    },
+                    "last_success_time": 1776451408.471194,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model2",
+                    "pid": 65454,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 1927,
+                    "restart_count": 0,
+                    "total_completed_requests": 1927,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model4": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model4",
+                "total_assigned_requests": 6927,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776451404.956985,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451180.496398,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.11008521899930201,
+                      "process_bootstrap_seconds": 0.802339171001222,
+                      "tensorflow_import_seconds": 7.796972773998277,
+                      "total_startup_seconds": 8.723490878008306,
+                      "worker_ready_seconds": 7.921668451992446
+                    },
+                    "last_success_time": 1776451404.968128,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model4",
+                    "pid": 65542,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 3474,
+                    "restart_count": 0,
+                    "total_completed_requests": 3474,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776451405.004562,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451189.220472,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1099373269971693,
+                      "process_bootstrap_seconds": 0.673092896991875,
+                      "tensorflow_import_seconds": 7.06718146399362,
+                      "total_startup_seconds": 7.864629229996353,
+                      "worker_ready_seconds": 7.192001622010139
+                    },
+                    "last_success_time": 1776451405.016702,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model4",
+                    "pid": 65654,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 3453,
+                    "restart_count": 0,
+                    "total_completed_requests": 3453,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model5": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model5",
+                "total_assigned_requests": 6516,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776451379.701764,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451197.086266,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.11850306599808391,
+                      "process_bootstrap_seconds": 0.6554489699919941,
+                      "tensorflow_import_seconds": 6.866208174993517,
+                      "total_startup_seconds": 7.656636574000004,
+                      "worker_ready_seconds": 7.001685477007413
+                    },
+                    "last_success_time": 1776451379.712388,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model5",
+                    "pid": 65744,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 3246,
+                    "restart_count": 0,
+                    "total_completed_requests": 3246,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776451379.65819,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776451204.743969,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1068229149968829,
+                      "process_bootstrap_seconds": 0.6516102150053484,
+                      "tensorflow_import_seconds": 6.637563458003569,
+                      "total_startup_seconds": 7.410349141006009,
+                      "worker_ready_seconds": 6.759247135007172
+                    },
+                    "last_success_time": 1776451379.669269,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model5",
+                    "pid": 65846,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 3270,
+                    "restart_count": 0,
+                    "total_completed_requests": 3270,
+                    "worker_index": 1
+                  }
+                ]
+              }
+            }
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "generated_at": "2026-04-17T18:56:29Z",
+      "status": "ok",
+      "summary": {
+        "totalServices": 3,
+        "healthyServices": 3,
+        "degradedServices": 0
+      },
+      "services": [
+        {
+          "name": "entity_action_bc_v1_20260408_0428",
+          "url": "http://127.0.0.1:5001/health",
+          "httpStatus": 200,
+          "latencyMs": 14.377,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_bc_v1_20260408_0428",
+            "model_name": "entity_action_bc_v1_20260408_0428",
+            "status": "ok",
+            "switch_logit_bias": 0.2
+          },
+          "error": null
+        },
+        {
+          "name": "entity_action_v2_20260409_1811",
+          "url": "http://127.0.0.1:5002/health",
+          "httpStatus": 200,
+          "latencyMs": 1.462,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_v2_20260409_1811",
+            "model_name": "entity_action_v2_20260409_1811",
+            "status": "ok",
+            "switch_logit_bias": 0.0
+          },
+          "error": null
+        },
+        {
+          "name": "model5",
+          "url": "http://127.0.0.1:5000/health",
+          "httpStatus": 200,
+          "latencyMs": 1.598,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "default_model_id": "model1",
+            "mode": "multi",
+            "status": "ok",
+            "supported_model_ids": [
+              "model1",
+              "model2",
+              "model4",
+              "model5"
+            ],
+            "worker_health": {
+              "model1": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model1",
+                "total_assigned_requests": 43226,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776452189.528275,
+                    "last_restart_reason": "max_requests",
+                    "last_start_time": 1776452158.1369212,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.3113199409999652,
+                      "process_bootstrap_seconds": 0.934630654999637,
+                      "tensorflow_import_seconds": 8.04264052498911,
+                      "total_startup_seconds": 9.308283384001697,
+                      "worker_ready_seconds": 8.373919491990819
+                    },
+                    "last_success_time": 1776452189.538029,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model1",
+                    "pid": 75935,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 1446,
+                    "restart_count": 4,
+                    "total_completed_requests": 21452,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776452189.516514,
+                    "last_restart_reason": "max_requests",
+                    "last_start_time": 1776452145.47668,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.2320705690071918,
+                      "process_bootstrap_seconds": 0.7573115620034514,
+                      "tensorflow_import_seconds": 7.956117675013957,
+                      "total_startup_seconds": 8.962502235997817,
+                      "worker_ready_seconds": 8.205894936996629
+                    },
+                    "last_success_time": 1776452189.527023,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model1",
+                    "pid": 75800,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 1768,
+                    "restart_count": 4,
+                    "total_completed_requests": 21774,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model2": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model2",
+                "total_assigned_requests": 45222,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776452189.531769,
+                    "last_restart_reason": "max_requests",
+                    "last_start_time": 1776452084.2399821,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.12627879100909922,
+                      "process_bootstrap_seconds": 0.7431218429992441,
+                      "tensorflow_import_seconds": 7.6767059470003005,
+                      "total_startup_seconds": 8.563432470997213,
+                      "worker_ready_seconds": 7.82083806200535
+                    },
+                    "last_success_time": 1776452189.540722,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model2",
+                    "pid": 75181,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 2562,
+                    "restart_count": 4,
+                    "total_completed_requests": 22571,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776452189.52113,
+                    "last_restart_reason": "max_requests",
+                    "last_start_time": 1776452072.948558,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.12215589899278712,
+                      "process_bootstrap_seconds": 0.769977582996944,
+                      "tensorflow_import_seconds": 7.9035505579959136,
+                      "total_startup_seconds": 8.812481076005497,
+                      "worker_ready_seconds": 8.042856148007559
+                    },
+                    "last_success_time": 1776452189.5304801,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model2",
+                    "pid": 75071,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 2647,
+                    "restart_count": 4,
+                    "total_completed_requests": 22651,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model4": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model4",
+                "total_assigned_requests": 44750,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776452144.3591292,
+                    "last_restart_reason": "max_requests",
+                    "last_start_time": 1776452103.9753878,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10536459500144701,
+                      "process_bootstrap_seconds": 0.9161718870018376,
+                      "tensorflow_import_seconds": 8.28372156099067,
+                      "total_startup_seconds": 9.320160511997528,
+                      "worker_ready_seconds": 8.404396879996057
+                    },
+                    "last_success_time": 1776452144.368684,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model4",
+                    "pid": 75371,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 2397,
+                    "restart_count": 4,
+                    "total_completed_requests": 22403,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776452144.2417731,
+                    "last_restart_reason": "max_requests",
+                    "last_start_time": 1776452094.586847,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.13325070899736602,
+                      "process_bootstrap_seconds": 0.7769365519925486,
+                      "tensorflow_import_seconds": 7.847202846998698,
+                      "total_startup_seconds": 8.774211804004153,
+                      "worker_ready_seconds": 7.997691808006493
+                    },
+                    "last_success_time": 1776452144.252783,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model4",
+                    "pid": 75273,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 2341,
+                    "restart_count": 4,
+                    "total_completed_requests": 22347,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model5": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model5",
+                "total_assigned_requests": 43750,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776452057.2869608,
+                    "last_restart_reason": "max_requests",
+                    "last_start_time": 1776452007.1137002,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.11334755399730057,
+                      "process_bootstrap_seconds": 0.7092245329986326,
+                      "tensorflow_import_seconds": 6.938643558998592,
+                      "total_startup_seconds": 7.776015264011221,
+                      "worker_ready_seconds": 7.066808221992687
+                    },
+                    "last_success_time": 1776452057.297963,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model5",
+                    "pid": 74417,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 2064,
+                    "restart_count": 4,
+                    "total_completed_requests": 22066,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776452057.3263638,
+                    "last_restart_reason": "max_requests",
+                    "last_start_time": 1776452028.3364182,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1122583350079367,
+                      "process_bootstrap_seconds": 0.6833108489954611,
+                      "tensorflow_import_seconds": 7.165950648995931,
+                      "total_startup_seconds": 7.9739913170051295,
+                      "worker_ready_seconds": 7.293908997991821
+                    },
+                    "last_success_time": 1776452057.334663,
+                    "max_requests_before_recycle": 5000,
+                    "max_worker_age_seconds": 3600.0,
+                    "model_id": "model5",
+                    "pid": 74621,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 1684,
+                    "restart_count": 4,
+                    "total_completed_requests": 21684,
+                    "worker_index": 1
+                  }
+                ]
+              }
+            }
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "generated_at": "2026-04-17T19:12:13Z",
+      "status": "ok",
+      "summary": {
+        "totalServices": 3,
+        "healthyServices": 3,
+        "degradedServices": 0
+      },
+      "services": [
+        {
+          "name": "entity_action_bc_v1_20260408_0428",
+          "url": "http://127.0.0.1:5001/health",
+          "httpStatus": 200,
+          "latencyMs": 13.86,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_bc_v1_20260408_0428",
+            "model_name": "entity_action_bc_v1_20260408_0428",
+            "request_metrics": {
+              "avg_elapsed_ms": 0.0,
+              "avg_inference_ms": 0.0,
+              "error_count": 0,
+              "max_elapsed_ms": 0.0,
+              "max_inference_ms": 0.0,
+              "move_count": 0,
+              "none_count": 0,
+              "request_count": 0,
+              "revive_count": 0,
+              "success_count": 0,
+              "switch_count": 0
+            },
+            "runtime": {
+              "alive": true,
+              "entity_token_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.entity_token_vocabs.json",
+              "family_id": "entity_action_bc",
+              "family_name": "entity_action_bc_v1",
+              "family_version": 1,
+              "input_mode": "entity_action",
+              "kind": "entity",
+              "metadata_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/training_metadata_entity_action_bc_v1_20260408_0428.json",
+              "model_id": "entity_action_bc_v1_20260408_0428",
+              "model_name": "entity_action_bc_v1_20260408_0428",
+              "model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/policy_value_model_entity_action_bc_v1_20260408_0428.keras",
+              "policy_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.policy_vocab.json",
+              "switch_logit_bias": 0.2
+            },
+            "status": "ok",
+            "switch_logit_bias": 0.2
+          },
+          "error": null
+        },
+        {
+          "name": "entity_action_v2_20260409_1811",
+          "url": "http://127.0.0.1:5002/health",
+          "httpStatus": 200,
+          "latencyMs": 1.723,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_v2_20260409_1811",
+            "model_name": "entity_action_v2_20260409_1811",
+            "request_metrics": {
+              "avg_elapsed_ms": 0.0,
+              "avg_inference_ms": 0.0,
+              "error_count": 0,
+              "max_elapsed_ms": 0.0,
+              "max_inference_ms": 0.0,
+              "move_count": 0,
+              "none_count": 0,
+              "request_count": 0,
+              "revive_count": 0,
+              "success_count": 0,
+              "switch_count": 0
+            },
+            "runtime": {
+              "alive": true,
+              "entity_token_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/entity_action_v2_20260409_1811.entity_token_vocabs.json",
+              "family_id": "entity_action_v2",
+              "family_name": "entity_action_v2",
+              "family_version": 1,
+              "input_mode": "entity_action_v2",
+              "kind": "entity",
+              "metadata_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/training_metadata_entity_action_v2_20260409_1811.json",
+              "model_id": "entity_action_v2_20260409_1811",
+              "model_name": "entity_action_v2_20260409_1811",
+              "model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/training_model_entity_action_v2_20260409_1811.keras",
+              "policy_vocab_path": null,
+              "switch_logit_bias": 0.0
+            },
+            "status": "ok",
+            "switch_logit_bias": 0.0
+          },
+          "error": null
+        },
+        {
+          "name": "model5",
+          "url": "http://127.0.0.1:5000/health",
+          "httpStatus": 200,
+          "latencyMs": 1.93,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "default_model_id": "model1",
+            "mode": "multi",
+            "request_metrics": {
+              "model1": {
+                "avg_elapsed_ms": 0.0,
+                "avg_observed_batch_size": 0.0,
+                "avg_queue_wait_ms": 0.0,
+                "avg_service_ms": 0.0,
+                "avg_worker_total_ms": 0.0,
+                "error_count": 0,
+                "max_elapsed_ms": 0.0,
+                "max_observed_batch_size": 0,
+                "max_queue_wait_ms": 0.0,
+                "max_service_ms": 0.0,
+                "max_worker_total_ms": 0.0,
+                "move_count": 0,
+                "none_count": 0,
+                "request_count": 0,
+                "revive_count": 0,
+                "success_count": 0,
+                "switch_count": 0
+              },
+              "model2": {
+                "avg_elapsed_ms": 0.0,
+                "avg_observed_batch_size": 0.0,
+                "avg_queue_wait_ms": 0.0,
+                "avg_service_ms": 0.0,
+                "avg_worker_total_ms": 0.0,
+                "error_count": 0,
+                "max_elapsed_ms": 0.0,
+                "max_observed_batch_size": 0,
+                "max_queue_wait_ms": 0.0,
+                "max_service_ms": 0.0,
+                "max_worker_total_ms": 0.0,
+                "move_count": 0,
+                "none_count": 0,
+                "request_count": 0,
+                "revive_count": 0,
+                "success_count": 0,
+                "switch_count": 0
+              },
+              "model4": {
+                "avg_elapsed_ms": 0.0,
+                "avg_observed_batch_size": 0.0,
+                "avg_queue_wait_ms": 0.0,
+                "avg_service_ms": 0.0,
+                "avg_worker_total_ms": 0.0,
+                "error_count": 0,
+                "max_elapsed_ms": 0.0,
+                "max_observed_batch_size": 0,
+                "max_queue_wait_ms": 0.0,
+                "max_service_ms": 0.0,
+                "max_worker_total_ms": 0.0,
+                "move_count": 0,
+                "none_count": 0,
+                "request_count": 0,
+                "revive_count": 0,
+                "success_count": 0,
+                "switch_count": 0
+              },
+              "model5": {
+                "avg_elapsed_ms": 0.0,
+                "avg_observed_batch_size": 0.0,
+                "avg_queue_wait_ms": 0.0,
+                "avg_service_ms": 0.0,
+                "avg_worker_total_ms": 0.0,
+                "error_count": 0,
+                "max_elapsed_ms": 0.0,
+                "max_observed_batch_size": 0,
+                "max_queue_wait_ms": 0.0,
+                "max_service_ms": 0.0,
+                "max_worker_total_ms": 0.0,
+                "move_count": 0,
+                "none_count": 0,
+                "request_count": 0,
+                "revive_count": 0,
+                "success_count": 0,
+                "switch_count": 0
+              }
+            },
+            "status": "ok",
+            "supported_model_ids": [
+              "model1",
+              "model2",
+              "model4",
+              "model5"
+            ],
+            "worker_health": {
+              "model1": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model1",
+                "request_metrics": {
+                  "avg_batch_size": 0.0,
+                  "avg_queue_wait_ms": 0.0,
+                  "avg_service_ms": 0.0,
+                  "avg_total_ms": 0.0,
+                  "batch_prediction_calls": 0,
+                  "max_queue_wait_ms": 0.0,
+                  "max_service_ms": 0.0,
+                  "max_total_ms": 0.0,
+                  "prediction_calls": 0,
+                  "prediction_errors": 0
+                },
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453040.3970041,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.21416040998883545,
+                      "process_bootstrap_seconds": 0.5878122230060399,
+                      "tensorflow_import_seconds": 6.72761679199175,
+                      "total_startup_seconds": 7.545779309002683,
+                      "worker_ready_seconds": 6.958692776999669
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model1",
+                    "pid": 85711,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453047.925052,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1937292460061144,
+                      "process_bootstrap_seconds": 0.6159825899958378,
+                      "tensorflow_import_seconds": 6.546384850007598,
+                      "total_startup_seconds": 7.370180811994942,
+                      "worker_ready_seconds": 6.754721085002529
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model1",
+                    "pid": 85905,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model2": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model2",
+                "request_metrics": {
+                  "avg_batch_size": 0.0,
+                  "avg_queue_wait_ms": 0.0,
+                  "avg_service_ms": 0.0,
+                  "avg_total_ms": 0.0,
+                  "batch_prediction_calls": 0,
+                  "max_queue_wait_ms": 0.0,
+                  "max_service_ms": 0.0,
+                  "max_total_ms": 0.0,
+                  "prediction_calls": 0,
+                  "prediction_errors": 0
+                },
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453055.2954948,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10619444800249767,
+                      "process_bootstrap_seconds": 0.5462576789868763,
+                      "tensorflow_import_seconds": 6.342395486994064,
+                      "total_startup_seconds": 7.009113358988543,
+                      "worker_ready_seconds": 6.463404356996762
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model2",
+                    "pid": 85971,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453062.3049119,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10431556600087788,
+                      "process_bootstrap_seconds": 0.5431093949882779,
+                      "tensorflow_import_seconds": 6.330680724000558,
+                      "total_startup_seconds": 6.992232928998419,
+                      "worker_ready_seconds": 6.449495438995655
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model2",
+                    "pid": 86037,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model4": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model4",
+                "request_metrics": {
+                  "avg_batch_size": 0.0,
+                  "avg_queue_wait_ms": 0.0,
+                  "avg_service_ms": 0.0,
+                  "avg_total_ms": 0.0,
+                  "batch_prediction_calls": 0,
+                  "max_queue_wait_ms": 0.0,
+                  "max_service_ms": 0.0,
+                  "max_total_ms": 0.0,
+                  "prediction_calls": 0,
+                  "prediction_errors": 0
+                },
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453069.297997,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10592072599683888,
+                      "process_bootstrap_seconds": 0.5340674420003779,
+                      "tensorflow_import_seconds": 6.321387834002962,
+                      "total_startup_seconds": 6.975710648010136,
+                      "worker_ready_seconds": 6.442159455007641
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model4",
+                    "pid": 86145,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453076.2743502,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10401647799881175,
+                      "process_bootstrap_seconds": 0.536503512004856,
+                      "tensorflow_import_seconds": 6.259664767989307,
+                      "total_startup_seconds": 6.913994972012006,
+                      "worker_ready_seconds": 6.377909678005381
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model4",
+                    "pid": 86212,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model5": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model5",
+                "request_metrics": {
+                  "avg_batch_size": 0.0,
+                  "avg_queue_wait_ms": 0.0,
+                  "avg_service_ms": 0.0,
+                  "avg_total_ms": 0.0,
+                  "batch_prediction_calls": 0,
+                  "max_queue_wait_ms": 0.0,
+                  "max_service_ms": 0.0,
+                  "max_total_ms": 0.0,
+                  "prediction_calls": 0,
+                  "prediction_errors": 0
+                },
+                "total_assigned_requests": 0,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453083.1888971,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10579013799724635,
+                      "process_bootstrap_seconds": 0.5345417339995038,
+                      "tensorflow_import_seconds": 6.239562005997868,
+                      "total_startup_seconds": 6.89500345599663,
+                      "worker_ready_seconds": 6.360823537994293
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model5",
+                    "pid": 86278,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": null,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453090.0845928,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10490454500541091,
+                      "process_bootstrap_seconds": 0.5504202190059004,
+                      "tensorflow_import_seconds": 6.230755689990474,
+                      "total_startup_seconds": 6.900112559000263,
+                      "worker_ready_seconds": 6.35011540898995
+                    },
+                    "last_success_time": null,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model5",
+                    "pid": 86384,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 0,
+                    "restart_count": 0,
+                    "total_completed_requests": 0,
+                    "worker_index": 1
+                  }
+                ]
+              }
+            }
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "generated_at": "2026-04-18T12:21:28Z",
+      "status": "ok",
+      "summary": {
+        "totalServices": 3,
+        "healthyServices": 3,
+        "degradedServices": 0
+      },
+      "services": [
+        {
+          "name": "entity_action_bc_v1_20260408_0428",
+          "url": "http://127.0.0.1:5001/health",
+          "httpStatus": 200,
+          "latencyMs": 82.573,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_bc_v1_20260408_0428",
+            "model_name": "entity_action_bc_v1_20260408_0428",
+            "request_metrics": {
+              "avg_elapsed_ms": 5.047980949234371,
+              "avg_inference_ms": 3.8667177875489926,
+              "error_count": 0,
+              "max_elapsed_ms": 117.81134299235418,
+              "max_inference_ms": 114.9886679922929,
+              "move_count": 19486,
+              "none_count": 0,
+              "request_count": 22210,
+              "revive_count": 4,
+              "success_count": 22210,
+              "switch_count": 2720
+            },
+            "runtime": {
+              "alive": true,
+              "entity_token_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.entity_token_vocabs.json",
+              "family_id": "entity_action_bc",
+              "family_name": "entity_action_bc_v1",
+              "family_version": 1,
+              "input_mode": "entity_action",
+              "kind": "entity",
+              "metadata_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/training_metadata_entity_action_bc_v1_20260408_0428.json",
+              "model_id": "entity_action_bc_v1_20260408_0428",
+              "model_name": "entity_action_bc_v1_20260408_0428",
+              "model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/policy_value_model_entity_action_bc_v1_20260408_0428.keras",
+              "policy_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.policy_vocab.json",
+              "switch_logit_bias": 0.2
+            },
+            "status": "ok",
+            "switch_logit_bias": 0.2
+          },
+          "error": null
+        },
+        {
+          "name": "entity_action_v2_20260409_1811",
+          "url": "http://127.0.0.1:5002/health",
+          "httpStatus": 200,
+          "latencyMs": 2.181,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "model_id": "entity_action_v2_20260409_1811",
+            "model_name": "entity_action_v2_20260409_1811",
+            "request_metrics": {
+              "avg_elapsed_ms": 8.63228573610738,
+              "avg_inference_ms": 6.968038581597592,
+              "error_count": 0,
+              "max_elapsed_ms": 3407.0405649981694,
+              "max_inference_ms": 3405.0992880074773,
+              "move_count": 19382,
+              "none_count": 0,
+              "request_count": 21886,
+              "revive_count": 1,
+              "success_count": 21886,
+              "switch_count": 2503
+            },
+            "runtime": {
+              "alive": true,
+              "entity_token_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/entity_action_v2_20260409_1811.entity_token_vocabs.json",
+              "family_id": "entity_action_v2",
+              "family_name": "entity_action_v2",
+              "family_version": 1,
+              "input_mode": "entity_action_v2",
+              "kind": "entity",
+              "metadata_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/training_metadata_entity_action_v2_20260409_1811.json",
+              "model_id": "entity_action_v2_20260409_1811",
+              "model_name": "entity_action_v2_20260409_1811",
+              "model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/training_model_entity_action_v2_20260409_1811.keras",
+              "policy_vocab_path": null,
+              "switch_logit_bias": 0.0
+            },
+            "status": "ok",
+            "switch_logit_bias": 0.0
+          },
+          "error": null
+        },
+        {
+          "name": "model5",
+          "url": "http://127.0.0.1:5000/health",
+          "httpStatus": 200,
+          "latencyMs": 3.132,
+          "status": "ok",
+          "healthy": true,
+          "payload": {
+            "default_model_id": "model1",
+            "mode": "multi",
+            "request_metrics": {
+              "model1": {
+                "avg_elapsed_ms": 33.90987181759137,
+                "avg_observed_batch_size": 4.577260693883238,
+                "avg_queue_wait_ms": 0.005698720325934623,
+                "avg_service_ms": 19.425851205646037,
+                "avg_worker_total_ms": 19.43154992597197,
+                "error_count": 0,
+                "max_elapsed_ms": 4239.409517991589,
+                "max_observed_batch_size": 8,
+                "max_queue_wait_ms": 0.9196179889841005,
+                "max_service_ms": 4217.856963994564,
+                "max_worker_total_ms": 4217.863846992259,
+                "move_count": 18849,
+                "none_count": 0,
+                "request_count": 21531,
+                "revive_count": 0,
+                "success_count": 21531,
+                "switch_count": 2682
+              },
+              "model2": {
+                "avg_elapsed_ms": 27.79365268816191,
+                "avg_observed_batch_size": 4.575259678942398,
+                "avg_queue_wait_ms": 0.004866950840534681,
+                "avg_service_ms": 16.625645841751265,
+                "avg_worker_total_ms": 16.630512792591798,
+                "error_count": 0,
+                "max_elapsed_ms": 4382.984683004906,
+                "max_observed_batch_size": 8,
+                "max_queue_wait_ms": 0.2830629964591935,
+                "max_service_ms": 4379.605148991686,
+                "max_worker_total_ms": 4379.6156059834175,
+                "move_count": 18527,
+                "none_count": 0,
+                "request_count": 21180,
+                "revive_count": 0,
+                "success_count": 21180,
+                "switch_count": 2653
+              },
+              "model4": {
+                "avg_elapsed_ms": 31.79614815354292,
+                "avg_observed_batch_size": 4.634567674354498,
+                "avg_queue_wait_ms": 0.005608073718557496,
+                "avg_service_ms": 17.79594903382414,
+                "avg_worker_total_ms": 17.801557107542695,
+                "error_count": 0,
+                "max_elapsed_ms": 3517.6598859980004,
+                "max_observed_batch_size": 8,
+                "max_queue_wait_ms": 0.44361999607644975,
+                "max_service_ms": 3443.7027940002736,
+                "max_worker_total_ms": 3443.835643993225,
+                "move_count": 19099,
+                "none_count": 0,
+                "request_count": 21766,
+                "revive_count": 0,
+                "success_count": 21766,
+                "switch_count": 2667
+              },
+              "model5": {
+                "avg_elapsed_ms": 25.771239456150294,
+                "avg_observed_batch_size": 4.5722724289392636,
+                "avg_queue_wait_ms": 0.004462122743154752,
+                "avg_service_ms": 14.64775086201863,
+                "avg_worker_total_ms": 14.652212984761784,
+                "error_count": 0,
+                "max_elapsed_ms": 4238.940077004372,
+                "max_observed_batch_size": 8,
+                "max_queue_wait_ms": 0.10548900172580034,
+                "max_service_ms": 4216.878131002886,
+                "max_worker_total_ms": 4216.888067996479,
+                "move_count": 17185,
+                "none_count": 0,
+                "request_count": 19807,
+                "revive_count": 2,
+                "success_count": 19807,
+                "switch_count": 2620
+              }
+            },
+            "status": "ok",
+            "supported_model_ids": [
+              "model1",
+              "model2",
+              "model4",
+              "model5"
+            ],
+            "worker_health": {
+              "model1": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model1",
+                "request_metrics": {
+                  "avg_batch_size": 3.0338171058193604,
+                  "avg_queue_wait_ms": 0.006186355973674727,
+                  "avg_service_ms": 19.037210521782388,
+                  "avg_total_ms": 19.043396877756063,
+                  "batch_prediction_calls": 4861,
+                  "max_queue_wait_ms": 0.9196179889841005,
+                  "max_service_ms": 4217.856963994564,
+                  "max_total_ms": 4217.863846992259,
+                  "prediction_calls": 7097,
+                  "prediction_errors": 0
+                },
+                "total_assigned_requests": 21531,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776514887.280929,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453040.3970041,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.21416040998883545,
+                      "process_bootstrap_seconds": 0.5878122230060399,
+                      "tensorflow_import_seconds": 6.72761679199175,
+                      "total_startup_seconds": 7.545779309002683,
+                      "worker_ready_seconds": 6.958692776999669
+                    },
+                    "last_success_time": 1776514887.3070028,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model1",
+                    "pid": 85711,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 10712,
+                    "restart_count": 0,
+                    "total_completed_requests": 10712,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776500927.373649,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453047.925052,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.1937292460061144,
+                      "process_bootstrap_seconds": 0.6159825899958378,
+                      "tensorflow_import_seconds": 6.546384850007598,
+                      "total_startup_seconds": 7.370180811994942,
+                      "worker_ready_seconds": 6.754721085002529
+                    },
+                    "last_success_time": 1776500927.402715,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model1",
+                    "pid": 85905,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 10819,
+                    "restart_count": 0,
+                    "total_completed_requests": 10819,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model2": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model2",
+                "request_metrics": {
+                  "avg_batch_size": 3.0196749358426005,
+                  "avg_queue_wait_ms": 0.005239653132694166,
+                  "avg_service_ms": 18.192092305503444,
+                  "avg_total_ms": 18.197331958636138,
+                  "batch_prediction_calls": 4775,
+                  "max_queue_wait_ms": 0.2830629964591935,
+                  "max_service_ms": 4379.605148991686,
+                  "max_total_ms": 4379.6156059834175,
+                  "prediction_calls": 7014,
+                  "prediction_errors": 0
+                },
+                "total_assigned_requests": 21180,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776500927.3668349,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453055.2954948,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10619444800249767,
+                      "process_bootstrap_seconds": 0.5462576789868763,
+                      "tensorflow_import_seconds": 6.342395486994064,
+                      "total_startup_seconds": 7.009113358988543,
+                      "worker_ready_seconds": 6.463404356996762
+                    },
+                    "last_success_time": 1776500927.393256,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model2",
+                    "pid": 85971,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 10553,
+                    "restart_count": 0,
+                    "total_completed_requests": 10553,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776500927.4033659,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453062.3049119,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10431556600087788,
+                      "process_bootstrap_seconds": 0.5431093949882779,
+                      "tensorflow_import_seconds": 6.330680724000558,
+                      "total_startup_seconds": 6.992232928998419,
+                      "worker_ready_seconds": 6.449495438995655
+                    },
+                    "last_success_time": 1776514887.29013,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model2",
+                    "pid": 86037,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 10627,
+                    "restart_count": 0,
+                    "total_completed_requests": 10627,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model4": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model4",
+                "request_metrics": {
+                  "avg_batch_size": 3.0716906576347727,
+                  "avg_queue_wait_ms": 0.0058716652879756675,
+                  "avg_service_ms": 18.586698622750365,
+                  "avg_total_ms": 18.59257028803834,
+                  "batch_prediction_calls": 4816,
+                  "max_queue_wait_ms": 0.44361999607644975,
+                  "max_service_ms": 3443.7027940002736,
+                  "max_total_ms": 3443.835643993225,
+                  "prediction_calls": 7086,
+                  "prediction_errors": 0
+                },
+                "total_assigned_requests": 21766,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776497277.8655958,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453069.297997,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10592072599683888,
+                      "process_bootstrap_seconds": 0.5340674420003779,
+                      "tensorflow_import_seconds": 6.321387834002962,
+                      "total_startup_seconds": 6.975710648010136,
+                      "worker_ready_seconds": 6.442159455007641
+                    },
+                    "last_success_time": 1776497277.9002519,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model4",
+                    "pid": 86145,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 10810,
+                    "restart_count": 0,
+                    "total_completed_requests": 10810,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776497278.0512881,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453076.2743502,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10401647799881175,
+                      "process_bootstrap_seconds": 0.536503512004856,
+                      "tensorflow_import_seconds": 6.259664767989307,
+                      "total_startup_seconds": 6.913994972012006,
+                      "worker_ready_seconds": 6.377909678005381
+                    },
+                    "last_success_time": 1776497278.078815,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model4",
+                    "pid": 86212,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 10956,
+                    "restart_count": 0,
+                    "total_completed_requests": 10956,
+                    "worker_index": 1
+                  }
+                ]
+              },
+              "model5": {
+                "alive": true,
+                "busy_workers": 0,
+                "idle_workers": 2,
+                "model_id": "model5",
+                "request_metrics": {
+                  "avg_batch_size": 3.067998760842627,
+                  "avg_queue_wait_ms": 0.004750565828354031,
+                  "avg_service_ms": 15.074996525971844,
+                  "avg_total_ms": 15.079747091800199,
+                  "batch_prediction_calls": 4520,
+                  "max_queue_wait_ms": 0.10548900172580034,
+                  "max_service_ms": 4216.878131002886,
+                  "max_total_ms": 4216.888067996479,
+                  "prediction_calls": 6456,
+                  "prediction_errors": 0
+                },
+                "total_assigned_requests": 19807,
+                "waiting_requests": 0,
+                "worker_count": 2,
+                "workers": [
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776495962.115274,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453083.1888971,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10579013799724635,
+                      "process_bootstrap_seconds": 0.5345417339995038,
+                      "tensorflow_import_seconds": 6.239562005997868,
+                      "total_startup_seconds": 6.89500345599663,
+                      "worker_ready_seconds": 6.360823537994293
+                    },
+                    "last_success_time": 1776495962.169727,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model5",
+                    "pid": 86278,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 9915,
+                    "restart_count": 0,
+                    "total_completed_requests": 9915,
+                    "worker_index": 0
+                  },
+                  {
+                    "alive": true,
+                    "bootstrap_timeout_seconds": 30.0,
+                    "last_error": null,
+                    "last_request_time": 1776495962.172074,
+                    "last_restart_reason": null,
+                    "last_start_time": 1776453090.0845928,
+                    "last_startup_timings": {
+                      "model_load_seconds": 0.10490454500541091,
+                      "process_bootstrap_seconds": 0.5504202190059004,
+                      "tensorflow_import_seconds": 6.230755689990474,
+                      "total_startup_seconds": 6.900112559000263,
+                      "worker_ready_seconds": 6.35011540898995
+                    },
+                    "last_success_time": 1776495962.184753,
+                    "max_requests_before_recycle": 0,
+                    "max_worker_age_seconds": 0.0,
+                    "model_id": "model5",
+                    "pid": 86384,
+                    "request_timeout_seconds": 15.0,
+                    "requests_since_start": 9892,
+                    "restart_count": 0,
+                    "total_completed_requests": 9892,
+                    "worker_index": 1
+                  }
+                ]
+              }
+            }
+          },
+          "error": null
+        }
+      ]
+    }
+  ]
 }

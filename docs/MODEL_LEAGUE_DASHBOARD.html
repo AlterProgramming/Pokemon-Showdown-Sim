@@ -126,7 +126,7 @@
 
       <section class="panel section">
         <h2>Service Health</h2>
-        <p class="muted">Latest snapshot: 2026-04-17 · no snapshot</p>
+        <p class="muted">Latest snapshot: 2026-04-18T12:21:28Z · 3/3 healthy</p>
         <table>
           <thead>
             <tr>
@@ -138,7 +138,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan='5' class='muted'>No service snapshot recorded yet. Run <code>python scripts/collect_model_service_health.py</code>.</td></tr>
+            <tr><td><code>entity_action_bc_v1_20260408_0428</code></td><td class='ok'>ok</td><td>82.573</td><td><code>entity_action_bc_v1_20260408_0428</code></td><td>http://127.0.0.1:5001/health</td></tr>
+<tr><td><code>entity_action_v2_20260409_1811</code></td><td class='ok'>ok</td><td>2.181</td><td><code>entity_action_v2_20260409_1811</code></td><td>http://127.0.0.1:5002/health</td></tr>
+<tr><td><code>model5</code></td><td class='ok'>ok</td><td>3.132</td><td><code>model1, model2, model4, model5</code></td><td>http://127.0.0.1:5000/health</td></tr>
           </tbody>
         </table>
       </section>
@@ -158,8 +160,11 @@
           </thead>
           <tbody>
             <tr><td><code>2026-04-09_long_full_attempt</code></td><td><span class='pill bad'>invalid</span></td><td>15000 scheduled, 12000 completed</td><td class='bad'>140</td><td><code>word_policy_v1</code> 1738</td><td>Pre-stabilization 1000-games-per-pair mixed-model league. Run degraded under sustained shared vector-server load and was stopped before completion. Keep for reliability comparison, not as canonical rankings.</td></tr>
-<tr><td><code>2026-04-17_vector_soak</code></td><td><span class='pill ok'>validated</span></td><td>1200 scheduled, 1200 completed</td><td class='ok'>0</td><td><code>model2</code> 1512</td><td>Post-stabilization soak for model1/model2/model4/model5 only. Used to verify shared vector serving before rerunning mixed-model leagues.</td></tr>
+<tr><td><code>2026-04-17_134310</code></td><td><span class='pill bad'>exploratory</span></td><td>2 scheduled, 2 completed</td><td class='ok'>0</td><td><code>word_policy_v1</code> 1577</td><td>Automated league run from pokemon-showdown-model-feature/scripts/model-league-runner.js.</td></tr>
+<tr><td><code>2026-04-17_134328</code></td><td><span class='pill bad'>exploratory</span></td><td>2100 scheduled, 2100 completed</td><td class='ok'>0</td><td><code>word_policy_v1</code> 1730</td><td>Automated league run from pokemon-showdown-model-feature/scripts/model-league-runner.js.</td></tr>
+<tr><td><code>2026-04-17_141213</code></td><td><span class='pill bad'>exploratory</span></td><td>2100 scheduled, 2100 completed</td><td class='bad'>167</td><td><code>word_policy_v1</code> 1712</td><td>Automated league run from pokemon-showdown-model-feature/scripts/model-league-runner.js.</td></tr>
 <tr><td><code>2026-04-17_medium_full</code></td><td><span class='pill ok'>validated</span></td><td>1500 scheduled, 1500 completed</td><td class='ok'>0</td><td><code>word_policy_v1</code> 1751</td><td>First clean mixed-model league after vector-serving stabilization. This is the current canonical league baseline.</td></tr>
+<tr><td><code>2026-04-17_vector_soak</code></td><td><span class='pill ok'>validated</span></td><td>1200 scheduled, 1200 completed</td><td class='ok'>0</td><td><code>model2</code> 1512</td><td>Post-stabilization soak for model1/model2/model4/model5 only. Used to verify shared vector serving before rerunning mixed-model leagues.</td></tr>
           </tbody>
         </table>
       </section>
