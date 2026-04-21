@@ -797,6 +797,7 @@ class BattleStateTracker:
             yield {
                 "battle_id": self.battle_id,
                 "turn_number": int(turn.get("turn_number")),
+                "player": player,
                 "state": state_before,
                 "next_state": state_after,
                 "action": action,
