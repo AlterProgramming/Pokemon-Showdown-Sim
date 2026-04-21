@@ -15,6 +15,33 @@ import numpy as np
 from .ModelRegistry import resolve_artifact_path
 
 
+def _load_json_artifact(path: Path | str) -> dict:
+    """Load a JSON artifact from a local path or a GCS URI (gs://)."""
+    path_str = str(path)
+    if path_str.startswith("gs://"):
+        from google.cloud import storage
+        from google.oauth2 import service_account
+        import io
+        # Strip gs://bucket-name/blob-name
+        without_scheme = path_str[len("gs://"):]
+        bucket_name, _, blob_name = without_scheme.partition("/")
+        key_path = os.environ.get(
+            "GOOGLE_APPLICATION_CREDENTIALS", ""
+        ).strip()
+        if key_path:
+            creds = service_account.Credentials.from_service_account_file(
+                key_path,
+                scopes=["https://www.googleapis.com/auth/cloud-platform"],
+            )
+            client = storage.Client(credentials=creds)
+        else:
+            client = storage.Client()
+        blob = client.bucket(bucket_name).blob(blob_name)
+        return json.loads(blob.download_as_text())
+    with open(path_str, "r", encoding="utf-8") as fh:
+        return json.load(fh)
+
+
 MODEL_WORKER_DEBUG = os.environ.get("PS_MODEL_WORKER_DEBUG", "").strip().lower() in {
     "1", "true", "yes", "on",
 }
@@ -87,8 +114,7 @@ def load_runtime_artifacts(repo_path: Path, model_entry: dict[str, Any]) -> dict
     model_path = resolve_artifact_path(repo_path, metadata_path, str(model_entry["policy_model_path"]))
     vocab_path = resolve_artifact_path(repo_path, metadata_path, str(model_entry["policy_vocab_path"]))
 
-    with open(vocab_path, "r", encoding="utf-8") as handle:
-        action_vocab = json.load(handle)
+    action_vocab = _load_json_artifact(vocab_path)
 
     expected_input_dim = model_entry.get("feature_dim")
     if expected_input_dim is not None:

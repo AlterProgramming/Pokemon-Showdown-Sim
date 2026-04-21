@@ -207,7 +207,12 @@ def enrich_training_metadata_recipe_fields(metadata: dict[str, Any]) -> dict[str
     return payload
 
 
-def resolve_artifact_path(repo_path: Path, metadata_path: Path, raw_path: str) -> Path:
+def resolve_artifact_path(repo_path: Path, metadata_path: Path, raw_path: str) -> Path | str:
+    # GCS URIs are returned as-is — tf.keras.models.load_model handles gs:// natively,
+    # and _load_json_artifact in ModelWorkers downloads them via the storage client.
+    if str(raw_path).startswith("gs://"):
+        return raw_path
+
     candidate = Path(raw_path)
     looks_posix_absolute = str(raw_path).startswith("/")
     absolute_parts = candidate.parts
