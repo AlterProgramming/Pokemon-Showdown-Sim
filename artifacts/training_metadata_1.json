@@ -1,0 +1,63 @@
+{
+  "model_path": "artifacts/model_1.keras",
+  "vocab_path": "artifacts/action_vocab_1.json",
+  "feature_dim": 582,
+  "feature_layout": [
+    {
+      "name": "my_active",
+      "size": 116,
+      "description": "My active mon: hp, knowledge flags, boosts, status, tera/item/ability flags, revealed moves hash, visible species hash."
+    },
+    {
+      "name": "opponent_active",
+      "size": 116,
+      "description": "Opponent active mon with the same feature template, masked to public information."
+    },
+    {
+      "name": "my_bench",
+      "size": 162,
+      "description": "Six bench slots: revealed flag, hp/fainted/tera, bench status, visible species hash."
+    },
+    {
+      "name": "opponent_bench",
+      "size": 162,
+      "description": "Opponent bench slots with the same bench template, masked to public information."
+    },
+    {
+      "name": "field",
+      "size": 9,
+      "description": "Weather plus global field conditions such as terrain or Trick Room."
+    },
+    {
+      "name": "my_side_conditions",
+      "size": 8,
+      "description": "My side's public side conditions such as rocks, spikes, screens, veil, and Tailwind."
+    },
+    {
+      "name": "opponent_side_conditions",
+      "size": 8,
+      "description": "Opponent side's public side conditions."
+    },
+    {
+      "name": "turn_index",
+      "size": 1,
+      "description": "Normalized capped turn number."
+    }
+  ],
+  "num_action_classes": 357,
+  "action_space": "joint",
+  "train_examples": 185546,
+  "val_examples": 45996,
+  "epochs_requested": 30,
+  "epochs_completed": 11,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "hidden_dim": 256,
+  "depth": 3,
+  "dropout": 0.1,
+  "min_move_count": 1,
+  "max_battles": 5000,
+  "val_ratio": 0.2,
+  "seed": 42,
+  "include_switches": true
+}

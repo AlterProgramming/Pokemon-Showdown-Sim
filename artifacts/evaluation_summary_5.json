@@ -1,0 +1,181 @@
+{
+  "epochs_completed": 14,
+  "metrics": {
+    "loss": {
+      "direction": "min",
+      "first": 5.3363213539123535,
+      "last": 2.9630210399627686,
+      "best": 2.9630210399627686,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "policy_loss": {
+      "direction": "min",
+      "first": 4.255042552947998,
+      "last": 2.3338236808776855,
+      "best": 2.3338236808776855,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "policy_top1": {
+      "direction": "max",
+      "first": 0.13486681878566742,
+      "last": 0.317910373210907,
+      "best": 0.317910373210907,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "policy_top3": {
+      "direction": "max",
+      "first": 0.2720942497253418,
+      "last": 0.5702736973762512,
+      "best": 0.5702736973762512,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "sequence_loss": {
+      "direction": "min",
+      "first": 4.85660457611084,
+      "last": 2.8536579608917236,
+      "best": 2.8536579608917236,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "sequence_token_acc": {
+      "direction": "max",
+      "first": 0.23765578866004944,
+      "last": 0.37596869468688965,
+      "best": 0.37596869468688965,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "transition_loss": {
+      "direction": "min",
+      "first": 0.046090103685855865,
+      "last": 0.03622003272175789,
+      "best": 0.03622003272175789,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "transition_mae": {
+      "direction": "min",
+      "first": 0.10606775432825089,
+      "last": 0.08156239241361618,
+      "best": 0.08156239241361618,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "val_loss": {
+      "direction": "min",
+      "first": 4.704849720001221,
+      "last": 3.837183952331543,
+      "best": 3.8206512928009033,
+      "best_epoch": 11,
+      "count": 14
+    },
+    "val_policy_loss": {
+      "direction": "min",
+      "first": 3.7003369331359863,
+      "last": 2.916592836380005,
+      "best": 2.9015543460845947,
+      "best_epoch": 11,
+      "count": 14
+    },
+    "val_policy_top1": {
+      "direction": "max",
+      "first": 0.1917775422334671,
+      "last": 0.24021653831005096,
+      "best": 0.24510827660560608,
+      "best_epoch": 8,
+      "count": 14
+    },
+    "val_policy_top3": {
+      "direction": "max",
+      "first": 0.36935821175575256,
+      "last": 0.48173755407333374,
+      "best": 0.48586833477020264,
+      "best_epoch": 11,
+      "count": 14
+    },
+    "val_sequence_loss": {
+      "direction": "min",
+      "first": 4.284636974334717,
+      "last": 2.9213008880615234,
+      "best": 2.9213008880615234,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "val_sequence_token_acc": {
+      "direction": "max",
+      "first": 0.2806145250797272,
+      "last": 0.37174227833747864,
+      "best": 0.37174227833747864,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "val_transition_loss": {
+      "direction": "min",
+      "first": 0.0392611064016819,
+      "last": 0.034454379230737686,
+      "best": 0.034454379230737686,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "val_transition_mae": {
+      "direction": "min",
+      "first": 0.08672236651182175,
+      "last": 0.078853540122509,
+      "best": 0.078853540122509,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "val_value_brier": {
+      "direction": "min",
+      "first": 15.331901550292969,
+      "last": 17.22626495361328,
+      "best": 14.85355281829834,
+      "best_epoch": 2,
+      "count": 14
+    },
+    "val_value_loss": {
+      "direction": "min",
+      "first": 2.2660906314849854,
+      "last": 2.4814138412475586,
+      "best": 2.2660906314849854,
+      "best_epoch": 1,
+      "count": 14
+    },
+    "val_value_mae": {
+      "direction": "min",
+      "first": 2.71870756149292,
+      "last": 2.9370992183685303,
+      "best": 2.71870756149292,
+      "best_epoch": 1,
+      "count": 14
+    },
+    "value_brier": {
+      "direction": "min",
+      "first": 16.42930030822754,
+      "last": 6.594515800476074,
+      "best": 6.594515800476074,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "value_loss": {
+      "direction": "min",
+      "first": 2.332071542739868,
+      "last": 1.338815450668335,
+      "best": 1.338815450668335,
+      "best_epoch": 14,
+      "count": 14
+    },
+    "value_mae": {
+      "direction": "min",
+      "first": 2.789278507232666,
+      "last": 1.7653892040252686,
+      "best": 1.7653892040252686,
+      "best_epoch": 14,
+      "count": 14
+    }
+  }
+}

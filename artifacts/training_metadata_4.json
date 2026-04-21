@@ -1,8 +1,8 @@
 {
-  "policy_model_path": "artifacts\\model_4.keras",
-  "policy_vocab_path": "artifacts\\action_vocab_4.json",
-  "metadata_path": "artifacts\\training_metadata_4.json",
-  "reward_profile_path": "artifacts\\move_reward_profile_4.json",
+  "policy_model_path": "artifacts/model_4.keras",
+  "policy_vocab_path": "artifacts/action_vocab_4.json",
+  "metadata_path": "artifacts/training_metadata_4.json",
+  "reward_profile_path": "artifacts/move_reward_profile_4.json",
   "feature_dim": 582,
   "feature_layout": [
     {
@@ -85,7 +85,7 @@
   "num_offensive_reward_moves": 240,
   "policy_param_count": 372581,
   "training_param_count": 531877,
-  "training_model_path": "artifacts\\training_model_4.keras",
+  "training_model_path": "artifacts/training_model_4.keras",
   "turn_outcome_dim": 127,
   "turn_outcome_layout": [
     {
@@ -129,9 +129,9 @@
       "description": "Opponent side conditions after the turn."
     }
   ],
-  "action_context_vocab_path": "artifacts\\action_context_vocab_4.json",
+  "action_context_vocab_path": "artifacts/action_context_vocab_4.json",
   "num_action_context_classes": 358,
-  "policy_value_model_path": "artifacts\\policy_value_model_4.keras",
+  "policy_value_model_path": "artifacts/policy_value_model_4.keras",
   "family_id": "vector_joint_bc_transition_value",
   "family_version": 1,
   "family_name": "vector_joint_bc_transition_value_v1",
@@ -156,6 +156,6 @@
   },
   "evaluation_bundle_id": "offline_validation_v1",
   "registry_visibility": "runnable_policy",
-  "evaluation_summary_path": "artifacts\\evaluation_summary_4.json",
-  "run_manifest_path": "artifacts\\run_manifest_4.json"
+  "evaluation_summary_path": "artifacts/evaluation_summary_4.json",
+  "run_manifest_path": "artifacts/run_manifest_4.json"
 }

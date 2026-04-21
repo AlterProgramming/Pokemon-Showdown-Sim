@@ -1,10 +1,10 @@
 {
-  "policy_model_path": "/content/artifacts/model_5.keras",
-  "policy_vocab_path": "/content/artifacts/action_vocab_5.json",
-  "metadata_path": "/content/artifacts/training_metadata_5.json",
-  "reward_profile_path": "/content/artifacts/move_reward_profile_5.json",
-  "evaluation_summary_path": "/content/artifacts/evaluation_summary_5.json",
-  "run_manifest_path": "/content/artifacts/run_manifest_5.json",
+  "policy_model_path": "artifacts/model_5.keras",
+  "policy_vocab_path": "artifacts/action_vocab_5.json",
+  "metadata_path": "artifacts/training_metadata_5.json",
+  "reward_profile_path": "artifacts/move_reward_profile_5.json",
+  "evaluation_summary_path": "artifacts/evaluation_summary_5.json",
+  "run_manifest_path": "artifacts/run_manifest_5.json",
   "parent_release_id": null,
   "feature_dim": 582,
   "feature_layout": [
@@ -145,7 +145,7 @@
   "num_offensive_reward_moves": 240,
   "policy_param_count": 372581,
   "training_param_count": 1577690,
-  "training_model_path": "/content/artifacts/training_model_5.keras",
+  "training_model_path": "artifacts/training_model_5.keras",
   "turn_outcome_dim": 127,
   "turn_outcome_layout": [
     {
@@ -189,16 +189,16 @@
       "description": "Opponent side conditions after the turn."
     }
   ],
-  "action_context_vocab_path": "/content/artifacts/action_context_vocab_5.json",
+  "action_context_vocab_path": "artifacts/action_context_vocab_5.json",
   "num_action_context_classes": 358,
   "transition_target_definition": "public_turn_outcome_summary_v1",
-  "policy_value_model_path": "/content/artifacts/policy_value_model_5.keras",
+  "policy_value_model_path": "artifacts/policy_value_model_5.keras",
   "sequence_vocab_size": 6325,
   "max_seq_len": 32,
   "sequence_hidden_dim": 128,
   "sequence_weight": 0.1,
   "sequence_target_definition": "composite_turn_event_sequence_v1",
-  "sequence_vocab_path": "/content/artifacts/sequence_vocab_5.json",
+  "sequence_vocab_path": "artifacts/sequence_vocab_5.json",
   "policy_weight_stats": {
     "count": 185546,
     "mean": 1.0025172233581543,

@@ -1,0 +1,174 @@
+{
+  "model_name": "entity_action_v2_20260409_1811",
+  "model_release_id": "entity_action_v2_20260409_1811",
+  "family_id": "entity_action_v2",
+  "family_version": 1,
+  "family_name": "entity_action_v2",
+  "training_regime": "offline_entity_candidate_bc",
+  "information_policy": "public_only_fallback_candidates",
+  "state_schema_version": "entity_action_v2",
+  "entity_schema_version": "entity_action_v2",
+  "policy_model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/entity_action_v2_20260409_1811.keras",
+  "training_model_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/training_model_entity_action_v2_20260409_1811.keras",
+  "entity_token_vocab_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/entity_action_v2_20260409_1811.entity_token_vocabs.json",
+  "metadata_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/training_metadata_entity_action_v2_20260409_1811.json",
+  "training_history_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/training_history_entity_action_v2_20260409_1811.json",
+  "evaluation_summary_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_v2_20260409_1811/evaluation_summary_entity_action_v2_20260409_1811.json",
+  "objective_set": [
+    "policy",
+    "value"
+  ],
+  "action_space": "legal_candidates",
+  "action_parameterization": "candidate_index_scored_by_entity_encoder",
+  "train_examples": 185546,
+  "val_examples": 45996,
+  "epochs_requested": 20,
+  "epochs_completed": 14,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "hidden_dim": 256,
+  "depth": 3,
+  "dropout": 0.1,
+  "token_embed_dim": 24,
+  "max_candidates": 10,
+  "predict_value": true,
+  "value_weight": 0.25,
+  "seed": 42,
+  "raw_data_paths": [
+    "/root/.cache/kagglehub/datasets/thephilliplin/pokemon-showdown-battles-gen9-randbats/versions/1"
+  ],
+  "resolved_data_paths": [
+    "/root/.cache/kagglehub/datasets/thephilliplin/pokemon-showdown-battles-gen9-randbats/versions/1"
+  ],
+  "json_file_count": 13979,
+  "entity_token_vocab_sizes": {
+    "species": 433,
+    "item": 33,
+    "ability": 108,
+    "tera": 22,
+    "status": 9,
+    "move": 352,
+    "weather": 7,
+    "global_condition": 6
+  },
+  "history_summary": {
+    "epochs_completed": 14,
+    "metrics": {
+      "loss": {
+        "direction": "min",
+        "first": 1.1426887512207031,
+        "last": 0.7008979320526123,
+        "best": 0.7008979320526123,
+        "best_epoch": 14,
+        "count": 14
+      },
+      "policy_loss": {
+        "direction": "min",
+        "first": 1.0055139064788818,
+        "last": 0.6830784678459167,
+        "best": 0.6830784678459167,
+        "best_epoch": 14,
+        "count": 14
+      },
+      "policy_top1": {
+        "direction": "max",
+        "first": 0.5691795945167542,
+        "last": 0.7140116095542908,
+        "best": 0.7140116095542908,
+        "best_epoch": 14,
+        "count": 14
+      },
+      "policy_top3": {
+        "direction": "max",
+        "first": 0.9018571972846985,
+        "last": 0.9439060688018799,
+        "best": 0.9439060688018799,
+        "best_epoch": 14,
+        "count": 14
+      },
+      "val_loss": {
+        "direction": "min",
+        "first": 1.0872431993484497,
+        "last": 1.1728429794311523,
+        "best": 1.0376505851745605,
+        "best_epoch": 3,
+        "count": 14
+      },
+      "val_policy_loss": {
+        "direction": "min",
+        "first": 0.9357054233551025,
+        "last": 0.7618138790130615,
+        "best": 0.7566178441047668,
+        "best_epoch": 10,
+        "count": 14
+      },
+      "val_policy_top1": {
+        "direction": "max",
+        "first": 0.5940516591072083,
+        "last": 0.6808200478553772,
+        "best": 0.6829941868782043,
+        "best_epoch": 11,
+        "count": 14
+      },
+      "val_policy_top3": {
+        "direction": "max",
+        "first": 0.9011000990867615,
+        "last": 0.9252978563308716,
+        "best": 0.9271675944328308,
+        "best_epoch": 11,
+        "count": 14
+      },
+      "val_value_brier": {
+        "direction": "min",
+        "first": 0.21024267375469208,
+        "last": 0.3125455379486084,
+        "best": 0.21024267375469208,
+        "best_epoch": 1,
+        "count": 14
+      },
+      "val_value_loss": {
+        "direction": "min",
+        "first": 0.6057006120681763,
+        "last": 1.6423581838607788,
+        "best": 0.6057006120681763,
+        "best_epoch": 1,
+        "count": 14
+      },
+      "val_value_mae": {
+        "direction": "min",
+        "first": 0.3681339919567108,
+        "last": 0.35067254304885864,
+        "best": 0.34084197878837585,
+        "best_epoch": 12,
+        "count": 14
+      },
+      "value_brier": {
+        "direction": "min",
+        "first": 0.18704530596733093,
+        "last": 0.020313015207648277,
+        "best": 0.020313015207648277,
+        "best_epoch": 14,
+        "count": 14
+      },
+      "value_loss": {
+        "direction": "min",
+        "first": 0.5486183166503906,
+        "last": 0.07116218656301498,
+        "best": 0.07116218656301498,
+        "best_epoch": 14,
+        "count": 14
+      },
+      "value_mae": {
+        "direction": "min",
+        "first": 0.374907523393631,
+        "last": 0.04046940058469772,
+        "best": 0.04046940058469772,
+        "best_epoch": 14,
+        "count": 14
+      }
+    }
+  },
+  "notes": [
+    "Offline replay training uses the candidate fallback path when full legal request objects are unavailable."
+  ]
+}
