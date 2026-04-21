@@ -591,9 +591,8 @@ def predict_entity_auxiliary_outputs_batch(
             )
         if transition is not None:
             outputs["transition_prediction"] = np.asarray(transition[index], dtype=np.float32)
-        history_attn = raw_output.get("history_attention")
-        if history_attn is not None:
-            outputs["history_attention"] = np.asarray(history_attn[index], dtype=np.float32)
+        # history_attention weights are computed post-hoc in the notebook via
+        # history_attention_layer.compute_weights() — not extracted at serve time.
         outputs_by_action.append(outputs)
 
     return outputs_by_action

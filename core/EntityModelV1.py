@@ -153,7 +153,8 @@ class HistoryAttention(_keras().layers.Layer):
     """Scaled dot-product cross-attention: query from shared state, K/V from Bi-LSTM output.
 
     Masked via event_history_mask to suppress padded turns.
-    Returns (context [batch, attn_dim], attn_weights [batch, K]).
+    Returns context [batch, attn_dim] only. Attention weights are accessible
+    post-hoc via compute_weights() using the same trained sub-projections.
     """
 
     def __init__(self, attn_dim: int, **kwargs):
@@ -171,39 +172,31 @@ class HistoryAttention(_keras().layers.Layer):
         import math
         tf = _tf()
         query, lstm_out, mask = inputs
-        # query: [batch, d]; lstm_out: [batch, K, lstm_dim]; mask: [batch, K]
         Q = tf.expand_dims(self.q_proj(query), axis=1)          # [batch, 1, attn_dim]
         K = self.k_proj(lstm_out)                                 # [batch, K, attn_dim]
         V = self.v_proj(lstm_out)                                 # [batch, K, attn_dim]
         scale = math.sqrt(float(self.attn_dim))
         scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / scale  # [batch, K]
-        scores = scores + (1.0 - mask) * -1e9                    # mask padding
+        scores = scores + (1.0 - mask) * -1e9
         weights = tf.nn.softmax(scores, axis=-1)                 # [batch, K]
-        context = tf.einsum("bk,bkd->bd", weights, V)            # [batch, attn_dim]
-        return context, weights
+        return tf.einsum("bk,bkd->bd", weights, V)               # context only
+
+    def compute_weights(self, inputs):
+        """Return attention weights [batch, K] without computing context. Used for analysis."""
+        import math
+        tf = _tf()
+        query, lstm_out, mask = inputs
+        Q = tf.expand_dims(self.q_proj(query), axis=1)
+        K = self.k_proj(lstm_out)
+        scale = math.sqrt(float(self.attn_dim))
+        scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / scale
+        scores = scores + (1.0 - mask) * -1e9
+        return tf.nn.softmax(scores, axis=-1)
 
     def get_config(self):
         cfg = super().get_config()
         cfg["attn_dim"] = self.attn_dim
         return cfg
-
-
-@_keras().saving.register_keras_serializable(package="EntityModelV1")
-class _SelectFirst(_keras().layers.Layer):
-    """Extract first element from a tuple of tensors (used to split attention outputs)."""
-    def call(self, inputs):
-        return inputs[0]
-    def get_config(self):
-        return super().get_config()
-
-
-@_keras().saving.register_keras_serializable(package="EntityModelV1")
-class _SelectSecond(_keras().layers.Layer):
-    """Extract second element from a tuple of tensors (used to split attention outputs)."""
-    def call(self, inputs):
-        return inputs[1]
-    def get_config(self):
-        return super().get_config()
 
 
 # ---------------------------------------------------------------------------
@@ -446,9 +439,7 @@ def build_entity_action_models(
         )(hist_pooled)  # [B, K, 2*history_lstm_dim]
 
         _attn_layer = HistoryAttention(_attn_dim, name="history_attention_layer")
-        _attn_outputs = _attn_layer([shared, hist_lstm_out, hist_mask_input])
-        history_context = _SelectFirst(name="history_context")(_attn_outputs)
-        history_attn_weights_tensor = _SelectSecond(name="history_attention_weights")(_attn_outputs)
+        history_context = _attn_layer([shared, hist_lstm_out, hist_mask_input])
 
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
@@ -566,9 +557,8 @@ def build_entity_action_models(
         loss_weights["sequence"] = sequence_weight
         metrics["sequence"] = [masked_token_accuracy]
 
-    if use_history and history_attn_weights_tensor is not None:
-        outputs["history_attention"] = history_attn_weights_tensor
-        # loss_weights must match losses keys exactly in Keras 3 — no entry here.
+    # history_attention weights are NOT added to outputs — they are extracted
+    # post-hoc via history_attention_layer.compute_weights() for analysis.
 
     # The training artifact is the richest object because it includes every enabled
     # auxiliary head. The policy and policy+value artifacts stay serving-friendly.
