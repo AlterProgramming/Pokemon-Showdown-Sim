@@ -131,10 +131,6 @@ class BenchMask(_keras().layers.Layer):
         return (1.0 - active) * (1.0 - fainted)
 
 
-# Note: TurnTokenMeanPool and HistoryAttention custom layers have been replaced
-# with standard Keras ops (Lambda + MultiHeadAttention) in build_entity_action_models
-# to ensure cuDNN compilation. Attention weights for analysis are extracted via
-# return_attention_scores=True on the MultiHeadAttention layer in the notebook.
 
 
 # ---------------------------------------------------------------------------
@@ -192,7 +188,6 @@ def build_entity_action_models(
     history_vocab_size: int | None = None,
     history_embed_dim: int = 32,
     history_lstm_dim: int = 64,
-    history_attn_dim: int | None = None,
     history_turns: int = 8,
     history_events_per_turn: int = 24,
 ):
@@ -346,7 +341,8 @@ def build_entity_action_models(
     history_context = None
 
     if use_history and history_vocab_size is not None:
-        _attn_dim = history_attn_dim or (history_lstm_dim * 2)
+        _attn_dim = history_lstm_dim * 2
+        tf = _tf()
         hist_tokens_input = layers.Input(
             shape=(history_turns, history_events_per_turn),
             dtype="int32",
@@ -365,56 +361,47 @@ def build_entity_action_models(
             history_embed_dim,
             name="history_event_embedding",
         )
-        # [B, K, E, D] — embed all event tokens
         hist_embedded = history_event_embedding(hist_tokens_input)
 
-        # Mean-pool over E (event axis) using standard Keras ops only.
-        # Mask PAD (id=0) explicitly so pad tokens don't contribute.
-        # All ops are plain TF; no custom Python layer so cuDNN can compile.
-        hist_mask_3d = layers.Lambda(
-            lambda x: tf.cast(tf.not_equal(x, 0), tf.float32)[..., None],
-            name="history_pad_mask",
-        )(hist_tokens_input)                                           # [B, K, E, 1]
-        hist_numer = layers.Lambda(
-            lambda args: tf.reduce_sum(args[0] * args[1], axis=2),
-            name="history_masked_sum",
-        )([hist_embedded, hist_mask_3d])                              # [B, K, D]
-        hist_denom = layers.Lambda(
-            lambda x: tf.maximum(tf.reduce_sum(x, axis=2), 1.0),
-            name="history_token_count",
-        )(hist_mask_3d)                                               # [B, K, 1]
+        # PAD-masked mean pool over the event axis in a single Lambda.
+        # Lambda keeps all ops in one traced graph node; four separate nodes
+        # would add serialization overhead with no correctness benefit.
         hist_pooled = layers.Lambda(
-            lambda args: args[0] / args[1],
+            lambda args: (
+                lambda emb, ids: tf.reduce_sum(
+                    emb * tf.cast(tf.not_equal(ids, 0), emb.dtype)[..., None], axis=2
+                ) / tf.maximum(
+                    tf.reduce_sum(tf.cast(tf.not_equal(ids, 0), emb.dtype), axis=2, keepdims=True), 1.0
+                )
+            )(args[0], args[1]),
             name="history_turn_pool",
-        )([hist_numer, hist_denom])                                   # [B, K, D]
+        )([hist_embedded, hist_tokens_input])
 
-        # Bi-LSTM over K turns — cuDNN path (standard activations, no dropout).
+        # recurrent_dropout=0.0 is explicit — any non-zero value disables cuDNN path.
         hist_lstm_out = layers.Bidirectional(
-            layers.LSTM(history_lstm_dim, return_sequences=True,
-                        activation="tanh", recurrent_activation="sigmoid",
-                        recurrent_dropout=0.0),
+            layers.LSTM(history_lstm_dim, return_sequences=True, recurrent_dropout=0.0),
             name="history_bilstm",
-        )(hist_pooled)                                                # [B, K, 2*lstm_dim]
+        )(hist_pooled)
 
-        # Cross-attention: query=shared state [B,1,D], K/V=Bi-LSTM output [B,K,2*lstm_dim].
-        # hist_mask_input [B,K] float (1=real, 0=pad) is reshaped to [B,1,K] bool so
-        # MultiHeadAttention ignores padded turns.  This also keeps hist_mask_input
-        # connected to the output graph — Keras raises if any model_input is disconnected.
+        # hist_mask_input [B,K] float (1=real turn, 0=pad) → [B,1,K] bool.
+        # Passed as attention_mask so padded turns are ignored AND the input
+        # is connected to the output graph (Keras requires every model_input
+        # to reach at least one output).
         shared_q = layers.Reshape((1, hidden_dim), name="shared_query")(shared)
         hist_attn_mask = layers.Lambda(
-            lambda x: _tf().cast(x[:, None, :], _tf().bool),
+            lambda x: tf.cast(x[:, None, :], tf.bool),
             name="history_attn_mask",
-        )(hist_mask_input)                                            # [B, 1, K] bool
+        )(hist_mask_input)
         hist_context_seq = layers.MultiHeadAttention(
             num_heads=1,
             key_dim=_attn_dim,
             output_shape=_attn_dim,
             name="history_attention_layer",
         )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out,
-          attention_mask=hist_attn_mask)                              # [B, 1, _attn_dim]
+          attention_mask=hist_attn_mask)
         history_context = layers.Lambda(
             lambda x: x[:, 0, :], name="history_context"
-        )(hist_context_seq)                                           # [B, _attn_dim]
+        )(hist_context_seq)
 
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
