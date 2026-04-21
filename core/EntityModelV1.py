@@ -131,70 +131,10 @@ class BenchMask(_keras().layers.Layer):
         return (1.0 - active) * (1.0 - fainted)
 
 
-@_keras().saving.register_keras_serializable(package="EntityModelV1")
-class TurnTokenMeanPool(_keras().layers.Layer):
-    """Mean-pool event token embeddings over the event axis, ignoring PAD (id==0)."""
-
-    def call(self, inputs):
-        tf = _tf()
-        embedded, token_ids = inputs
-        # embedded: [batch, K, E, embed_dim]; token_ids: [batch, K, E]
-        non_pad = tf.cast(tf.not_equal(token_ids, 0), tf.float32)  # [batch, K, E]
-        non_pad = tf.expand_dims(non_pad, axis=-1)                   # [batch, K, E, 1]
-        numer = tf.reduce_sum(embedded * non_pad, axis=2)            # [batch, K, embed_dim]
-        denom = tf.maximum(tf.reduce_sum(non_pad, axis=2), 1.0)     # [batch, K, 1]
-        return numer / denom                                          # [batch, K, embed_dim]
-
-    def get_config(self):
-        return super().get_config()
-
-
-@_keras().saving.register_keras_serializable(package="EntityModelV1")
-class HistoryAttention(_keras().layers.Layer):
-    """Scaled dot-product cross-attention: query from shared state, K/V from Bi-LSTM output.
-
-    Masked via event_history_mask to suppress padded turns.
-    Returns context [batch, attn_dim] only. Attention weights are accessible
-    post-hoc via compute_weights() using the same trained sub-projections.
-    """
-
-    def __init__(self, attn_dim: int, **kwargs):
-        super().__init__(**kwargs)
-        self.attn_dim = attn_dim
-
-    def build(self, input_shape):
-        keras = _keras()
-        self.q_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_q")
-        self.k_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_k")
-        self.v_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_v")
-        self._scale = math.sqrt(float(self.attn_dim))
-        super().build(input_shape)
-
-    def call(self, inputs):
-        tf = _tf()
-        query, lstm_out, mask = inputs
-        Q = tf.expand_dims(self.q_proj(query), axis=1)
-        K = self.k_proj(lstm_out)
-        V = self.v_proj(lstm_out)
-        scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / self._scale
-        scores = scores + (1.0 - mask) * -1e9
-        weights = tf.nn.softmax(scores, axis=-1)
-        return tf.einsum("bk,bkd->bd", weights, V)
-
-    def compute_weights(self, inputs):
-        """Return attention weights [batch, K] without computing context. Used for analysis."""
-        tf = _tf()
-        query, lstm_out, mask = inputs
-        Q = tf.expand_dims(self.q_proj(query), axis=1)
-        K = self.k_proj(lstm_out)
-        scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / self._scale
-        scores = scores + (1.0 - mask) * -1e9
-        return tf.nn.softmax(scores, axis=-1)
-
-    def get_config(self):
-        cfg = super().get_config()
-        cfg["attn_dim"] = self.attn_dim
-        return cfg
+# Note: TurnTokenMeanPool and HistoryAttention custom layers have been replaced
+# with standard Keras ops (Lambda + MultiHeadAttention) in build_entity_action_models
+# to ensure cuDNN compilation. Attention weights for analysis are extracted via
+# return_attention_scores=True on the MultiHeadAttention layer in the notebook.
 
 
 # ---------------------------------------------------------------------------
@@ -423,20 +363,48 @@ def build_entity_action_models(
         history_event_embedding = layers.Embedding(
             history_vocab_size,
             history_embed_dim,
-            mask_zero=True,
             name="history_event_embedding",
         )
-        hist_embedded = history_event_embedding(hist_tokens_input)  # [B, K, E, D]
-        hist_pooled = TurnTokenMeanPool(name="history_turn_pool")(
-            [hist_embedded, hist_tokens_input]
-        )  # [B, K, D]
-        hist_lstm_out = layers.Bidirectional(
-            layers.LSTM(history_lstm_dim, return_sequences=True),
-            name="history_bilstm",
-        )(hist_pooled)  # [B, K, 2*history_lstm_dim]
+        # [B, K, E, D] — embed all event tokens
+        hist_embedded = history_event_embedding(hist_tokens_input)
 
-        _attn_layer = HistoryAttention(_attn_dim, name="history_attention_layer")
-        history_context = _attn_layer([shared, hist_lstm_out, hist_mask_input])
+        # Mean-pool over E (event axis) using standard Keras ops only.
+        # Mask PAD (id=0) explicitly so pad tokens don't contribute.
+        # All ops are plain TF; no custom Python layer so cuDNN can compile.
+        hist_mask_3d = layers.Lambda(
+            lambda x: tf.cast(tf.not_equal(x, 0), tf.float32)[..., None],
+            name="history_pad_mask",
+        )(hist_tokens_input)                                           # [B, K, E, 1]
+        hist_numer = layers.Lambda(
+            lambda args: tf.reduce_sum(args[0] * args[1], axis=2),
+            name="history_masked_sum",
+        )([hist_embedded, hist_mask_3d])                              # [B, K, D]
+        hist_denom = layers.Lambda(
+            lambda x: tf.maximum(tf.reduce_sum(x, axis=2), 1.0),
+            name="history_token_count",
+        )(hist_mask_3d)                                               # [B, K, 1]
+        hist_pooled = layers.Lambda(
+            lambda args: args[0] / args[1],
+            name="history_turn_pool",
+        )([hist_numer, hist_denom])                                   # [B, K, D]
+
+        # Bi-LSTM over K turns — cuDNN path (standard activations, no dropout).
+        hist_lstm_out = layers.Bidirectional(
+            layers.LSTM(history_lstm_dim, return_sequences=True,
+                        activation="tanh", recurrent_activation="sigmoid",
+                        recurrent_dropout=0.0),
+            name="history_bilstm",
+        )(hist_pooled)                                                # [B, K, 2*lstm_dim]
+
+        # Dot-product attention: query=shared state, K/V=LSTM output.
+        # Use built-in MultiHeadAttention (1 head) — avoids custom layer tracing.
+        shared_q = layers.Reshape((1, hidden_dim), name="shared_query")(shared)
+        hist_context_seq = layers.MultiHeadAttention(
+            num_heads=1,
+            key_dim=_attn_dim,
+            name="history_attention_layer",
+        )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out)    # [B, 1, attn_dim]
+        history_context = layers.Reshape((_attn_dim,), name="history_context")(hist_context_seq)
 
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
