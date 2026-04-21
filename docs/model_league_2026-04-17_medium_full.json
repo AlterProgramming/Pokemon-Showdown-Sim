@@ -1,0 +1,153 @@
+{
+  "generated_at": "2026-04-17",
+  "label": "medium_full_stabilized",
+  "status": "validated",
+  "notes": [
+    "First clean mixed-model league after stabilizing multi-model vector serving.",
+    "Use this instead of the older 1000-games-per-pair run that accumulated serving failures."
+  ],
+  "totalGames": 1500,
+  "completed": 1500,
+  "failures": 0,
+  "wallSeconds": 390.685,
+  "perPairGames": 100,
+  "concurrency": 10,
+  "models": [
+    "word_policy_v1",
+    "entity_action_bc_v1_20260408_0428",
+    "model1",
+    "model2",
+    "model4",
+    "model5"
+  ],
+  "ranking": [
+    {
+      "model": "word_policy_v1",
+      "wins": 424,
+      "losses": 76,
+      "elo": 1751
+    },
+    {
+      "model": "entity_action_bc_v1_20260408_0428",
+      "wins": 271,
+      "losses": 229,
+      "elo": 1521
+    },
+    {
+      "model": "model5",
+      "wins": 205,
+      "losses": 295,
+      "elo": 1437
+    },
+    {
+      "model": "model2",
+      "wins": 203,
+      "losses": 297,
+      "elo": 1434
+    },
+    {
+      "model": "model4",
+      "wins": 200,
+      "losses": 300,
+      "elo": 1430
+    },
+    {
+      "model": "model1",
+      "wins": 197,
+      "losses": 303,
+      "elo": 1427
+    }
+  ],
+  "pairings": [
+    {
+      "pairing": "entity_action_bc_v1_20260408_0428 vs word_policy_v1",
+      "entity_action_bc_v1_20260408_0428": 24,
+      "word_policy_v1": 76,
+      "ties": 0
+    },
+    {
+      "pairing": "model5 vs word_policy_v1",
+      "model5": 17,
+      "word_policy_v1": 83,
+      "ties": 0
+    },
+    {
+      "pairing": "model4 vs word_policy_v1",
+      "model4": 10,
+      "word_policy_v1": 90,
+      "ties": 0
+    },
+    {
+      "pairing": "model2 vs word_policy_v1",
+      "model2": 11,
+      "word_policy_v1": 89,
+      "ties": 0
+    },
+    {
+      "pairing": "model1 vs word_policy_v1",
+      "model1": 14,
+      "word_policy_v1": 86,
+      "ties": 0
+    },
+    {
+      "pairing": "entity_action_bc_v1_20260408_0428 vs model5",
+      "entity_action_bc_v1_20260408_0428": 55,
+      "model5": 45,
+      "ties": 0
+    },
+    {
+      "pairing": "entity_action_bc_v1_20260408_0428 vs model4",
+      "entity_action_bc_v1_20260408_0428": 66,
+      "model4": 34,
+      "ties": 0
+    },
+    {
+      "pairing": "entity_action_bc_v1_20260408_0428 vs model2",
+      "entity_action_bc_v1_20260408_0428": 63,
+      "model2": 37,
+      "ties": 0
+    },
+    {
+      "pairing": "entity_action_bc_v1_20260408_0428 vs model1",
+      "entity_action_bc_v1_20260408_0428": 63,
+      "model1": 37,
+      "ties": 0
+    },
+    {
+      "pairing": "model4 vs model5",
+      "model4": 48,
+      "model5": 52,
+      "ties": 0
+    },
+    {
+      "pairing": "model2 vs model5",
+      "model2": 52,
+      "model5": 48,
+      "ties": 0
+    },
+    {
+      "pairing": "model1 vs model5",
+      "model1": 57,
+      "model5": 43,
+      "ties": 0
+    },
+    {
+      "pairing": "model2 vs model4",
+      "model2": 48,
+      "model4": 52,
+      "ties": 0
+    },
+    {
+      "pairing": "model1 vs model4",
+      "model1": 44,
+      "model4": 56,
+      "ties": 0
+    },
+    {
+      "pairing": "model1 vs model2",
+      "model1": 45,
+      "model2": 55,
+      "ties": 0
+    }
+  ]
+}

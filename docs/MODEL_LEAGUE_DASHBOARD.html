@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Model League Dashboard</title>
+    <style>
+      :root {
+        --bg: #f2efe8;
+        --panel: #fffaf0;
+        --ink: #1e2a26;
+        --muted: #5b6a63;
+        --accent: #1d6b57;
+        --warning: #a46012;
+        --danger: #a0342a;
+        --border: #d9d1c4;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Menlo, Monaco, Consolas, monospace;
+        background: linear-gradient(180deg, #ece7dc 0%, var(--bg) 100%);
+        color: var(--ink);
+      }
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      h1, h2, h3 { margin: 0 0 12px; }
+      p { margin: 0; line-height: 1.5; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+      }
+      .metric {
+        font-size: 28px;
+        font-weight: 700;
+        margin-top: 6px;
+      }
+      .muted { color: var(--muted); }
+      .ok { color: var(--accent); }
+      .warn { color: var(--warning); }
+      .bad { color: var(--danger); }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        text-align: left;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      th { color: var(--muted); font-weight: 700; }
+      .section { margin-top: 24px; }
+      .pill {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        font-size: 12px;
+      }
+      .small { font-size: 13px; }
+      code { font-family: inherit; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Model League Dashboard</h1>
+      <p class="muted">Canonical league reporting for standings, stability, and service health.</p>
+
+      <div class="grid">
+        <section class="panel">
+          <h2>Champion</h2>
+          <div class="metric">word_policy_v1</div>
+          <p class="muted">Current validated leader</p>
+        </section>
+        <section class="panel">
+          <h2>Current Elo</h2>
+          <div class="metric">1751</div>
+          <p class="muted">From the latest validated mixed-model league</p>
+        </section>
+        <section class="panel">
+          <h2>Latest Run</h2>
+          <div class="metric">1500</div>
+          <p class="muted">games, 0 failures, concurrency 10</p>
+        </section>
+        <section class="panel">
+          <h2>Reliability Shift</h2>
+          <div class="metric ok">140 → 0</div>
+          <p class="muted">failures from the pre-stabilization long run to the current validated baseline</p>
+        </section>
+      </div>
+
+      <section class="panel section">
+        <h2>Current Ranking</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Model</th>
+              <th>Elo</th>
+              <th>Record</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td><code>word_policy_v1</code></td><td>1751</td><td>424-76</td></tr>
+<tr><td>2</td><td><code>entity_action_bc_v1_20260408_0428</code></td><td>1521</td><td>271-229</td></tr>
+<tr><td>3</td><td><code>model5</code></td><td>1437</td><td>205-295</td></tr>
+<tr><td>4</td><td><code>model2</code></td><td>1434</td><td>203-297</td></tr>
+<tr><td>5</td><td><code>model4</code></td><td>1430</td><td>200-300</td></tr>
+<tr><td>6</td><td><code>model1</code></td><td>1427</td><td>197-303</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel section">
+        <h2>Service Health</h2>
+        <p class="muted">Latest snapshot: 2026-04-18T12:21:28Z · 3/3 healthy</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Latency ms</th>
+              <th>Models</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>entity_action_bc_v1_20260408_0428</code></td><td class='ok'>ok</td><td>82.573</td><td><code>entity_action_bc_v1_20260408_0428</code></td><td>http://127.0.0.1:5001/health</td></tr>
+<tr><td><code>entity_action_v2_20260409_1811</code></td><td class='ok'>ok</td><td>2.181</td><td><code>entity_action_v2_20260409_1811</code></td><td>http://127.0.0.1:5002/health</td></tr>
+<tr><td><code>model5</code></td><td class='ok'>ok</td><td>3.132</td><td><code>model1, model2, model4, model5</code></td><td>http://127.0.0.1:5000/health</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel section">
+        <h2>Run History</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Run</th>
+              <th>Status</th>
+              <th>Shape</th>
+              <th>Failures</th>
+              <th>Leader</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>2026-04-09_long_full_attempt</code></td><td><span class='pill bad'>invalid</span></td><td>15000 scheduled, 12000 completed</td><td class='bad'>140</td><td><code>word_policy_v1</code> 1738</td><td>Pre-stabilization 1000-games-per-pair mixed-model league. Run degraded under sustained shared vector-server load and was stopped before completion. Keep for reliability comparison, not as canonical rankings.</td></tr>
+<tr><td><code>2026-04-17_134310</code></td><td><span class='pill bad'>exploratory</span></td><td>2 scheduled, 2 completed</td><td class='ok'>0</td><td><code>word_policy_v1</code> 1577</td><td>Automated league run from pokemon-showdown-model-feature/scripts/model-league-runner.js.</td></tr>
+<tr><td><code>2026-04-17_134328</code></td><td><span class='pill bad'>exploratory</span></td><td>2100 scheduled, 2100 completed</td><td class='ok'>0</td><td><code>word_policy_v1</code> 1730</td><td>Automated league run from pokemon-showdown-model-feature/scripts/model-league-runner.js.</td></tr>
+<tr><td><code>2026-04-17_141213</code></td><td><span class='pill bad'>exploratory</span></td><td>2100 scheduled, 2100 completed</td><td class='bad'>167</td><td><code>word_policy_v1</code> 1712</td><td>Automated league run from pokemon-showdown-model-feature/scripts/model-league-runner.js.</td></tr>
+<tr><td><code>2026-04-17_medium_full</code></td><td><span class='pill ok'>validated</span></td><td>1500 scheduled, 1500 completed</td><td class='ok'>0</td><td><code>word_policy_v1</code> 1751</td><td>First clean mixed-model league after vector-serving stabilization. This is the current canonical league baseline.</td></tr>
+<tr><td><code>2026-04-17_vector_soak</code></td><td><span class='pill ok'>validated</span></td><td>1200 scheduled, 1200 completed</td><td class='ok'>0</td><td><code>model2</code> 1512</td><td>Post-stabilization soak for model1/model2/model4/model5 only. Used to verify shared vector serving before rerunning mixed-model leagues.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="grid section">
+        <section class="panel">
+          <h2>Storage Contract</h2>
+          <p class="small">Latest league pointer: <code>docs/model_league_latest.json</code></p>
+          <p class="small">League history: <code>docs/model_league_history.json</code></p>
+          <p class="small">Latest service snapshot: <code>docs/model_service_health_latest.json</code></p>
+          <p class="small">Service history: <code>docs/model_service_health_history.json</code></p>
+        </section>
+        <section class="panel">
+          <h2>Operational Use</h2>
+          <p class="small">Record both clean runs and failed runs. Reliability regressions are part of the benchmark signal.</p>
+        </section>
+        <section class="panel">
+          <h2>Maintenance</h2>
+          <p class="small">After new league data or service data arrives, regenerate this file with <code>python scripts/render_model_dashboard.py</code>.</p>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

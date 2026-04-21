@@ -105,11 +105,16 @@ def adjust_logits_for_switch_bias(
 
 
 def pick_best_slot_target(
-    action_vocab: Mapping[str, int],
+    action_vocab: Mapping[str, int] | None,
     logits: np.ndarray,
     slot_targets: Sequence[dict[str, Any]],
     target_type: str,
 ) -> tuple[dict[str, Any] | None, float | None]:
+    if not slot_targets:
+        return None, None
+    if not action_vocab:
+        return {"type": target_type, "payload": slot_targets[0], "token": None}, None
+
     probs = softmax(logits)
     best_target = None
     best_prob = -1.0
@@ -129,9 +134,6 @@ def pick_best_slot_target(
 
     if best_target is not None:
         return best_target, best_prob
-
-    if not slot_targets:
-        return None, None
 
     return {"type": target_type, "payload": slot_targets[0], "token": None}, None
 

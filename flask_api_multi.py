@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import atexit
 from collections import deque
+import logging
 import sys
 import threading
 import time
@@ -40,6 +41,11 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=3600.0,
         help="Gracefully recycle a model worker after this many seconds. Set 0 to disable.",
+    )
+    parser.add_argument(
+        "--disable-worker-recycling",
+        action="store_true",
+        help="Disable request-count and age-based worker recycling entirely.",
     )
     parser.add_argument(
         "--workers-per-model",
@@ -80,6 +86,23 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=1,
         help="Maximum micro-batch size per model worker call. Set 1 to disable batching.",
+    )
+    parser.add_argument(
+        "--request-log-every",
+        type=int,
+        default=0,
+        help="Log every Nth request. Set 0 to disable periodic request logs.",
+    )
+    parser.add_argument(
+        "--request-log-slower-than-ms",
+        type=float,
+        default=1000.0,
+        help="Always log requests slower than this threshold in milliseconds. Set 0 to disable.",
+    )
+    parser.add_argument(
+        "--access-log",
+        action="store_true",
+        help="Enable Werkzeug access logging for every HTTP request.",
     )
     return parser.parse_args()
 
@@ -223,20 +246,37 @@ def load_models(mode: str) -> tuple[dict[str, dict[str, Any]], str]:
         for model_id in model_ids
     }
     worker_overrides = parse_worker_count_overrides(ARGS.model_worker_overrides)
+    model_count = len(model_ids)
     for model_id, artifact in artifacts.items():
-        worker_count = worker_overrides.get(model_id, ARGS.workers_per_model)
+        configured_worker_count = worker_overrides.get(model_id, ARGS.workers_per_model)
+        worker_count = resolve_worker_count(
+            configured_count=configured_worker_count,
+            mode=mode,
+            model_count=model_count,
+        )
+        max_requests_before_recycle, max_worker_age_seconds = resolve_recycle_settings(
+            worker_count=worker_count,
+            mode=mode,
+            model_count=model_count,
+            max_requests=ARGS.worker_max_requests,
+            max_age_seconds=ARGS.worker_max_age_seconds,
+        )
         worker_pool = ModelWorkerPool(
             repo_path=REPO_PATH,
             model_entry=registered_models[model_id],
             worker_count=worker_count,
             request_timeout_seconds=ARGS.request_timeout_seconds,
-            max_requests_before_recycle=ARGS.worker_max_requests,
-            max_worker_age_seconds=ARGS.worker_max_age_seconds,
+            max_requests_before_recycle=max_requests_before_recycle,
+            max_worker_age_seconds=max_worker_age_seconds,
             bootstrap_timeout_seconds=ARGS.worker_bootstrap_timeout_seconds,
             startup_timeout_seconds=ARGS.worker_startup_timeout_seconds,
         )
         worker_pool.start()
         artifact["worker_pool"] = worker_pool
+        artifact["configured_worker_count"] = int(configured_worker_count)
+        artifact["effective_worker_count"] = int(worker_count)
+        artifact["max_requests_before_recycle"] = int(max_requests_before_recycle)
+        artifact["max_worker_age_seconds"] = float(max_worker_age_seconds)
         if ARGS.batch_max_size > 1:
             artifact["batcher"] = InferenceBatcher(
                 worker_pool,
@@ -254,6 +294,143 @@ def load_models(mode: str) -> tuple[dict[str, dict[str, Any]], str]:
 MODEL_ARTIFACTS: dict[str, dict[str, Any]] = {}
 DEFAULT_MODEL_ID = ""
 APP = Flask(__name__)
+REQUEST_LOG_LOCK = threading.Lock()
+REQUEST_COUNTER = 0
+REQUEST_METRICS_LOCK = threading.Lock()
+MODEL_REQUEST_METRICS: dict[str, dict[str, Any]] = {}
+
+
+def recommended_worker_floor(*, mode: str, model_count: int) -> int:
+    return 2 if mode == "multi" and model_count > 1 else 1
+
+
+def resolve_worker_count(*, configured_count: int, mode: str, model_count: int) -> int:
+    return max(int(configured_count), recommended_worker_floor(mode=mode, model_count=model_count))
+
+
+def resolve_recycle_settings(
+    *,
+    worker_count: int,
+    mode: str,
+    model_count: int,
+    max_requests: int,
+    max_age_seconds: float,
+) -> tuple[int, float]:
+    if ARGS.disable_worker_recycling:
+        return 0, 0.0
+    if worker_count < 2 and mode == "multi" and model_count > 1:
+        return 0, 0.0
+    return int(max_requests), float(max_age_seconds)
+
+
+def empty_request_metrics() -> dict[str, Any]:
+    return {
+        "request_count": 0,
+        "success_count": 0,
+        "error_count": 0,
+        "move_count": 0,
+        "switch_count": 0,
+        "revive_count": 0,
+        "none_count": 0,
+        "avg_observed_batch_size": 0.0,
+        "avg_queue_wait_ms": 0.0,
+        "avg_service_ms": 0.0,
+        "avg_worker_total_ms": 0.0,
+        "avg_elapsed_ms": 0.0,
+        "max_observed_batch_size": 0,
+        "max_queue_wait_ms": 0.0,
+        "max_service_ms": 0.0,
+        "max_worker_total_ms": 0.0,
+        "max_elapsed_ms": 0.0,
+        "_total_batch_size": 0.0,
+        "_total_queue_wait_ms": 0.0,
+        "_total_service_ms": 0.0,
+        "_total_worker_total_ms": 0.0,
+        "_total_elapsed_ms": 0.0,
+    }
+
+
+def initialize_request_metrics() -> None:
+    with REQUEST_METRICS_LOCK:
+        MODEL_REQUEST_METRICS.clear()
+        for model_id in MODEL_ARTIFACTS:
+            MODEL_REQUEST_METRICS[model_id] = empty_request_metrics()
+
+
+def record_request_metric(
+    *,
+    model_id: str,
+    elapsed_ms: float,
+    queue_wait_ms: float | None = None,
+    service_ms: float | None = None,
+    worker_total_ms: float | None = None,
+    batch_size: int = 1,
+    result_type: str | None = None,
+    success: bool,
+) -> None:
+    with REQUEST_METRICS_LOCK:
+        metrics = MODEL_REQUEST_METRICS.setdefault(model_id, empty_request_metrics())
+        metrics["request_count"] += 1
+        if success:
+            metrics["success_count"] += 1
+        else:
+            metrics["error_count"] += 1
+
+        if result_type == "move":
+            metrics["move_count"] += 1
+        elif result_type == "switch":
+            metrics["switch_count"] += 1
+        elif result_type == "revive":
+            metrics["revive_count"] += 1
+        elif result_type == "none":
+            metrics["none_count"] += 1
+
+        observed_batch_size = max(1, int(batch_size))
+        metrics["_total_batch_size"] += float(observed_batch_size)
+        metrics["max_observed_batch_size"] = max(metrics["max_observed_batch_size"], observed_batch_size)
+        metrics["_total_elapsed_ms"] += float(elapsed_ms)
+        metrics["max_elapsed_ms"] = max(metrics["max_elapsed_ms"], float(elapsed_ms))
+
+        if queue_wait_ms is not None:
+            metrics["_total_queue_wait_ms"] += float(queue_wait_ms)
+            metrics["max_queue_wait_ms"] = max(metrics["max_queue_wait_ms"], float(queue_wait_ms))
+        if service_ms is not None:
+            metrics["_total_service_ms"] += float(service_ms)
+            metrics["max_service_ms"] = max(metrics["max_service_ms"], float(service_ms))
+        if worker_total_ms is not None:
+            metrics["_total_worker_total_ms"] += float(worker_total_ms)
+            metrics["max_worker_total_ms"] = max(metrics["max_worker_total_ms"], float(worker_total_ms))
+
+        request_count = float(metrics["request_count"])
+        metrics["avg_observed_batch_size"] = metrics["_total_batch_size"] / request_count
+        metrics["avg_elapsed_ms"] = metrics["_total_elapsed_ms"] / request_count
+        metrics["avg_queue_wait_ms"] = metrics["_total_queue_wait_ms"] / request_count
+        metrics["avg_service_ms"] = metrics["_total_service_ms"] / request_count
+        metrics["avg_worker_total_ms"] = metrics["_total_worker_total_ms"] / request_count
+
+
+def snapshot_request_metrics() -> dict[str, dict[str, Any]]:
+    with REQUEST_METRICS_LOCK:
+        result: dict[str, dict[str, Any]] = {}
+        for model_id, metrics in MODEL_REQUEST_METRICS.items():
+            public_metrics = {
+                key: value
+                for key, value in metrics.items()
+                if not key.startswith("_")
+            }
+            result[model_id] = public_metrics
+        return result
+
+
+def should_log_request(elapsed_ms: float) -> bool:
+    if ARGS.request_log_slower_than_ms > 0 and elapsed_ms >= float(ARGS.request_log_slower_than_ms):
+        return True
+    if ARGS.request_log_every <= 0:
+        return False
+    global REQUEST_COUNTER
+    with REQUEST_LOG_LOCK:
+        REQUEST_COUNTER += 1
+        return REQUEST_COUNTER % int(ARGS.request_log_every) == 0
 
 
 def shutdown_workers() -> None:
@@ -272,7 +449,10 @@ def log_loaded_models() -> None:
     print(f"[startup] request_timeout_seconds={ARGS.request_timeout_seconds}")
     print(f"[startup] worker_max_requests={ARGS.worker_max_requests}")
     print(f"[startup] worker_max_age_seconds={ARGS.worker_max_age_seconds}")
+    print(f"[startup] disable_worker_recycling={ARGS.disable_worker_recycling}")
     print(f"[startup] workers_per_model={ARGS.workers_per_model}")
+    print(f"[startup] request_log_every={ARGS.request_log_every}")
+    print(f"[startup] request_log_slower_than_ms={ARGS.request_log_slower_than_ms}")
     print(f"[startup] model_worker_overrides={ARGS.model_worker_overrides or '(none)'}")
     print(f"[startup] worker_bootstrap_timeout_seconds={ARGS.worker_bootstrap_timeout_seconds}")
     print(f"[startup] worker_startup_timeout_seconds={ARGS.worker_startup_timeout_seconds}")
@@ -293,7 +473,10 @@ def log_loaded_models() -> None:
             f"model_id={model_id} "
             f"model_path={artifacts['model_path']} "
             f"vocab_path={artifacts['vocab_path']} "
+            f"configured_worker_count={artifacts['configured_worker_count']} "
             f"worker_count={worker_health['worker_count']} "
+            f"effective_worker_max_requests={artifacts['max_requests_before_recycle']} "
+            f"effective_worker_max_age_seconds={artifacts['max_worker_age_seconds']} "
             f"worker_pids={worker_pids or '(starting)'}"
         )
         for worker_entry in worker_health["workers"]:
@@ -434,6 +617,7 @@ def health():
         model_id: artifacts["worker_pool"].health()
         for model_id, artifacts in MODEL_ARTIFACTS.items()
     }
+    request_metrics = snapshot_request_metrics()
     overall_status = "ok" if all(entry["alive"] for entry in worker_health.values()) else "degraded"
     return jsonify(
         status=overall_status,
@@ -441,11 +625,14 @@ def health():
         default_model_id=DEFAULT_MODEL_ID,
         supported_model_ids=sorted(MODEL_ARTIFACTS.keys()),
         worker_health=worker_health,
+        request_metrics=request_metrics,
     )
 
 
 @APP.route("/predict", methods=["POST"])
 def predict():
+    model_artifacts: dict[str, Any] | None = None
+    started_at: float | None = None
     try:
         data = request.get_json(silent=True)
         if data is None:
@@ -470,27 +657,48 @@ def predict():
         queue_wait_ms = worker_metrics.get("queue_wait_ms")
         service_ms = worker_metrics.get("service_ms")
         batch_size = worker_metrics.get("batch_size", 1)
-        print(
-            "[predict] "
-            f"model_id={model_artifacts['model_id']} "
-            f"worker_index={worker_index} "
-            f"worker_pid={worker_pid} "
-            f"batch_size={batch_size} "
-            f"state_len={len(state_vector)} "
-            f"queue_wait_ms={0.0 if queue_wait_ms is None else float(queue_wait_ms):.2f} "
-            f"service_ms={0.0 if service_ms is None else float(service_ms):.2f} "
-            f"elapsed_ms={elapsed_ms:.2f}"
-        )
+        if should_log_request(elapsed_ms):
+            print(
+                "[predict] "
+                f"model_id={model_artifacts['model_id']} "
+                f"worker_index={worker_index} "
+                f"worker_pid={worker_pid} "
+                f"batch_size={batch_size} "
+                f"state_len={len(state_vector)} "
+                f"queue_wait_ms={0.0 if queue_wait_ms is None else float(queue_wait_ms):.2f} "
+                f"service_ms={0.0 if service_ms is None else float(service_ms):.2f} "
+                f"elapsed_ms={elapsed_ms:.2f}"
+            )
 
         if revive_targets:
             best_revive, best_prob = pick_best_slot_target(model_artifacts, logits, revive_targets, "revive")
             if best_revive is None:
+                record_request_metric(
+                    model_id=model_artifacts["model_id"],
+                    elapsed_ms=elapsed_ms,
+                    queue_wait_ms=queue_wait_ms,
+                    service_ms=service_ms,
+                    worker_total_ms=worker_metrics.get("total_ms"),
+                    batch_size=batch_size,
+                    result_type="none",
+                    success=True,
+                )
                 return jsonify(
                     type="none",
                     note="revive target request detected but no legal revive targets were available",
                     revive_reason=revive_reason,
                     **context,
                 )
+            record_request_metric(
+                model_id=model_artifacts["model_id"],
+                elapsed_ms=elapsed_ms,
+                queue_wait_ms=queue_wait_ms,
+                service_ms=service_ms,
+                worker_total_ms=worker_metrics.get("total_ms"),
+                batch_size=batch_size,
+                result_type="revive",
+                success=True,
+            )
             return jsonify(
                 best_revive=best_revive["payload"],
                 slot=best_revive["payload"].get("slot"),
@@ -503,6 +711,16 @@ def predict():
 
         best_action, best_prob = pick_best_action(model_artifacts, logits, legal_moves, legal_switches)
         if best_action is None:
+            record_request_metric(
+                model_id=model_artifacts["model_id"],
+                elapsed_ms=elapsed_ms,
+                queue_wait_ms=queue_wait_ms,
+                service_ms=service_ms,
+                worker_total_ms=worker_metrics.get("total_ms"),
+                batch_size=batch_size,
+                result_type="none",
+                success=True,
+            )
             return jsonify(
                 best_action=None,
                 type="none",
@@ -514,6 +732,16 @@ def predict():
             )
 
         if best_action["type"] == "move":
+            record_request_metric(
+                model_id=model_artifacts["model_id"],
+                elapsed_ms=elapsed_ms,
+                queue_wait_ms=queue_wait_ms,
+                service_ms=service_ms,
+                worker_total_ms=worker_metrics.get("total_ms"),
+                batch_size=batch_size,
+                result_type="move",
+                success=True,
+            )
             return jsonify(
                 best_move=best_action["payload"],
                 type="move",
@@ -522,6 +750,16 @@ def predict():
                 **context,
             )
 
+        record_request_metric(
+            model_id=model_artifacts["model_id"],
+            elapsed_ms=elapsed_ms,
+            queue_wait_ms=queue_wait_ms,
+            service_ms=service_ms,
+            worker_total_ms=worker_metrics.get("total_ms"),
+            batch_size=batch_size,
+            result_type="switch",
+            success=True,
+        )
         return jsonify(
             best_switch=best_action["payload"],
             slot=best_action["payload"].get("slot"),
@@ -542,6 +780,14 @@ def predict():
             supported_model_ids=sorted(MODEL_ARTIFACTS.keys()),
         ), 503
     except Exception as error:
+        if model_artifacts is not None:
+            elapsed_ms = 0.0 if started_at is None else (time.perf_counter() - started_at) * 1000.0
+            record_request_metric(
+                model_id=model_artifacts["model_id"],
+                elapsed_ms=elapsed_ms,
+                result_type="error",
+                success=False,
+            )
         import traceback
 
         traceback.print_exc()
@@ -553,6 +799,9 @@ if __name__ == "__main__":
 
     mp.freeze_support()
     MODEL_ARTIFACTS, DEFAULT_MODEL_ID = load_models(ARGS.mode)
+    initialize_request_metrics()
     atexit.register(shutdown_workers)
     log_loaded_models()
+    if not ARGS.access_log:
+        logging.getLogger("werkzeug").setLevel(logging.ERROR)
     APP.run(host=ARGS.host, port=ARGS.port, debug=False, use_reloader=False, threaded=True)
