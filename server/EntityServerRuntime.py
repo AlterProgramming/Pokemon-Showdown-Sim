@@ -18,6 +18,7 @@ from EntityTensorizationV2 import encode_entity_state_with_candidates, to_single
 from ModelRegistry import resolve_artifact_path
 from core.ActionSelection import resolve_switch_logit_bias
 from core.SequencePlanning import decode_greedy_sequence_tokens
+from core.TurnEventTokenizer import encode_event_history
 
 
 build_entity_invariance_models = None
@@ -555,13 +556,11 @@ def predict_entity_auxiliary_outputs_batch(
     if use_history and past_turn_events is not None:
         sequence_vocab = runtime.get("sequence_vocab")
         if sequence_vocab:
-            from core.TurnEventTokenizer import encode_event_history
             history_turns = int(runtime.get("history_turns", 8))
             history_events_per_turn = int(runtime.get("history_events_per_turn", 24))
             hist_tokens, hist_mask = encode_event_history(
                 past_turn_events, sequence_vocab, history_turns, history_events_per_turn
             )
-            batch_size = len(my_action_tokens)
             raw_inputs["event_history_tokens"] = [hist_tokens] * batch_size
             raw_inputs["event_history_mask"] = [hist_mask] * batch_size
     batched_inputs = to_numpy_entity_inputs(raw_inputs)

@@ -13,6 +13,7 @@ That makes it a safe first entity generation while keeping the door open for a
 future true graph encoder under a new family version.
 """
 
+import math
 from typing import Any, Dict, List
 
 from .EntityTensorization import MAX_GLOBAL_CONDITIONS, MAX_OBSERVED_MOVES
@@ -166,30 +167,27 @@ class HistoryAttention(_keras().layers.Layer):
         self.q_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_q")
         self.k_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_k")
         self.v_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_v")
+        self._scale = math.sqrt(float(self.attn_dim))
         super().build(input_shape)
 
     def call(self, inputs):
-        import math
-        tf = _tf()
-        query, lstm_out, mask = inputs
-        Q = tf.expand_dims(self.q_proj(query), axis=1)          # [batch, 1, attn_dim]
-        K = self.k_proj(lstm_out)                                 # [batch, K, attn_dim]
-        V = self.v_proj(lstm_out)                                 # [batch, K, attn_dim]
-        scale = math.sqrt(float(self.attn_dim))
-        scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / scale  # [batch, K]
-        scores = scores + (1.0 - mask) * -1e9
-        weights = tf.nn.softmax(scores, axis=-1)                 # [batch, K]
-        return tf.einsum("bk,bkd->bd", weights, V)               # context only
-
-    def compute_weights(self, inputs):
-        """Return attention weights [batch, K] without computing context. Used for analysis."""
-        import math
         tf = _tf()
         query, lstm_out, mask = inputs
         Q = tf.expand_dims(self.q_proj(query), axis=1)
         K = self.k_proj(lstm_out)
-        scale = math.sqrt(float(self.attn_dim))
-        scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / scale
+        V = self.v_proj(lstm_out)
+        scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / self._scale
+        scores = scores + (1.0 - mask) * -1e9
+        weights = tf.nn.softmax(scores, axis=-1)
+        return tf.einsum("bk,bkd->bd", weights, V)
+
+    def compute_weights(self, inputs):
+        """Return attention weights [batch, K] without computing context. Used for analysis."""
+        tf = _tf()
+        query, lstm_out, mask = inputs
+        Q = tf.expand_dims(self.q_proj(query), axis=1)
+        K = self.k_proj(lstm_out)
+        scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / self._scale
         scores = scores + (1.0 - mask) * -1e9
         return tf.nn.softmax(scores, axis=-1)
 
@@ -406,7 +404,6 @@ def build_entity_action_models(
 
     # --- Optional event history encoder ---
     history_context = None
-    history_attn_weights_tensor = None
 
     if use_history and history_vocab_size is not None:
         _attn_dim = history_attn_dim or (history_lstm_dim * 2)
@@ -491,9 +488,7 @@ def build_entity_action_models(
             keras.metrics.MeanAbsoluteError(name="mae"),
             keras.metrics.MeanSquaredError(name="brier"),
         ]
-        # When use_history=True, value_out depends on hist inputs; use model_inputs
-        # to avoid a disconnected-graph error in keras.Model construction.
-        pv_inputs = model_inputs if (use_history and history_vocab_size is not None) else inputs
+        pv_inputs = model_inputs if history_context is not None else inputs
         policy_value_model = keras.Model(
             pv_inputs,
             {"policy": policy_logits, "value": value_out},
