@@ -1,0 +1,7 @@
+{
+  "bucket": "artifacts-model-serving",
+  "project_id": "pokemon-battle-agent-494015",
+  "service_account_email": "artifact-writer@pokemon-battle-agent-494015.iam.gserviceaccount.com",
+  "key_path": "~/.config/gcloud/service-accounts/pokemon-battle-agent.json",
+  "artifacts_prefix": "artifacts"
+}
