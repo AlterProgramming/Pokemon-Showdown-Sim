@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from pathlib import PurePosixPath
 from typing import Any, Dict, Sequence
 
 
@@ -208,8 +209,28 @@ def enrich_training_metadata_recipe_fields(metadata: dict[str, Any]) -> dict[str
 
 def resolve_artifact_path(repo_path: Path, metadata_path: Path, raw_path: str) -> Path:
     candidate = Path(raw_path)
-    if candidate.is_absolute():
-        return candidate
+    looks_posix_absolute = str(raw_path).startswith("/")
+    absolute_parts = candidate.parts
+    if looks_posix_absolute and not candidate.is_absolute():
+        absolute_parts = PurePosixPath(str(raw_path)).parts
+
+    if candidate.is_absolute() or looks_posix_absolute:
+        if candidate.is_absolute() and candidate.exists():
+            return candidate
+
+        parts_lower = [part.lower() for part in absolute_parts]
+        if "artifacts" in parts_lower:
+            artifacts_index = parts_lower.index("artifacts")
+            relative_from_artifacts = Path(*absolute_parts[artifacts_index:])
+            repo_candidate = (repo_path / relative_from_artifacts).resolve()
+            if repo_candidate.exists():
+                return repo_candidate
+
+        metadata_sibling_candidate = (metadata_path.parent / candidate.name).resolve()
+        if metadata_sibling_candidate.exists():
+            return metadata_sibling_candidate
+
+        return metadata_sibling_candidate
 
     repo_candidate = (repo_path / candidate).resolve()
     if repo_candidate.exists():
@@ -250,7 +271,7 @@ def build_model_registry(repo_path: Path) -> dict[str, Any]:
             "model_id": model_id,
             "model_name": metadata.get("model_name"),
             "model_variant": metadata.get("model_variant"),
-            "metadata_path": str(metadata_path.relative_to(repo_path)),
+            "metadata_path": metadata_path.relative_to(repo_path).as_posix(),
             "policy_model_path": str(policy_model_path),
             "policy_vocab_path": str(policy_vocab_path),
             "policy_value_model_path": metadata.get("policy_value_model_path"),
@@ -287,7 +308,7 @@ def build_model_registry(repo_path: Path) -> dict[str, Any]:
     default_model_id = "model1" if "model1" in models else (sorted(models.keys())[0] if models else None)
     return {
         "repo_path": str(repo_path),
-        "registry_path": str((artifacts_dir / REGISTRY_FILENAME).relative_to(repo_path)),
+        "registry_path": (artifacts_dir / REGISTRY_FILENAME).relative_to(repo_path).as_posix(),
         "default_model_id": default_model_id,
         "models": dict(sorted(models.items())),
     }

@@ -215,6 +215,7 @@ There are also a few Windows PowerShell utilities under `scripts/` for desktop-o
 - `scripts/get_codex_session_id.ps1`: prints the active Codex desktop conversation ID from the newest local app log
 - `scripts/broadcast_ble_value.ps1`: advertises a compact value over Bluetooth Low Energy, including the current Codex session ID
 - `scripts/scan_ble_value.ps1`: listens for the matching BLE broadcast format on another Windows device
+- `scripts/scan_browser_bridge.ps1`: listens for browser bridge messages from the local localhost bridge
 
 Broadcast the current Codex session ID for two minutes:
 
@@ -228,7 +229,27 @@ Listen for it on another Windows device:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\scan_ble_value.ps1 -FirstOnly
 ```
 
+If you want the same Codex session record to reach a browser tab too, start the local model server, open:
+
+```text
+http://127.0.0.1:5000/bridge
+```
+
+Then broadcast with the browser bridge enabled:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\broadcast_codex_session_id.ps1 -BrowserBridgeUrl http://127.0.0.1:5000/bridge/messages
+```
+
+To let Codex receive messages that the browser sends back, use:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\scan_browser_bridge.ps1 -FirstOnly
+```
+
 These utilities use BLE advertising rather than Bluetooth pairing. The payload is intentionally small, so text broadcasts must stay short.
+
+For same-host testing, you can also pass `-LoopbackJsonPath` to the broadcaster and receiver. The sender writes a local pass record with `SessionId`, `PayloadHex`, `TimestampUtc`, and `PredictionScore`, and the receiver prints the decoded pass info from that file if the BLE self-scan does not loop back reliably.
 
 ## Local Setup
 

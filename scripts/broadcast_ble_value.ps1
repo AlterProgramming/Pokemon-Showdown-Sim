@@ -4,6 +4,8 @@ param(
     [string]$ValueKind = "Auto",
     [uint16]$CompanyId = 65534,
     [int]$DurationSeconds = 120,
+    [string]$LoopbackJsonPath,
+    [string]$BrowserBridgeUrl,
     [switch]$UseCodexSessionId,
     [switch]$DryRun,
     [switch]$PassThru
@@ -12,9 +14,6 @@ param(
 $ErrorActionPreference = "Stop"
 
 Add-Type -AssemblyName System.Runtime.WindowsRuntime
-[Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementPublisher, Windows, ContentType = WindowsRuntime] | Out-Null
-[Windows.Devices.Bluetooth.Advertisement.BluetoothLEManufacturerData, Windows, ContentType = WindowsRuntime] | Out-Null
-[Windows.Storage.Streams.DataWriter, Windows, ContentType = WindowsRuntime] | Out-Null
 
 function Resolve-BroadcastValue {
     param(
@@ -107,20 +106,102 @@ function Encode-BroadcastPayload {
     return [pscustomobject]@{
         Kind        = $resolvedKind
         SourceValue = $InputValue
-        Payload     = $customBytes
         HexPayload  = ([System.BitConverter]::ToString($customBytes) -replace '-', '')
+    }
+}
+
+function Get-BleHelperBuildSpec {
+    $frameworkRoot = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319'
+    $compilerPath = Join-Path $frameworkRoot 'csc.exe'
+    $runtimeWindowsPath = Join-Path $frameworkRoot 'System.Runtime.WindowsRuntime.dll'
+    $systemRuntimePath = 'C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Runtime\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Runtime.dll'
+    $windowsWinMdPath = 'C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.19041.0\Windows.winmd'
+
+    foreach ($requiredPath in @($compilerPath, $runtimeWindowsPath, $systemRuntimePath, $windowsWinMdPath)) {
+        if (-not (Test-Path -LiteralPath $requiredPath)) {
+            throw "Missing required BLE helper dependency: $requiredPath"
+        }
+    }
+
+    $helperSourcePath = Join-Path $PSScriptRoot 'BleBroadcastHelper.cs'
+    if (-not (Test-Path -LiteralPath $helperSourcePath)) {
+        throw "Missing BLE helper source file: $helperSourcePath"
+    }
+
+    $helperDir = Join-Path $PSScriptRoot '.bin'
+    $helperExePath = Join-Path $helperDir 'BleBroadcastHelper.exe'
+
+    return [pscustomobject]@{
+        CompilerPath       = $compilerPath
+        RuntimeWindowsPath = $runtimeWindowsPath
+        SystemRuntimePath  = $systemRuntimePath
+        WindowsWinMdPath   = $windowsWinMdPath
+        HelperSourcePath   = $helperSourcePath
+        HelperDir          = $helperDir
+        HelperExePath      = $helperExePath
+    }
+}
+
+function Build-BleHelperIfNeeded {
+    param([pscustomobject]$BuildSpec)
+
+    $needsBuild = -not (Test-Path -LiteralPath $BuildSpec.HelperExePath)
+    if (-not $needsBuild) {
+        $needsBuild = (Get-Item -LiteralPath $BuildSpec.HelperSourcePath).LastWriteTimeUtc -gt (Get-Item -LiteralPath $BuildSpec.HelperExePath).LastWriteTimeUtc
+    }
+
+    if (-not $needsBuild) {
+        return
+    }
+
+    New-Item -ItemType Directory -Force -Path $BuildSpec.HelperDir | Out-Null
+    $compilerArgs = @(
+        '/nologo',
+        '/target:exe',
+        "/out:$($BuildSpec.HelperExePath)",
+        "/reference:$($BuildSpec.RuntimeWindowsPath)",
+        "/reference:$($BuildSpec.SystemRuntimePath)",
+        "/reference:$($BuildSpec.WindowsWinMdPath)",
+        $BuildSpec.HelperSourcePath
+    )
+
+    & $BuildSpec.CompilerPath @compilerArgs
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $BuildSpec.HelperExePath)) {
+        throw "Failed to build the BLE broadcast helper."
+    }
+}
+
+function Send-BrowserBridgeMessage {
+    param(
+        [string]$BridgeUrl,
+        [pscustomobject]$Message
+    )
+
+    if (-not $BridgeUrl) {
+        return
+    }
+
+    try {
+        $body = $Message | ConvertTo-Json -Depth 6
+        Invoke-RestMethod -Method Post -Uri $BridgeUrl -ContentType "application/json" -Body $body | Out-Null
+    } catch {
+        Write-Warning "Failed to publish browser bridge message to ${BridgeUrl}: $($_.Exception.Message)"
     }
 }
 
 $resolvedValue = Resolve-BroadcastValue -ExplicitValue $Value -FromCodexSession:$UseCodexSessionId
 $encoded = Encode-BroadcastPayload -InputValue $resolvedValue -RequestedKind $ValueKind
+$timestampUtc = [DateTimeOffset]::UtcNow.ToString("o")
 
 $result = [pscustomobject]@{
+    SessionId       = $encoded.SourceValue
     Value           = $encoded.SourceValue
     ValueKind       = $encoded.Kind
     CompanyId       = $CompanyId
     DurationSeconds = $DurationSeconds
+    PredictionScore = 1.0
     PayloadHex      = $encoded.HexPayload
+    TimestampUtc    = $timestampUtc
 }
 
 if ($DryRun) {
@@ -132,23 +213,54 @@ if ($DryRun) {
     exit 0
 }
 
-$writer = [Windows.Storage.Streams.DataWriter]::new()
-$writer.WriteBytes($encoded.Payload)
-$buffer = $writer.DetachBuffer()
+$loopbackPath = $null
+if ($LoopbackJsonPath) {
+    if ([System.IO.Path]::IsPathRooted($LoopbackJsonPath)) {
+        $loopbackPath = [System.IO.Path]::GetFullPath($LoopbackJsonPath)
+    } else {
+        $loopbackPath = [System.IO.Path]::GetFullPath((Join-Path $PWD $LoopbackJsonPath))
+    }
+    $loopbackDir = Split-Path -Parent $loopbackPath
+    if ($loopbackDir) {
+        New-Item -ItemType Directory -Force -Path $loopbackDir | Out-Null
+    }
 
-$advertisement = [Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisement]::new()
-$manufacturerData = [Windows.Devices.Bluetooth.Advertisement.BluetoothLEManufacturerData]::new($CompanyId, $buffer)
-[void]$advertisement.ManufacturerData.Add($manufacturerData)
+    $loopbackRecord = [pscustomobject]@{
+        SessionId       = $result.SessionId
+        Value           = $result.Value
+        ValueKind       = $result.ValueKind
+        CompanyId       = $result.CompanyId
+        DurationSeconds = $result.DurationSeconds
+        PredictionScore = $result.PredictionScore
+        PayloadHex      = $result.PayloadHex
+        TimestampUtc    = $timestampUtc
+        WrittenAtUtc    = $timestampUtc
+    }
 
-$publisher = [Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementPublisher]::new($advertisement)
-$publisher.Start()
-Start-Sleep -Milliseconds 500
-
-if ($publisher.Status.ToString() -ne "Started") {
-    $status = $publisher.Status.ToString()
-    $publisher.Stop()
-    throw "BLE advertisement did not start. Publisher status: $status"
+    $loopbackRecord | ConvertTo-Json -Depth 4 | Set-Content -Path $loopbackPath -Encoding UTF8
 }
+
+Send-BrowserBridgeMessage -BridgeUrl $BrowserBridgeUrl -Message ([pscustomobject]@{
+    source          = "codex"
+    target          = "browser"
+    kind            = "codex_session_id"
+    session_id      = $result.SessionId
+    value           = $result.Value
+    value_kind      = $result.ValueKind
+    company_id      = $result.CompanyId
+    duration_seconds = $result.DurationSeconds
+    prediction_score = $result.PredictionScore
+    payload_hex     = $result.PayloadHex
+    timestamp_utc   = $result.TimestampUtc
+})
+
+$buildSpec = Get-BleHelperBuildSpec
+Build-BleHelperIfNeeded -BuildSpec $buildSpec
+$helperArgs = @(
+    '--company-id', "$CompanyId",
+    '--payload-hex', $encoded.HexPayload,
+    '--duration-ms', "$($DurationSeconds * 1000)"
+)
 
 try {
     if ($PassThru) {
@@ -156,11 +268,15 @@ try {
     } else {
         Write-Host "Broadcasting BLE payload..."
         $result | Format-List
+        if ($loopbackPath) {
+            Write-Host "Loopback JSON: $loopbackPath"
+        }
         Write-Host ""
         Write-Host "Press Ctrl+C to stop early."
     }
 
-    Start-Sleep -Seconds $DurationSeconds
-} finally {
-    $publisher.Stop()
-}
+    & $buildSpec.HelperExePath @helperArgs
+    if ($LASTEXITCODE -ne 0) {
+        throw "The BLE broadcast helper exited with code $LASTEXITCODE."
+    }
+} finally {}

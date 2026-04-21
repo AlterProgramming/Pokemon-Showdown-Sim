@@ -4,9 +4,11 @@ import argparse
 import atexit
 from collections import deque
 import logging
+from datetime import datetime, timezone
 import sys
 import threading
 import time
+from threading import Lock
 from pathlib import Path
 from typing import Any
 
@@ -432,6 +434,349 @@ def should_log_request(elapsed_ms: float) -> bool:
         REQUEST_COUNTER += 1
         return REQUEST_COUNTER % int(ARGS.request_log_every) == 0
 
+BRIDGE_LOCK = Lock()
+BRIDGE_MESSAGES = deque(maxlen=1000)
+BRIDGE_NEXT_ID = 1
+
+
+def bridge_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def bridge_coerce_prediction_score(value: Any) -> float:
+    if value is None:
+        return 1.0
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 1.0
+
+
+def bridge_append_message(payload: dict[str, Any]) -> dict[str, Any]:
+    global BRIDGE_NEXT_ID
+
+    with BRIDGE_LOCK:
+        record = {
+            "id": BRIDGE_NEXT_ID,
+            "timestamp_utc": bridge_now_iso(),
+            "source": str(payload.get("source") or "codex"),
+            "target": str(payload.get("target") or "browser"),
+            "kind": str(payload.get("kind") or "text"),
+            "session_id": payload.get("session_id") or payload.get("SessionId"),
+            "value": payload.get("value") or payload.get("Value"),
+            "value_kind": payload.get("value_kind") or payload.get("ValueKind"),
+            "payload_hex": payload.get("payload_hex") or payload.get("PayloadHex"),
+            "prediction_score": bridge_coerce_prediction_score(
+                payload.get("prediction_score") if "prediction_score" in payload else payload.get("PredictionScore")
+            ),
+            "note": payload.get("note") or payload.get("Note"),
+        }
+        BRIDGE_MESSAGES.append(record)
+        BRIDGE_NEXT_ID += 1
+
+    return record
+
+
+def bridge_messages_after(after_id: int, limit: int) -> list[dict[str, Any]]:
+    with BRIDGE_LOCK:
+        messages = [message for message in BRIDGE_MESSAGES if int(message["id"]) > after_id]
+        if limit > 0:
+            messages = messages[:limit]
+        return messages
+
+
+BRIDGE_PAGE = """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codex Browser Bridge</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f3ec;
+      --panel: #fffaf1;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #0f766e;
+      --border: #d6cbb9;
+      --shadow: rgba(15, 23, 42, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 28%),
+        linear-gradient(180deg, #fbf8f2 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: -0.03em;
+    }
+    .sub {
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .status {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.12);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 18px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px var(--shadow);
+      padding: 18px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    input, textarea, button {
+      font: inherit;
+    }
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--text);
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .feed {
+      display: grid;
+      gap: 12px;
+    }
+    .message {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+    }
+    .message pre {
+      margin: 8px 0 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      header { align-items: start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Codex Browser Bridge</h1>
+        <div class="sub">Bidirectional localhost message bus for Codex and browser sessions.</div>
+      </div>
+      <div class="status" id="status">Connecting...</div>
+    </header>
+    <div class="grid">
+      <section class="card">
+        <h2 style="margin-top:0">Send a message</h2>
+        <label for="source">Source</label>
+        <input id="source" value="browser" />
+        <label for="target">Target</label>
+        <input id="target" value="codex" />
+        <label for="sessionId">Session ID</label>
+        <input id="sessionId" placeholder="optional session id" />
+        <label for="value">Value</label>
+        <textarea id="value" placeholder="Enter text or a Codex session payload"></textarea>
+        <label for="predictionScore">Prediction score</label>
+        <input id="predictionScore" value="1.0" />
+        <label for="kind">Kind</label>
+        <input id="kind" value="text" />
+        <div class="row">
+          <button id="sendBtn">Send</button>
+          <button class="secondary" id="clearBtn" type="button">Clear</button>
+        </div>
+      </section>
+      <section class="card">
+        <div class="row" style="justify-content:space-between; align-items:center; margin-top:0">
+          <h2 style="margin:0">Recent messages</h2>
+          <button class="secondary" id="refreshBtn" type="button">Refresh</button>
+        </div>
+        <div class="feed" id="feed" style="margin-top:16px"></div>
+      </section>
+    </div>
+  </div>
+  <script>
+    const feedEl = document.getElementById("feed");
+    const statusEl = document.getElementById("status");
+    const sendBtn = document.getElementById("sendBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const sourceEl = document.getElementById("source");
+    const targetEl = document.getElementById("target");
+    const sessionIdEl = document.getElementById("sessionId");
+    const valueEl = document.getElementById("value");
+    const predictionScoreEl = document.getElementById("predictionScore");
+    const kindEl = document.getElementById("kind");
+    let lastSeenId = 0;
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+    }
+
+    function renderMessage(message) {
+      const div = document.createElement("div");
+      div.className = "message";
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = `#${message.id} ${message.timestamp_utc} ${message.source} -> ${message.target} ${message.kind} score=${message.prediction_score}`;
+      const pre = document.createElement("pre");
+      pre.textContent = JSON.stringify(message, null, 2);
+      div.appendChild(meta);
+      div.appendChild(pre);
+      return div;
+    }
+
+    function upsertMessages(messages) {
+      if (!messages.length) {
+        return;
+      }
+      for (const message of messages) {
+        if (message.id > lastSeenId) {
+          lastSeenId = message.id;
+        }
+        feedEl.prepend(renderMessage(message));
+      }
+    }
+
+    async function fetchMessages() {
+      const response = await fetch(`/bridge/messages?after_id=${lastSeenId}`);
+      if (!response.ok) {
+        throw new Error(`Fetch failed: ${response.status}`);
+      }
+      const payload = await response.json();
+      upsertMessages(payload.messages || []);
+      setStatus(`Connected. Latest id ${payload.latest_id || 0}`);
+    }
+
+    async function sendMessage() {
+      const body = {
+        source: sourceEl.value || "browser",
+        target: targetEl.value || "codex",
+        session_id: sessionIdEl.value || "",
+        value: valueEl.value || "",
+        prediction_score: Number(predictionScoreEl.value || "1"),
+        kind: kindEl.value || "text",
+      };
+      const response = await fetch("/bridge/messages", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `Send failed: ${response.status}`);
+      }
+      const message = await response.json();
+      upsertMessages([message]);
+      valueEl.value = "";
+    }
+
+    sendBtn.addEventListener("click", async () => {
+      sendBtn.disabled = true;
+      try {
+        await sendMessage();
+      } catch (error) {
+        setStatus(String(error));
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      feedEl.innerHTML = "";
+      lastSeenId = 0;
+    });
+
+    refreshBtn.addEventListener("click", async () => {
+      try {
+        await fetchMessages();
+      } catch (error) {
+        setStatus(String(error));
+      }
+    });
+
+    async function poll() {
+      try {
+        await fetchMessages();
+      } catch (error) {
+        setStatus(String(error));
+      }
+    }
+
+    poll();
+    setInterval(poll, 1000);
+  </script>
+</body>
+</html>
+"""
+
 
 def shutdown_workers() -> None:
     for artifact in MODEL_ARTIFACTS.values():
@@ -609,6 +954,33 @@ def build_response_context(model_artifacts: dict[str, Any]) -> dict[str, Any]:
         "model_id": model_artifacts["model_id"],
         "supported_model_ids": sorted(MODEL_ARTIFACTS.keys()),
     }
+
+
+@APP.route("/bridge", methods=["GET"])
+def bridge_page():
+    return BRIDGE_PAGE, 200, {"Content-Type": "text/html; charset=utf-8"}
+
+
+@APP.route("/bridge/messages", methods=["GET", "POST"])
+def bridge_messages():
+    if request.method == "POST":
+        data = request.get_json(silent=True)
+        if data is None:
+            return jsonify(error="invalid JSON"), 400
+        record = bridge_append_message(data)
+        return jsonify(record)
+
+    after_id_raw = request.args.get("after_id", "0")
+    limit_raw = request.args.get("limit", "100")
+    try:
+        after_id = max(int(after_id_raw), 0)
+        limit = max(int(limit_raw), 0)
+    except ValueError:
+        return jsonify(error="after_id and limit must be integers"), 400
+
+    messages = bridge_messages_after(after_id, limit)
+    latest_id = messages[-1]["id"] if messages else max(BRIDGE_NEXT_ID - 1, 0)
+    return jsonify(messages=messages, latest_id=latest_id)
 
 
 @APP.route("/health", methods=["GET"])

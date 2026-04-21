@@ -13,10 +13,11 @@ except ImportError:
     _ORT_AVAILABLE = False
 
 from EntityInvarianceTensorization import to_numpy_invariance_inputs
-from EntityTensorization import encode_entity_state, to_single_example_entity_inputs
+from EntityTensorization import encode_entity_state, to_numpy_entity_inputs, to_single_example_entity_inputs
 from EntityTensorizationV2 import encode_entity_state_with_candidates, to_single_example_entity_v2_inputs
 from ModelRegistry import resolve_artifact_path
 from core.ActionSelection import resolve_switch_logit_bias
+from core.SequencePlanning import decode_greedy_sequence_tokens
 
 
 build_entity_invariance_models = None
@@ -81,6 +82,122 @@ def _run_onnx_outputs(onnx_session: Any, batched_inputs: dict[str, np.ndarray]) 
     return dict(zip(output_names, onnx_outputs))
 
 
+def _normalize_runtime_outputs(raw_output: Any) -> Any:
+    if isinstance(raw_output, dict):
+        return {
+            key: value.numpy() if hasattr(value, "numpy") else value
+            for key, value in raw_output.items()
+        }
+    if isinstance(raw_output, (list, tuple)):
+        return [value.numpy() if hasattr(value, "numpy") else value for value in raw_output]
+    if hasattr(raw_output, "numpy"):
+        return raw_output.numpy()
+    return raw_output
+
+
+def _extract_policy_and_value(
+    raw_output: Any,
+    *,
+    has_value_head: bool,
+) -> tuple[np.ndarray, float | None]:
+    value_estimate: float | None = None
+
+    if has_value_head and isinstance(raw_output, dict) and "value" in raw_output:
+        value_estimate = float(np.asarray(raw_output["value"]).reshape(-1)[0])
+        raw_output = raw_output["policy"]
+    elif has_value_head and isinstance(raw_output, (list, tuple)) and len(raw_output) >= 2:
+        value_estimate = float(np.asarray(raw_output[1]).reshape(-1)[0])
+        raw_output = raw_output[0]
+    elif isinstance(raw_output, dict):
+        raw_output = raw_output.get("policy")
+    elif isinstance(raw_output, (list, tuple)):
+        raw_output = raw_output[0]
+
+    policy = np.asarray(raw_output, dtype=np.float32)
+    if policy.ndim > 1 and policy.shape[0] == 1:
+        policy = policy[0]
+    return policy, value_estimate
+
+
+def _run_runtime_outputs(
+    runtime: dict[str, Any],
+    batched_inputs: dict[str, np.ndarray],
+) -> Any:
+    onnx_session = runtime.get("onnx_session")
+    if onnx_session is not None:
+        return _run_onnx_outputs(onnx_session, batched_inputs)
+    return _normalize_runtime_outputs(runtime["model"](batched_inputs, training=False))
+
+def _load_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _resolve_optional_artifact(
+    repo_path: Path,
+    metadata_path: Path,
+    raw_path: Any,
+) -> Path | None:
+    if not raw_path:
+        return None
+    return resolve_artifact_path(repo_path, metadata_path, str(raw_path))
+
+
+def _build_entity_training_model(
+    metadata: dict[str, Any],
+    *,
+    token_vocabs: dict[str, Any],
+    action_context_vocab: dict[str, int] | None,
+    sequence_vocab: dict[str, int] | None,
+):
+    transition_dim = metadata.get("turn_outcome_dim")
+    num_action_context_classes = metadata.get("num_action_context_classes")
+    predict_value = bool(metadata.get("predict_value"))
+    sequence_vocab_size = len(sequence_vocab or {})
+    predict_sequence = sequence_vocab_size > 0
+
+    if transition_dim is not None:
+        transition_dim = int(transition_dim)
+    if num_action_context_classes is not None:
+        num_action_context_classes = int(num_action_context_classes)
+
+    training_model, _, _ = build_entity_action_models(
+        vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
+        num_policy_classes=int(metadata["num_action_classes"]),
+        hidden_dim=int(metadata["hidden_dim"]),
+        depth=int(metadata["depth"]),
+        dropout=float(metadata["dropout"]),
+        learning_rate=float(metadata["learning_rate"]),
+        token_embed_dim=int(metadata.get("token_embed_dim", 24)),
+        transition_dim=transition_dim,
+        action_context_vocab_size=num_action_context_classes,
+        action_embed_dim=int(metadata.get("action_embed_dim", 16)),
+        transition_hidden_dim=int(metadata.get("transition_hidden_dim") or metadata["hidden_dim"]),
+        transition_weight=float(metadata.get("transition_weight", 0.25)),
+        predict_value=predict_value,
+        value_hidden_dim=int(metadata.get("value_hidden_dim") or max(64, int(metadata["hidden_dim"]) // 2)),
+        value_weight=float(metadata.get("value_weight", 0.25)),
+        predict_sequence=predict_sequence,
+        sequence_vocab_size=sequence_vocab_size or None,
+        sequence_hidden_dim=int(metadata.get("sequence_hidden_dim", 128)),
+        sequence_weight=float(metadata.get("sequence_weight", 0.1)),
+        max_seq_len=int(metadata.get("max_seq_len", 32)),
+    )
+    return training_model
+
+
+def _action_context_id(
+    action_context_vocab: dict[str, int] | None,
+    action_token: str | None,
+) -> int | None:
+    if action_context_vocab is None:
+        return None
+    none_id = int(action_context_vocab.get("<NONE>", 0))
+    unk_id = int(action_context_vocab.get("<UNK>", none_id))
+    if action_token is None:
+        return none_id
+    return int(action_context_vocab.get(str(action_token), unk_id))
+
+
 def load_entity_runtime_artifacts(
     metadata_path: Path,
     *,
@@ -101,6 +218,9 @@ def load_entity_runtime_artifacts(
     if metadata.get("policy_vocab_path"):
         policy_vocab_path = resolve_artifact_path(repo_path, metadata_path, str(metadata["policy_vocab_path"]))
     token_vocab_path = resolve_artifact_path(repo_path, metadata_path, str(metadata["entity_token_vocab_path"]))
+    training_model_path = _resolve_optional_artifact(repo_path, metadata_path, metadata.get("training_model_path"))
+    action_context_vocab_path = _resolve_optional_artifact(repo_path, metadata_path, metadata.get("action_context_vocab_path"))
+    sequence_vocab_path = _resolve_optional_artifact(repo_path, metadata_path, metadata.get("sequence_vocab_path"))
 
     action_vocab = None
     if policy_vocab_path is not None and policy_vocab_path.exists():
@@ -108,6 +228,8 @@ def load_entity_runtime_artifacts(
             action_vocab = json.load(handle)
     with open(token_vocab_path, "r", encoding="utf-8") as handle:
         token_vocabs = json.load(handle)
+    action_context_vocab = _load_json(action_context_vocab_path) if action_context_vocab_path is not None and action_context_vocab_path.exists() else None
+    sequence_vocab = _load_json(sequence_vocab_path) if sequence_vocab_path is not None and sequence_vocab_path.exists() else None
 
     has_value_head = False
     try:
@@ -248,11 +370,23 @@ def load_entity_runtime_artifacts(
         except Exception as exc:
             print(f"[runtime] Keras warmup failed: {exc}")
 
+    model.load_weights(model_path)
+    training_model = None
+    if family_id == "entity_action_bc" and training_model_path is not None and training_model_path.exists():
+        training_model = _build_entity_training_model(
+            metadata,
+            token_vocabs=token_vocabs,
+            action_context_vocab=action_context_vocab,
+            sequence_vocab=sequence_vocab,
+        )
+        training_model.load_weights(training_model_path)
+        has_value_head = has_value_head or bool(metadata.get("predict_value"))
     model_id = str(metadata.get("model_release_id") or metadata.get("model_name") or model_path.stem)
     family_default_switch_bias = 0.20 if family_id == "entity_action_bc" else 0.0
     return {
         "kind": "entity",
         "model": model,
+        "training_model": training_model,
         "onnx_session": onnx_session,
         "model_id": model_id,
         "model_name": metadata.get("model_name"),
@@ -264,10 +398,17 @@ def load_entity_runtime_artifacts(
         "model_path": str(model_path),
         "policy_vocab_path": str(policy_vocab_path) if policy_vocab_path is not None else None,
         "entity_token_vocab_path": str(token_vocab_path),
+        "training_model_path": None if training_model_path is None else str(training_model_path),
+        "action_context_vocab_path": None if action_context_vocab_path is None else str(action_context_vocab_path),
+        "sequence_vocab_path": None if sequence_vocab_path is None else str(sequence_vocab_path),
         "action_vocab": action_vocab,
         "token_vocabs": token_vocabs,
-        "switch_logit_bias": resolve_switch_logit_bias(metadata, default=family_default_switch_bias),
+        "action_context_vocab": action_context_vocab,
+        "sequence_vocab": sequence_vocab,
+        "sequence_reverse_vocab": None if sequence_vocab is None else {int(value): key for key, value in sequence_vocab.items()},
         "has_value_head": has_value_head,
+        "has_sequence_head": bool(sequence_vocab),
+        "switch_logit_bias": resolve_switch_logit_bias(metadata, default=family_default_switch_bias),
         "max_candidates": int(metadata.get("max_candidates", 10)),
     }
 
@@ -281,11 +422,11 @@ def to_single_example_invariance_inputs(current_inputs: dict[str, Any]) -> dict[
     return to_numpy_invariance_inputs(raw_inputs)
 
 
-def predict_entity_logits(
+def predict_entity_logits_with_metadata(
     runtime: dict[str, Any],
     battle_state: dict[str, Any],
     perspective_player: str,
-) -> np.ndarray:
+) -> tuple[np.ndarray, dict[str, Any]]:
     encoded = encode_entity_state(
         battle_state,
         perspective_player=perspective_player,
@@ -295,53 +436,37 @@ def predict_entity_logits(
         batched_inputs = to_single_example_invariance_inputs(encoded)
     else:
         batched_inputs = to_single_example_entity_inputs(encoded)
-    # Use ONNX if available (~0.4ms), else direct model() call (~55ms), never model.predict() (~153ms)
-    onnx_session = runtime.get("onnx_session")
-    if onnx_session is not None:
-        raw_output = _run_onnx_outputs(onnx_session, batched_inputs)
-    else:
-        raw_output = runtime["model"](batched_inputs, training=False)
-        # Direct call returns tensors — convert to numpy
-        if isinstance(raw_output, dict):
-            raw_output = {k: v.numpy() for k, v in raw_output.items()}
-        elif isinstance(raw_output, (list, tuple)):
-            raw_output = [v.numpy() if hasattr(v, "numpy") else v for v in raw_output]
-        elif hasattr(raw_output, "numpy"):
-            raw_output = raw_output.numpy()
-
-    # Handle policy-value model output (dict with policy and value keys)
-    if runtime.get("has_value_head") and isinstance(raw_output, dict) and "value" in raw_output:
-        policy_logits = np.asarray(raw_output["policy"][0], dtype=np.float32)
-        value_estimate = np.asarray(raw_output["value"][0][0], dtype=np.float32)
-        runtime["_last_value_estimate"] = value_estimate
-        return policy_logits
-
-    # Handle policy-value model output (tuple of policy, value)
-    if runtime.get("has_value_head") and isinstance(raw_output, (list, tuple)) and len(raw_output) >= 2:
-        policy_logits = np.asarray(raw_output[0][0], dtype=np.float32)
-        value_estimate = np.asarray(raw_output[1][0][0], dtype=np.float32)
-        runtime["_last_value_estimate"] = value_estimate
-        return policy_logits
-
-    # Handle dict output (policy extracted)
-    if isinstance(raw_output, dict):
-        raw_output = raw_output.get("policy")
-
-    # Handle list/tuple output (first element is policy)
-    if isinstance(raw_output, (list, tuple)):
-        raw_output = raw_output[0]
-
-    return np.asarray(raw_output[0], dtype=np.float32)
+    raw_output = _run_runtime_outputs(runtime, batched_inputs)
+    policy_logits, value_estimate = _extract_policy_and_value(
+        raw_output,
+        has_value_head=bool(runtime.get("has_value_head")),
+    )
+    if value_estimate is not None:
+        runtime["_last_value_estimate"] = np.float32(value_estimate)
+    return policy_logits, {"value_estimate": value_estimate}
 
 
-def predict_entity_candidate_logits(
+def predict_entity_logits(
+    runtime: dict[str, Any],
+    battle_state: dict[str, Any],
+    perspective_player: str,
+) -> np.ndarray:
+    logits, _ = predict_entity_logits_with_metadata(
+        runtime,
+        battle_state,
+        perspective_player,
+    )
+    return logits
+
+
+def predict_entity_candidate_logits_with_metadata(
     runtime: dict[str, Any],
     battle_state: dict[str, Any],
     perspective_player: str,
     *,
     legal_moves: list[dict[str, Any]] | None = None,
     legal_switches: list[dict[str, Any]] | None = None,
-) -> tuple[np.ndarray, list[str]]:
+) -> tuple[np.ndarray, list[str], dict[str, Any]]:
     if runtime.get("input_mode") != "entity_action_v2":
         raise ValueError("predict_entity_candidate_logits requires an entity_action_v2 runtime")
 
@@ -355,31 +480,116 @@ def predict_entity_candidate_logits(
     )
     candidate_tokens = list(encoded["candidate_tokens"])
     batched_inputs = to_single_example_entity_v2_inputs(encoded)
+    raw_output = _run_runtime_outputs(runtime, batched_inputs)
+    policy_logits, value_estimate = _extract_policy_and_value(
+        raw_output,
+        has_value_head=bool(runtime.get("has_value_head")),
+    )
+    if value_estimate is not None:
+        runtime["_last_value_estimate"] = np.float32(value_estimate)
+    return policy_logits, candidate_tokens, {"value_estimate": value_estimate}
 
-    onnx_session = runtime.get("onnx_session")
-    if onnx_session is not None:
-        raw_output = _run_onnx_outputs(onnx_session, batched_inputs)
-    else:
-        raw_output = runtime["model"](batched_inputs, training=False)
-        if isinstance(raw_output, dict):
-            raw_output = {k: v.numpy() if hasattr(v, "numpy") else v for k, v in raw_output.items()}
-        elif isinstance(raw_output, (list, tuple)):
-            raw_output = [v.numpy() if hasattr(v, "numpy") else v for v in raw_output]
-        elif hasattr(raw_output, "numpy"):
-            raw_output = raw_output.numpy()
 
-    if runtime.get("has_value_head") and isinstance(raw_output, dict) and "value" in raw_output:
-        runtime["_last_value_estimate"] = np.asarray(raw_output["value"][0][0], dtype=np.float32)
-        raw_output = raw_output["policy"]
-    elif runtime.get("has_value_head") and isinstance(raw_output, (list, tuple)) and len(raw_output) >= 2:
-        runtime["_last_value_estimate"] = np.asarray(raw_output[1][0][0], dtype=np.float32)
-        raw_output = raw_output[0]
-    elif isinstance(raw_output, dict):
-        raw_output = raw_output.get("policy")
-    elif isinstance(raw_output, (list, tuple)):
-        raw_output = raw_output[0]
+def predict_entity_candidate_logits(
+    runtime: dict[str, Any],
+    battle_state: dict[str, Any],
+    perspective_player: str,
+    *,
+    legal_moves: list[dict[str, Any]] | None = None,
+    legal_switches: list[dict[str, Any]] | None = None,
+) -> tuple[np.ndarray, list[str]]:
+    logits, candidate_tokens, _ = predict_entity_candidate_logits_with_metadata(
+        runtime,
+        battle_state,
+        perspective_player,
+        legal_moves=legal_moves,
+        legal_switches=legal_switches,
+    )
+    return logits, candidate_tokens
 
-    return np.asarray(raw_output[0], dtype=np.float32), candidate_tokens
+
+def predict_entity_auxiliary_outputs_batch(
+    runtime: dict[str, Any],
+    battle_state: dict[str, Any],
+    perspective_player: str,
+    *,
+    my_action_tokens: list[str],
+    opp_action_token: str | None = None,
+) -> list[dict[str, Any] | None]:
+    """Run the richer training artifact when available for multiple candidate actions."""
+
+    if not my_action_tokens:
+        return []
+
+    training_model = runtime.get("training_model")
+    action_context_vocab = runtime.get("action_context_vocab")
+    if training_model is None or action_context_vocab is None:
+        return [None for _ in my_action_tokens]
+
+    encoded = encode_entity_state(
+        battle_state,
+        perspective_player=perspective_player,
+        token_vocabs=runtime["token_vocabs"],
+    )
+    batch_size = len(my_action_tokens)
+    raw_inputs = {key: [value for _ in range(batch_size)] for key, value in encoded.items()}
+    raw_inputs["my_action"] = [
+        _action_context_id(action_context_vocab, my_action_token)
+        for my_action_token in my_action_tokens
+    ]
+    raw_inputs["opp_action"] = [
+        _action_context_id(action_context_vocab, opp_action_token)
+        for _ in range(batch_size)
+    ]
+    batched_inputs = to_numpy_entity_inputs(raw_inputs)
+    raw_output = _normalize_runtime_outputs(training_model(batched_inputs, training=False))
+    if not isinstance(raw_output, dict):
+        return [None for _ in my_action_tokens]
+
+    policy = raw_output.get("policy")
+    value = raw_output.get("value")
+    sequence = raw_output.get("sequence")
+    transition = raw_output.get("transition")
+    reverse_vocab = runtime.get("sequence_reverse_vocab") or {}
+
+    outputs_by_action: list[dict[str, Any] | None] = []
+    for index in range(batch_size):
+        outputs: dict[str, Any] = {}
+        if policy is not None:
+            outputs["policy_logits"] = np.asarray(policy[index], dtype=np.float32)
+        if value is not None:
+            outputs["value_prediction"] = float(np.asarray(value[index]).reshape(-1)[0])
+        if sequence is not None:
+            sequence_probs = np.asarray(sequence[index], dtype=np.float32)
+            outputs["sequence_probs"] = sequence_probs
+            outputs["sequence_tokens"] = decode_greedy_sequence_tokens(
+                sequence_probs.tolist(),
+                reverse_vocab,
+            )
+        if transition is not None:
+            outputs["transition_prediction"] = np.asarray(transition[index], dtype=np.float32)
+        outputs_by_action.append(outputs)
+
+    return outputs_by_action
+
+
+def predict_entity_auxiliary_outputs(
+    runtime: dict[str, Any],
+    battle_state: dict[str, Any],
+    perspective_player: str,
+    *,
+    my_action_token: str,
+    opp_action_token: str | None = None,
+) -> dict[str, Any] | None:
+    """Run the richer training artifact when available for one candidate action."""
+    outputs = predict_entity_auxiliary_outputs_batch(
+        runtime,
+        battle_state,
+        perspective_player,
+        my_action_tokens=[my_action_token],
+        opp_action_token=opp_action_token,
+    )
+    return outputs[0] if outputs else None
 
 
 def entity_runtime_health(runtime: dict[str, Any]) -> dict[str, Any]:
@@ -394,7 +604,13 @@ def entity_runtime_health(runtime: dict[str, Any]) -> dict[str, Any]:
         "input_mode": runtime.get("input_mode"),
         "metadata_path": runtime.get("metadata_path"),
         "model_path": runtime.get("model_path"),
+        "training_model_path": runtime.get("training_model_path"),
         "policy_vocab_path": runtime.get("policy_vocab_path"),
         "entity_token_vocab_path": runtime.get("entity_token_vocab_path"),
+        "action_context_vocab_path": runtime.get("action_context_vocab_path"),
+        "sequence_vocab_path": runtime.get("sequence_vocab_path"),
+        "has_training_model": runtime.get("training_model") is not None,
+        "has_value_head": bool(runtime.get("has_value_head")),
+        "has_sequence_head": bool(runtime.get("has_sequence_head")),
         "switch_logit_bias": runtime.get("switch_logit_bias", 0.0),
     }

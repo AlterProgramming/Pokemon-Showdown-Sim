@@ -59,6 +59,24 @@ class ModelRegistryTests(unittest.TestCase):
             resolved = resolve_artifact_path(repo_path, metadata_path, "artifacts/model_4.keras")
             self.assertEqual(resolved, model_path.resolve())
 
+    def test_resolve_artifact_path_rewrites_missing_absolute_artifact_paths_into_repo(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_path = Path(tmpdir)
+            nested_artifacts_dir = repo_path / "artifacts" / "entity_action_bc_v1_20260408_0428"
+            nested_artifacts_dir.mkdir(parents=True)
+            metadata_path = nested_artifacts_dir / "training_metadata_entity_action_bc_v1_20260408_0428.json"
+            metadata_path.write_text("{}", encoding="utf-8")
+            model_path = nested_artifacts_dir / "entity_action_bc_v1_20260408_0428.policy_vocab.json"
+            model_path.write_text("{}", encoding="utf-8")
+
+            resolved = resolve_artifact_path(
+                repo_path,
+                metadata_path,
+                "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Sim/artifacts/entity_action_bc_v1_20260408_0428/entity_action_bc_v1_20260408_0428.policy_vocab.json",
+            )
+
+            self.assertEqual(resolved, model_path.resolve())
+
     def test_build_and_write_registry_from_training_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             repo_path = Path(tmpdir)
