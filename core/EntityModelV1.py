@@ -568,7 +568,7 @@ def build_entity_action_models(
 
     if use_history and history_attn_weights_tensor is not None:
         outputs["history_attention"] = history_attn_weights_tensor
-        loss_weights["history_attention"] = 0.0
+        # loss_weights must match losses keys exactly in Keras 3 — no entry here.
 
     # The training artifact is the richest object because it includes every enabled
     # auxiliary head. The policy and policy+value artifacts stay serving-friendly.
