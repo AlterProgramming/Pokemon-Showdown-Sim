@@ -397,14 +397,18 @@ def build_entity_action_models(
         )(hist_pooled)                                                # [B, K, 2*lstm_dim]
 
         # Dot-product attention: query=shared state, K/V=LSTM output.
-        # Use built-in MultiHeadAttention (1 head) — avoids custom layer tracing.
+        # output_shape pins the projection; Keras 3 defaults to query.shape[-1] otherwise.
         shared_q = layers.Reshape((1, hidden_dim), name="shared_query")(shared)
         hist_context_seq = layers.MultiHeadAttention(
             num_heads=1,
             key_dim=_attn_dim,
+            output_shape=_attn_dim,
             name="history_attention_layer",
-        )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out)    # [B, 1, attn_dim]
-        history_context = layers.Reshape((_attn_dim,), name="history_context")(hist_context_seq)
+        )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out)    # [B, 1, _attn_dim]
+        # Squeeze the sequence-of-1 dim with Lambda — safer than Reshape for dynamic batch.
+        history_context = layers.Lambda(
+            lambda x: x[:, 0, :], name="history_context"
+        )(hist_context_seq)
 
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
