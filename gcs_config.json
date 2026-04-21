@@ -3,5 +3,8 @@
   "project_id": "pokemon-battle-agent-494015",
   "service_account_email": "artifact-writer@pokemon-battle-agent-494015.iam.gserviceaccount.com",
   "key_path": "~/.config/gcloud/service-accounts/pokemon-battle-agent.json",
-  "artifacts_prefix": "artifacts"
+  "artifacts_prefix": "artifacts",
+  "notebooks_prefix": "notebooks",
+  "vertex_ai_api_key_env": "VERTEX_AI_API_KEY",
+  "colab_secret_name": "GCS_SA_KEY_JSON"
 }
