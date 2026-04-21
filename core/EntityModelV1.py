@@ -396,19 +396,25 @@ def build_entity_action_models(
             name="history_bilstm",
         )(hist_pooled)                                                # [B, K, 2*lstm_dim]
 
-        # Dot-product attention: query=shared state, K/V=LSTM output.
-        # output_shape pins the projection; Keras 3 defaults to query.shape[-1] otherwise.
+        # Cross-attention: query=shared state [B,1,D], K/V=Bi-LSTM output [B,K,2*lstm_dim].
+        # hist_mask_input [B,K] float (1=real, 0=pad) is reshaped to [B,1,K] bool so
+        # MultiHeadAttention ignores padded turns.  This also keeps hist_mask_input
+        # connected to the output graph — Keras raises if any model_input is disconnected.
         shared_q = layers.Reshape((1, hidden_dim), name="shared_query")(shared)
+        hist_attn_mask = layers.Lambda(
+            lambda x: _tf().cast(x[:, None, :], _tf().bool),
+            name="history_attn_mask",
+        )(hist_mask_input)                                            # [B, 1, K] bool
         hist_context_seq = layers.MultiHeadAttention(
             num_heads=1,
             key_dim=_attn_dim,
             output_shape=_attn_dim,
             name="history_attention_layer",
-        )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out)    # [B, 1, _attn_dim]
-        # Squeeze the sequence-of-1 dim with Lambda — safer than Reshape for dynamic batch.
+        )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out,
+          attention_mask=hist_attn_mask)                              # [B, 1, _attn_dim]
         history_context = layers.Lambda(
             lambda x: x[:, 0, :], name="history_context"
-        )(hist_context_seq)
+        )(hist_context_seq)                                           # [B, _attn_dim]
 
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
