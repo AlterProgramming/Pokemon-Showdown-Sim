@@ -460,7 +460,14 @@ def build_entity_action_models(
             keras.metrics.MeanAbsoluteError(name="mae"),
             keras.metrics.MeanSquaredError(name="brier"),
         ]
-        pv_inputs = model_inputs if history_context is not None else inputs
+        # policy and value don't depend on action inputs (my_action/opp_action),
+        # so exclude them — Keras raises if inputs are disconnected from outputs.
+        _action_keys = {"my_action", "opp_action"}
+        pv_inputs = (
+            {k: v for k, v in model_inputs.items() if k not in _action_keys}
+            if history_context is not None
+            else inputs
+        )
         policy_value_model = keras.Model(
             pv_inputs,
             {"policy": policy_logits, "value": value_out},
