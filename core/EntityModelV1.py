@@ -130,6 +130,82 @@ class BenchMask(_keras().layers.Layer):
         return (1.0 - active) * (1.0 - fainted)
 
 
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class TurnTokenMeanPool(_keras().layers.Layer):
+    """Mean-pool event token embeddings over the event axis, ignoring PAD (id==0)."""
+
+    def call(self, inputs):
+        tf = _tf()
+        embedded, token_ids = inputs
+        # embedded: [batch, K, E, embed_dim]; token_ids: [batch, K, E]
+        non_pad = tf.cast(tf.not_equal(token_ids, 0), tf.float32)  # [batch, K, E]
+        non_pad = tf.expand_dims(non_pad, axis=-1)                   # [batch, K, E, 1]
+        numer = tf.reduce_sum(embedded * non_pad, axis=2)            # [batch, K, embed_dim]
+        denom = tf.maximum(tf.reduce_sum(non_pad, axis=2), 1.0)     # [batch, K, 1]
+        return numer / denom                                          # [batch, K, embed_dim]
+
+    def get_config(self):
+        return super().get_config()
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class HistoryAttention(_keras().layers.Layer):
+    """Scaled dot-product cross-attention: query from shared state, K/V from Bi-LSTM output.
+
+    Masked via event_history_mask to suppress padded turns.
+    Returns (context [batch, attn_dim], attn_weights [batch, K]).
+    """
+
+    def __init__(self, attn_dim: int, **kwargs):
+        super().__init__(**kwargs)
+        self.attn_dim = attn_dim
+
+    def build(self, input_shape):
+        keras = _keras()
+        self.q_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_q")
+        self.k_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_k")
+        self.v_proj = keras.layers.Dense(self.attn_dim, use_bias=False, name=f"{self.name}_v")
+        super().build(input_shape)
+
+    def call(self, inputs):
+        import math
+        tf = _tf()
+        query, lstm_out, mask = inputs
+        # query: [batch, d]; lstm_out: [batch, K, lstm_dim]; mask: [batch, K]
+        Q = tf.expand_dims(self.q_proj(query), axis=1)          # [batch, 1, attn_dim]
+        K = self.k_proj(lstm_out)                                 # [batch, K, attn_dim]
+        V = self.v_proj(lstm_out)                                 # [batch, K, attn_dim]
+        scale = math.sqrt(float(self.attn_dim))
+        scores = tf.squeeze(tf.matmul(Q, K, transpose_b=True), axis=1) / scale  # [batch, K]
+        scores = scores + (1.0 - mask) * -1e9                    # mask padding
+        weights = tf.nn.softmax(scores, axis=-1)                 # [batch, K]
+        context = tf.einsum("bk,bkd->bd", weights, V)            # [batch, attn_dim]
+        return context, weights
+
+    def get_config(self):
+        cfg = super().get_config()
+        cfg["attn_dim"] = self.attn_dim
+        return cfg
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class _SelectFirst(_keras().layers.Layer):
+    """Extract first element from a tuple of tensors (used to split attention outputs)."""
+    def call(self, inputs):
+        return inputs[0]
+    def get_config(self):
+        return super().get_config()
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class _SelectSecond(_keras().layers.Layer):
+    """Extract second element from a tuple of tensors (used to split attention outputs)."""
+    def call(self, inputs):
+        return inputs[1]
+    def get_config(self):
+        return super().get_config()
+
+
 # ---------------------------------------------------------------------------
 # Registered loss / metric functions — plain Python functions saved as Lambdas
 # by Keras unless decorated with register_keras_serializable.
@@ -181,6 +257,13 @@ def build_entity_action_models(
     sequence_hidden_dim: int = 128,
     sequence_weight: float = 0.1,
     max_seq_len: int = 32,
+    use_history: bool = False,
+    history_vocab_size: int | None = None,
+    history_embed_dim: int = 32,
+    history_lstm_dim: int = 64,
+    history_attn_dim: int | None = None,
+    history_turns: int = 8,
+    history_events_per_turn: int = 24,
 ):
     """Build the multitask entity-action models.
 
@@ -322,8 +405,63 @@ def build_entity_action_models(
             x = layers.Dropout(dropout, name=f"trunk_dropout_{layer_idx}")(x)
 
     shared = x
+
+    # model_inputs starts as a copy of inputs; history and action heads extend it.
+    # It must be initialised here so the history block below can add to it before
+    # the policy_model line (which uses the bare `inputs` dict, not model_inputs).
+    model_inputs: Dict[str, Any] = dict(inputs)
+
+    # --- Optional event history encoder ---
+    history_context = None
+    history_attn_weights_tensor = None
+
+    if use_history and history_vocab_size is not None:
+        _attn_dim = history_attn_dim or (history_lstm_dim * 2)
+        hist_tokens_input = layers.Input(
+            shape=(history_turns, history_events_per_turn),
+            dtype="int32",
+            name="event_history_tokens",
+        )
+        hist_mask_input = layers.Input(
+            shape=(history_turns,),
+            dtype="float32",
+            name="event_history_mask",
+        )
+        model_inputs["event_history_tokens"] = hist_tokens_input
+        model_inputs["event_history_mask"] = hist_mask_input
+
+        history_event_embedding = layers.Embedding(
+            history_vocab_size,
+            history_embed_dim,
+            mask_zero=True,
+            name="history_event_embedding",
+        )
+        hist_embedded = history_event_embedding(hist_tokens_input)  # [B, K, E, D]
+        hist_pooled = TurnTokenMeanPool(name="history_turn_pool")(
+            [hist_embedded, hist_tokens_input]
+        )  # [B, K, D]
+        hist_lstm_out = layers.Bidirectional(
+            layers.LSTM(history_lstm_dim, return_sequences=True),
+            name="history_bilstm",
+        )(hist_pooled)  # [B, K, 2*history_lstm_dim]
+
+        _attn_layer = HistoryAttention(_attn_dim, name="history_attention_layer")
+        _attn_outputs = _attn_layer([shared, hist_lstm_out, hist_mask_input])
+        history_context = _SelectFirst(name="history_context")(_attn_outputs)
+        history_attn_weights_tensor = _SelectSecond(name="history_attention_weights")(_attn_outputs)
+
+    # Build shared_with_history for auxiliary heads
+    if history_context is not None:
+        _fused = layers.Concatenate(name="shared_history_fuse")([shared, history_context])
+        shared_with_history = layers.Dense(
+            hidden_dim, activation="relu", name="history_fuse_proj"
+        )(_fused)
+    else:
+        shared_with_history = shared
+
     # v1 still predicts the global action vocabulary because offline logs do not contain
     # the per-turn legal request objects needed for true action-wise legal scoring.
+    # Policy head uses `shared` (not shared_with_history) for backward compatibility.
     policy_logits = layers.Dense(num_policy_classes, name="policy")(shared)
     policy_model = keras.Model(inputs, policy_logits, name="entity_action_policy_model")
 
@@ -351,7 +489,7 @@ def build_entity_action_models(
     policy_value_model = None
     if predict_value:
         # Keep value state-only and conservative: it estimates eventual win probability.
-        value_x = layers.Dense(value_hidden_dim or max(64, hidden_dim // 2), activation="relu", name="value_dense")(shared)
+        value_x = layers.Dense(value_hidden_dim or max(64, hidden_dim // 2), activation="relu", name="value_dense")(shared_with_history)
         if dropout > 0:
             value_x = layers.Dropout(dropout, name="value_dropout")(value_x)
         value_out = layers.Dense(1, activation="sigmoid", name="value")(value_x)
@@ -362,13 +500,15 @@ def build_entity_action_models(
             keras.metrics.MeanAbsoluteError(name="mae"),
             keras.metrics.MeanSquaredError(name="brier"),
         ]
+        # When use_history=True, value_out depends on hist inputs; use model_inputs
+        # to avoid a disconnected-graph error in keras.Model construction.
+        pv_inputs = model_inputs if (use_history and history_vocab_size is not None) else inputs
         policy_value_model = keras.Model(
-            inputs,
+            pv_inputs,
             {"policy": policy_logits, "value": value_out},
             name="entity_action_policy_value_model",
         )
 
-    model_inputs: Dict[str, Any] = dict(inputs)
     # Both the transition head and the sequence head are conditioned on action embeddings.
     # We create shared action inputs and a shared embedding layer whenever either head is on.
     need_action_inputs = use_transition or use_sequence
@@ -389,7 +529,7 @@ def build_entity_action_models(
     if use_transition:
         transition_x = layers.Concatenate(name="transition_features")(
             [
-                shared,
+                shared_with_history,
                 # The transition head gets both action identities so it can explain what
                 # public state should change after the simultaneous turn resolves.
                 action_embedding(my_action_input),
@@ -410,7 +550,7 @@ def build_entity_action_models(
         # repeat across time steps, then apply LSTM to produce per-step distributions.
         sequence_context = layers.Concatenate(name="sequence_context")(
             [
-                shared,
+                shared_with_history,
                 action_embedding(my_action_input),
                 action_embedding(opp_action_input),
             ]
@@ -425,6 +565,10 @@ def build_entity_action_models(
         losses["sequence"] = masked_sequence_loss
         loss_weights["sequence"] = sequence_weight
         metrics["sequence"] = [masked_token_accuracy]
+
+    if use_history and history_attn_weights_tensor is not None:
+        outputs["history_attention"] = history_attn_weights_tensor
+        loss_weights["history_attention"] = 0.0
 
     # The training artifact is the richest object because it includes every enabled
     # auxiliary head. The policy and policy+value artifacts stay serving-friendly.

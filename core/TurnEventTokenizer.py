@@ -7,7 +7,7 @@ and its most important payload fields.  A vocabulary built from training
 data assigns each unique key a stable integer ID.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 # ---------------------------------------------------------------------------
 # Special tokens
@@ -252,3 +252,59 @@ def decode_turn_event_sequence(
         result.append(reverse.get(tid, UNK_TOKEN))
 
     return result
+
+
+# ---------------------------------------------------------------------------
+# History encoding
+# ---------------------------------------------------------------------------
+
+
+def encode_event_history(
+    past_events_list: List[List[dict]],
+    vocab: Dict[str, int],
+    max_turns: int,
+    max_events_per_turn: int,
+) -> Tuple[List[List[int]], List[float]]:
+    """Encode a history of past turn event lists into a fixed-shape matrix.
+
+    Parameters
+    ----------
+    past_events_list : list of list of dict
+        Up to max_turns turn-event lists (oldest first). Each inner list
+        contains event dicts as produced by TurnEventV1.to_dict().
+    vocab : dict
+        Token vocabulary from build_sequence_vocab().
+    max_turns : int
+        K — the temporal dimension (number of history rows).
+    max_events_per_turn : int
+        E — maximum tokens per row (event dimension).
+
+    Returns
+    -------
+    tokens : List[List[int]]
+        Shape [max_turns, max_events_per_turn]. Left-padded with PAD rows
+        so real turns are right-aligned (index K-num_real .. K-1).
+    mask : List[float]
+        Shape [max_turns]. 1.0 for real turns, 0.0 for pad rows.
+    """
+    # Take only the most recent max_turns entries
+    clipped = list(past_events_list[-max_turns:]) if len(past_events_list) > max_turns else list(past_events_list)
+    num_real = len(clipped)
+    num_pad = max_turns - num_real
+
+    tokens: List[List[int]] = []
+    mask: List[float] = []
+
+    # Left-pad with all-PAD rows
+    pad_row = [PAD_ID] * max_events_per_turn
+    for _ in range(num_pad):
+        tokens.append(list(pad_row))
+        mask.append(0.0)
+
+    # Encode real turns
+    for turn_events in clipped:
+        row = encode_turn_event_sequence(turn_events, vocab, max_events_per_turn)
+        tokens.append(row)
+        mask.append(1.0)
+
+    return tokens, mask

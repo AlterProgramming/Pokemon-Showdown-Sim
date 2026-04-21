@@ -510,6 +510,7 @@ def iter_turn_examples_both_players(
                 "winner": ex.get("winner"),
                 "terminal_result": ex.get("terminal_result"),
                 "turn_events_v1": ex.get("turn_events_v1", []),
+                "past_turn_events": ex.get("past_turn_events", []),
             }
 
 

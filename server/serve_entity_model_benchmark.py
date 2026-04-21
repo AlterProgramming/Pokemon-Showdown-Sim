@@ -13,6 +13,7 @@ fold the family into the main multi-model runtime.
 
 import argparse
 import os
+from collections import deque
 from pathlib import Path
 import sys
 import threading
@@ -54,6 +55,32 @@ SERVER_METRICS_LOCK = threading.Lock()
 SERVER_METRICS: dict[str, Any] = {}
 DEFAULT_VOLUNTARY_SWITCH_RERANK_PENALTY = float(os.environ.get("ENTITY_RERANK_VOLUNTARY_SWITCH_PENALTY", "0.2"))
 
+_HISTORY_BUFFERS: dict[str, deque] = {}
+_HISTORY_LOCK = threading.Lock()
+
+
+def _get_history_buffer(battle_id: str, max_turns: int) -> deque:
+    with _HISTORY_LOCK:
+        if battle_id not in _HISTORY_BUFFERS:
+            _HISTORY_BUFFERS[battle_id] = deque(maxlen=max_turns)
+        return _HISTORY_BUFFERS[battle_id]
+
+
+def _append_aux_log(record: dict) -> None:
+    log_path = SERVER_STATE.get("_capture_aux_log_path")
+    if not log_path:
+        return
+    import json
+    lock = SERVER_STATE.get("_capture_aux_log_lock")
+    line = json.dumps(record, default=str) + "\n"
+    if lock:
+        with lock:
+            with open(log_path, "a", encoding="utf-8") as fh:
+                fh.write(line)
+    else:
+        with open(log_path, "a", encoding="utf-8") as fh:
+            fh.write(line)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Serve one entity_action_bc_v1 model for local benchmarks.")
@@ -64,6 +91,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5000)
+    parser.add_argument(
+        "--capture-aux-log",
+        default=None,
+        metavar="PATH",
+        help="If set, write one JSONL record per /predict call to this file.",
+    )
     return parser.parse_args()
 
 
@@ -238,6 +271,7 @@ def _select_best_action_with_auxiliary(
     value_scale: float,
     sequence_scale: float,
     voluntary_switch_penalty: float,
+    past_turn_events: list[list[dict]] | None = None,
 ) -> tuple[dict[str, Any] | None, float | None, list[dict[str, Any]]]:
     action_vocab = SERVER_STATE["action_vocab"]
     adjusted_logits = adjust_logits_for_switch_bias(
@@ -263,6 +297,7 @@ def _select_best_action_with_auxiliary(
         perspective_player,
         my_action_tokens=[str(candidate["token"]) for candidate in candidates],
         opp_action_token=opponent_action_token,
+        past_turn_events=past_turn_events,
     )
 
     for index, candidate in enumerate(candidates):
@@ -314,6 +349,11 @@ def _select_best_action_with_auxiliary(
                 "combined_score": combined_score,
                 "voluntary_switch_penalty_applied": switch_penalty_applied,
                 **summary,
+                "history_attention": (
+                    auxiliary.get("history_attention").tolist()
+                    if auxiliary is not None and auxiliary.get("history_attention") is not None
+                    else None
+                ),
             }
         )
         if best_score is None or combined_score > best_score:
@@ -383,6 +423,17 @@ def predict():
         battle_state = data.get("battle_state")
         if not isinstance(battle_state, dict):
             return jsonify(error="missing battle_state"), 400
+
+        battle_id = str(data.get("battle_id") or "")
+        last_turn_events = data.get("last_turn_events")  # list of event dicts, optional
+        past_turn_events: list = []
+
+        if SERVER_STATE.get("use_history") and battle_id:
+            K = int(SERVER_STATE.get("history_turns", 8))
+            buf = _get_history_buffer(battle_id, K)
+            if last_turn_events is not None:
+                buf.append(list(last_turn_events))
+            past_turn_events = list(buf)
 
         perspective_player = data.get("perspective_player")
         if perspective_player not in {"p1", "p2"}:
@@ -505,7 +556,16 @@ def predict():
                     value_scale=value_scale,
                     sequence_scale=sequence_scale,
                     voluntary_switch_penalty=voluntary_switch_penalty,
+                    past_turn_events=past_turn_events,
                 )
+                _append_aux_log({
+                    "battle_id": battle_id,
+                    "turn_number": battle_state.get("turn_index"),
+                    "perspective_player": perspective_player,
+                    "past_turns_in_buffer": len(past_turn_events),
+                    "selected_action_token": best_action.get("token") if best_action else None,
+                    "analyses": auxiliary_analysis,
+                })
             else:
                 best_action, best_prob = select_best_action(
                     SERVER_STATE["action_vocab"],
@@ -637,6 +697,8 @@ def main() -> None:
     metadata_path = Path(args.metadata_path).resolve()
     global SERVER_STATE
     SERVER_STATE = load_server_state(metadata_path)
+    SERVER_STATE["_capture_aux_log_path"] = getattr(args, "capture_aux_log", None)
+    SERVER_STATE["_capture_aux_log_lock"] = threading.Lock()
     reset_server_metrics()
     print(f"[entity-server] model_id={SERVER_STATE['model_id']}")
     print(f"[entity-server] metadata_path={metadata_path}")

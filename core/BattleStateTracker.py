@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from typing import Any, DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
 
@@ -94,9 +94,11 @@ class BattleStateTracker:
     This module intentionally contains NO model / vocab logic.
     """
 
-    def __init__(self, form_change_species: Optional[Set[str]] = None):
+    def __init__(self, form_change_species: Optional[Set[str]] = None, history_turns: int = 0):
         # Species that can appear under multiple battle UIDs but should share a slot.
         self.form_change_species: Set[str] = form_change_species or {"Palafin"}
+        self._history_turns: int = history_turns
+        self._past_turn_events: deque = deque(maxlen=history_turns) if history_turns > 0 else deque(maxlen=0)
         self._current_turn_events: list = []
         self.reset()
 
@@ -111,6 +113,7 @@ class BattleStateTracker:
         self.observed_moves: DefaultDict[str, Set[str]] = defaultdict(set)
         self.weather: Optional[str] = None
         self.global_conditions: Set[str] = set()
+        self._past_turn_events.clear()
 
     # ---------- Loading ----------
     def load_battle(self, battle: Dict[str, Any]) -> None:
@@ -393,6 +396,8 @@ class BattleStateTracker:
             elif et == "effect":
                 self._apply_effect(ev)
         self._current_turn_events.append(TurnEventV1(event_type=EVENT_TURN_END))
+        if self._history_turns > 0:
+            self._past_turn_events.append([ev.to_dict() for ev in self._current_turn_events])
 
     def _apply_move(self, ev: Dict[str, Any]) -> None:
         uid = ev.get("pokemon_uid")
@@ -776,6 +781,7 @@ class BattleStateTracker:
             if opponent_action is not None:
                 opponent_action_token = self.action_token_for_player(other, opponent_action)
 
+            past_events_snapshot = list(self._past_turn_events)
             self.apply_turn(turn)
             state_after = self.snapshot()
 
@@ -800,4 +806,5 @@ class BattleStateTracker:
                 "winner": winner,
                 "terminal_result": terminal_result,
                 "turn_events_v1": [ev.to_dict() for ev in self._current_turn_events],
+                "past_turn_events": past_events_snapshot,
             }

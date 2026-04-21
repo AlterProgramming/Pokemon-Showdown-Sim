@@ -142,6 +142,8 @@ def make_training_metadata(
         objective_set.append("value")
     if getattr(args, "predict_turn_sequence", False):
         objective_set.append("sequence_auxiliary")
+    if getattr(args, "predict_from_history", False):
+        objective_set.append("history_encoder")
     training_regime = "offline_entity_bc"
     if len(objective_set) > 1:
         training_regime = "offline_entity_bc_aux"
@@ -248,6 +250,7 @@ def make_training_metadata(
             1 for entry in move_reward_profile.values() if entry.get("is_offensive")
         ),
         "entity_token_vocab_sizes": {key: len(value) for key, value in token_vocabs.items()},
+        "use_history": False,
     }
 
     predict_sequence = getattr(args, "predict_turn_sequence", False)
@@ -275,6 +278,13 @@ def make_training_metadata(
         if not args.predict_turn_outcome:
             metadata["action_context_vocab_path"] = str(artifact_paths["action_context_vocab"])
             metadata["num_action_context_classes"] = len(action_context_vocab or {})
+
+    if getattr(args, "predict_from_history", False):
+        metadata["use_history"] = True
+        metadata["history_turns"] = int(args.history_turns)
+        metadata["history_events_per_turn"] = int(args.history_events_per_turn)
+        metadata["history_embed_dim"] = int(args.history_embed_dim)
+        metadata["history_lstm_dim"] = int(args.history_lstm_dim)
 
     if policy_weight_stats is not None:
         metadata["policy_weight_stats"] = policy_weight_stats
@@ -529,6 +539,35 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sequence-weight", type=float, default=0.1, help="Loss weight for the sequence head.")
     parser.add_argument("--sequence-hidden-dim", type=int, default=128, help="LSTM hidden width for the sequence head.")
     parser.add_argument("--max-seq-len", type=int, default=32, help="Maximum token sequence length for the sequence head.")
+    parser.add_argument(
+        "--predict-from-history",
+        action="store_true",
+        help="Enable the event history encoder auxiliary module.",
+    )
+    parser.add_argument(
+        "--history-turns",
+        type=int,
+        default=8,
+        help="K: number of past turns to retain in the rolling history buffer.",
+    )
+    parser.add_argument(
+        "--history-events-per-turn",
+        type=int,
+        default=24,
+        help="E: maximum event tokens per turn row in the history matrix.",
+    )
+    parser.add_argument(
+        "--history-embed-dim",
+        type=int,
+        default=32,
+        help="Embedding width for history event tokens.",
+    )
+    parser.add_argument(
+        "--history-lstm-dim",
+        type=int,
+        default=64,
+        help="LSTM hidden width for the history Bi-LSTM encoder.",
+    )
     parser.add_argument("--value-hidden-dim", type=int, default=0, help="Hidden width for the value head block.")
     parser.add_argument("--action-embed-dim", type=int, default=16, help="Embedding width for action-conditioned transition inputs.")
     parser.add_argument("--transition-hidden-dim", type=int, default=256, help="Hidden width for the transition head block.")
@@ -650,7 +689,10 @@ def main() -> None:
         flush=True,
     )
 
-    tracker = BattleStateTracker(form_change_species={"Palafin"})
+    tracker = BattleStateTracker(
+        form_change_species={"Palafin"},
+        history_turns=args.history_turns if args.predict_from_history else 0,
+    )
     # Reuse the battle ingester so the entity family stays comparable to the older
     # vector families at the data-loading layer.
     examples = ingest_battles_to_examples(
@@ -694,6 +736,9 @@ def main() -> None:
         include_value=args.predict_value,
         include_sequence=args.predict_turn_sequence,
         max_seq_len=args.max_seq_len,
+        include_history=args.predict_from_history,
+        history_turns=args.history_turns,
+        history_events_per_turn=args.history_events_per_turn,
     )
     policy_vocab = bundle["policy_vocab"]
     action_context_vocab = bundle["action_context_vocab"]
@@ -711,6 +756,9 @@ def main() -> None:
         include_sequence=args.predict_turn_sequence,
         sequence_vocab=sequence_vocab,
         max_seq_len=args.max_seq_len,
+        include_history=args.predict_from_history,
+        history_turns=args.history_turns,
+        history_events_per_turn=args.history_events_per_turn,
     )
     X_np = to_numpy_entity_inputs(X_raw)
 
@@ -790,10 +838,15 @@ def main() -> None:
     artifact_paths = build_entity_artifact_paths(
         output_dir,
         model_name=args.model_name,
-        save_training_model=(args.predict_turn_outcome or args.predict_value or args.predict_turn_sequence),
+        save_training_model=(
+            args.predict_turn_outcome
+            or args.predict_value
+            or args.predict_turn_sequence
+            or args.predict_from_history
+        ),
         save_action_context_vocab=(args.predict_turn_outcome or args.predict_turn_sequence),
         save_policy_value_model=args.predict_value,
-        save_sequence_vocab=args.predict_turn_sequence,
+        save_sequence_vocab=(args.predict_turn_sequence or args.predict_from_history),
     )
 
     try:
@@ -820,6 +873,12 @@ def main() -> None:
             sequence_hidden_dim=args.sequence_hidden_dim,
             sequence_weight=args.sequence_weight,
             max_seq_len=args.max_seq_len,
+            use_history=args.predict_from_history,
+            history_vocab_size=len(sequence_vocab or {}) if args.predict_from_history else None,
+            history_embed_dim=args.history_embed_dim,
+            history_lstm_dim=args.history_lstm_dim,
+            history_turns=args.history_turns,
+            history_events_per_turn=args.history_events_per_turn,
         )
         from tensorflow import keras
     except ModuleNotFoundError as exc:
@@ -921,7 +980,12 @@ def main() -> None:
     )
 
     policy_model.save(artifact_paths["policy_model"])
-    if (args.predict_turn_outcome or args.predict_value or args.predict_turn_sequence):
+    if (
+        args.predict_turn_outcome
+        or args.predict_value
+        or args.predict_turn_sequence
+        or args.predict_from_history
+    ):
         model.save(artifact_paths["training_model"])
     if args.predict_value and policy_value_model is not None:
         policy_value_model.save(artifact_paths["policy_value_model"])
@@ -932,7 +996,7 @@ def main() -> None:
     save_json(artifact_paths["entity_token_vocabs"], token_vocabs)
     if (args.predict_turn_outcome or args.predict_turn_sequence) and action_context_vocab is not None:
         save_json(artifact_paths["action_context_vocab"], action_context_vocab)
-    if args.predict_turn_sequence and sequence_vocab is not None:
+    if (args.predict_turn_sequence or args.predict_from_history) and sequence_vocab is not None:
         save_json(artifact_paths["sequence_vocab"], sequence_vocab)
     save_json(artifact_paths["reward_profile"], move_reward_profile)
 

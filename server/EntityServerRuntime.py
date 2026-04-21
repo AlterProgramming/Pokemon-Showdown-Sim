@@ -181,6 +181,12 @@ def _build_entity_training_model(
         sequence_hidden_dim=int(metadata.get("sequence_hidden_dim", 128)),
         sequence_weight=float(metadata.get("sequence_weight", 0.1)),
         max_seq_len=int(metadata.get("max_seq_len", 32)),
+        use_history=bool(metadata.get("use_history", False)),
+        history_vocab_size=len(sequence_vocab) if (metadata.get("use_history") and sequence_vocab) else None,
+        history_embed_dim=int(metadata.get("history_embed_dim", 32)),
+        history_lstm_dim=int(metadata.get("history_lstm_dim", 64)),
+        history_turns=int(metadata.get("history_turns", 8)),
+        history_events_per_turn=int(metadata.get("history_events_per_turn", 24)),
     )
     return training_model
 
@@ -410,6 +416,9 @@ def load_entity_runtime_artifacts(
         "has_sequence_head": bool(sequence_vocab),
         "switch_logit_bias": resolve_switch_logit_bias(metadata, default=family_default_switch_bias),
         "max_candidates": int(metadata.get("max_candidates", 10)),
+        "use_history": bool(metadata.get("use_history", False)),
+        "history_turns": int(metadata.get("history_turns", 8)),
+        "history_events_per_turn": int(metadata.get("history_events_per_turn", 24)),
     }
 
 
@@ -515,6 +524,7 @@ def predict_entity_auxiliary_outputs_batch(
     *,
     my_action_tokens: list[str],
     opp_action_token: str | None = None,
+    past_turn_events: list[list[dict]] | None = None,
 ) -> list[dict[str, Any] | None]:
     """Run the richer training artifact when available for multiple candidate actions."""
 
@@ -541,6 +551,19 @@ def predict_entity_auxiliary_outputs_batch(
         _action_context_id(action_context_vocab, opp_action_token)
         for _ in range(batch_size)
     ]
+    use_history = bool(runtime.get("use_history"))
+    if use_history and past_turn_events is not None:
+        sequence_vocab = runtime.get("sequence_vocab")
+        if sequence_vocab:
+            from core.TurnEventTokenizer import encode_event_history
+            history_turns = int(runtime.get("history_turns", 8))
+            history_events_per_turn = int(runtime.get("history_events_per_turn", 24))
+            hist_tokens, hist_mask = encode_event_history(
+                past_turn_events, sequence_vocab, history_turns, history_events_per_turn
+            )
+            batch_size = len(my_action_tokens)
+            raw_inputs["event_history_tokens"] = [hist_tokens] * batch_size
+            raw_inputs["event_history_mask"] = [hist_mask] * batch_size
     batched_inputs = to_numpy_entity_inputs(raw_inputs)
     raw_output = _normalize_runtime_outputs(training_model(batched_inputs, training=False))
     if not isinstance(raw_output, dict):
@@ -568,6 +591,9 @@ def predict_entity_auxiliary_outputs_batch(
             )
         if transition is not None:
             outputs["transition_prediction"] = np.asarray(transition[index], dtype=np.float32)
+        history_attn = raw_output.get("history_attention")
+        if history_attn is not None:
+            outputs["history_attention"] = np.asarray(history_attn[index], dtype=np.float32)
         outputs_by_action.append(outputs)
 
     return outputs_by_action
@@ -580,6 +606,7 @@ def predict_entity_auxiliary_outputs(
     *,
     my_action_token: str,
     opp_action_token: str | None = None,
+    past_turn_events: list[list[dict]] | None = None,
 ) -> dict[str, Any] | None:
     """Run the richer training artifact when available for one candidate action."""
     outputs = predict_entity_auxiliary_outputs_batch(
@@ -588,6 +615,7 @@ def predict_entity_auxiliary_outputs(
         perspective_player,
         my_action_tokens=[my_action_token],
         opp_action_token=opp_action_token,
+        past_turn_events=past_turn_events,
     )
     return outputs[0] if outputs else None
 

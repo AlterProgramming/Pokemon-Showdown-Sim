@@ -48,6 +48,7 @@ ENTITY_INT_INPUT_KEYS = {
     "global_conditions",
     "my_action",
     "opp_action",
+    "event_history_tokens",
 }
 
 
@@ -319,6 +320,9 @@ def vectorize_entity_multitask_dataset(
     include_sequence: bool = False,
     sequence_vocab: Dict[str, int] | None = None,
     max_seq_len: int = 32,
+    include_history: bool = False,
+    history_turns: int = 8,
+    history_events_per_turn: int = 24,
 ) -> Tuple[Dict[str, List[Any]], Dict[str, List[Any]]]:
     """Convert entity examples into raw tensor lists for supervised multitask training.
 
@@ -356,6 +360,12 @@ def vectorize_entity_multitask_dataset(
 
     if include_sequence and sequence_vocab is None:
         raise ValueError("include_sequence requires sequence_vocab")
+
+    if include_history and sequence_vocab is None:
+        raise ValueError("include_history=True requires sequence_vocab to be provided.")
+
+    X_history_tokens: list = []
+    X_history_mask: list = []
 
     for ex in examples:
         action = ex.get("action")
@@ -410,6 +420,21 @@ def vectorize_entity_multitask_dataset(
                 encode_turn_event_sequence(turn_events, sequence_vocab, max_seq_len)
             )
 
+        if include_history:
+            from .TurnEventTokenizer import encode_event_history
+            hist_tokens, hist_mask = encode_event_history(
+                ex.get("past_turn_events") or [],
+                sequence_vocab,
+                history_turns,
+                history_events_per_turn,
+            )
+            X_history_tokens.append(hist_tokens)
+            X_history_mask.append(hist_mask)
+
+    if include_history:
+        X["event_history_tokens"] = X_history_tokens
+        X["event_history_mask"] = X_history_mask
+
     if include_transition or include_sequence:
         X["my_action"] = X_my_action
         X["opp_action"] = X_opp_action
@@ -433,6 +458,9 @@ def build_entity_training_bundle(
     include_value: bool,
     include_sequence: bool = False,
     max_seq_len: int = 32,
+    include_history: bool = False,
+    history_turns: int = 8,
+    history_events_per_turn: int = 24,
 ) -> Dict[str, Any]:
     """Build the vocabulary bundle that defines a concrete entity-family release."""
     policy_vocab = build_action_vocab(
@@ -450,6 +478,10 @@ def build_entity_training_bundle(
         "token_vocabs": token_vocabs,
         "entity_tensor_layout": entity_tensor_layout(),
     }
-    if include_sequence:
+    need_sequence_vocab = include_sequence or include_history
+    if need_sequence_vocab:
         bundle["sequence_vocab"] = build_sequence_vocab(examples)
+    if include_history:
+        bundle["history_turns"] = history_turns
+        bundle["history_events_per_turn"] = history_events_per_turn
     return bundle
