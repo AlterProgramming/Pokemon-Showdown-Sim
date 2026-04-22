@@ -332,7 +332,7 @@ def build_entity_action_models(
     tera_embedding = layers.Embedding(vocab_sizes["tera"], max(8, token_embed_dim // 3), mask_zero=True, name="tera_embedding")
     status_embedding = layers.Embedding(vocab_sizes["status"], max(8, token_embed_dim // 3), mask_zero=True, name="status_embedding")
     move_embedding = layers.Embedding(vocab_sizes["move"], max(8, token_embed_dim // 2), mask_zero=True, name="move_embedding")
-    weather_embedding = layers.Embedding(vocab_sizes["weather"], max(8, token_embed_dim // 3), mask_zero=True, name="weather_embedding")
+    weather_embedding = layers.Embedding(vocab_sizes["weather"], max(8, token_embed_dim // 3), name="weather_embedding")
     global_condition_embedding = layers.Embedding(
         vocab_sizes["global_condition"],
         max(8, token_embed_dim // 3),
@@ -344,15 +344,26 @@ def build_entity_action_models(
 
     # Observed moves arrive as a short token list per slot. We embed each move and then
     # average only the non-pad entries to get one learned "observed move summary" vector.
+    # Inline masked mean-pool for observed moves — avoids list-input Lambda on GPU.
     move_embedded = move_embedding(inputs["pokemon_observed_moves"])
-    move_pooled = MaskedAverage(axis=2, name="observed_move_pool")(
-        [move_embedded, inputs["pokemon_observed_moves"]]
+    _ops = _keras().ops
+    _mv_mask   = _ops.cast(_ops.not_equal(inputs["pokemon_observed_moves"], 0), "float32")
+    _mv_mask3d = _ops.expand_dims(_mv_mask, axis=-1)
+    move_pooled = (
+        _ops.sum(move_embedded * _mv_mask3d, axis=2)
+        / _ops.maximum(_ops.sum(_mv_mask, axis=2, keepdims=True), 1.0)
     )
 
+    # weather_embedding does not use mask_zero — mask was immediately destroyed by Flatten.
     weather_x = layers.Flatten(name="weather_flat")(weather_embedding(inputs["weather"]))
+
+    # Inline masked mean-pool for global conditions — avoids list-input Lambda on GPU.
     global_condition_embedded = global_condition_embedding(inputs["global_conditions"])
-    global_condition_x = MaskedAverage(axis=1, name="global_condition_pool")(
-        [global_condition_embedded, inputs["global_conditions"]]
+    _gc_mask   = _ops.cast(_ops.not_equal(inputs["global_conditions"], 0), "float32")
+    _gc_mask2d = _ops.expand_dims(_gc_mask, axis=-1)
+    global_condition_x = (
+        _ops.sum(global_condition_embedded * _gc_mask2d, axis=1)
+        / _ops.maximum(_ops.sum(_gc_mask, axis=1, keepdims=True), 1.0)
     )
 
     pokemon_x = layers.Concatenate(axis=-1, name="pokemon_concat")(
