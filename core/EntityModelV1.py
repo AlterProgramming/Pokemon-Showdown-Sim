@@ -478,20 +478,27 @@ def build_entity_action_models(
             name="history_bilstm",
         )(hist_pooled)
 
-        # HistoryAttention replaces MultiHeadAttention+return_attention_scores.
-        # Keras 3 MHA has a shape-inference bug: attention_scores always get
-        # key_steps=1 when called in a functional graph, breaking downstream
-        # Reshape. HistoryAttention declares compute_output_shape explicitly.
+        # Scaled dot-product attention — inlined via keras.ops + Dense projections.
+        # A list-input custom layer (HistoryAttention([q,k,v,mask])) triggers the
+        # same GPU graph-tracing Lambda wrapping that broke MaskedAverage.  Using
+        # Dense(use_bias=False) for projections and keras.ops for the attention
+        # arithmetic avoids any Lambda and is mathematically identical.
         shared_q = layers.Reshape((1, hidden_dim), name="shared_query")(shared)
-        hist_context_seq, hist_attn_weights = HistoryAttention(
-            key_dim=_attn_dim, output_dim=_attn_dim, name="history_attention_layer"
-        )([shared_q, hist_lstm_out, hist_lstm_out, hist_mask_input])
+        _q_p = layers.Dense(_attn_dim, use_bias=False, name="history_attn_Wq")(shared_q)      # [B,1,attn_dim]
+        _k_p = layers.Dense(_attn_dim, use_bias=False, name="history_attn_Wk")(hist_lstm_out) # [B,K,attn_dim]
+        _v_p = layers.Dense(_attn_dim, use_bias=False, name="history_attn_Wv")(hist_lstm_out) # [B,K,attn_dim]
+        _scale   = _attn_dim ** -0.5
+        _scores  = _ops.matmul(_q_p, _ops.transpose(_k_p, axes=(0, 2, 1))) * _scale           # [B,1,K]
+        _fmask   = _ops.cast(_ops.expand_dims(hist_mask_input, axis=1), _q_p.dtype)            # [B,1,K]
+        _scores  = _scores + (1.0 - _fmask) * -1e9
+        _attn_w  = _ops.softmax(_scores, axis=-1)                                              # [B,1,K]
+        hist_context_seq = _ops.matmul(_attn_w, _v_p)                                          # [B,1,attn_dim]
         # [B, 1, _attn_dim] → [B, _attn_dim]
         history_context = layers.Reshape((_attn_dim,), name="history_context")(hist_context_seq)
         # [B, 1, K] → [B, K] for the attention extractor model
         history_attention_weights = layers.Reshape(
             (history_turns,), name="history_attention_weights"
-        )(hist_attn_weights)
+        )(_attn_w)
 
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
