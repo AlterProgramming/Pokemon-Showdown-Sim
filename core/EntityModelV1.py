@@ -56,6 +56,10 @@ class MaskedAverage(_keras().layers.Layer):
         denom = tf.maximum(tf.reduce_sum(mask, axis=self.axis), 1.0)
         return numer / denom
 
+    def compute_output_shape(self, input_shape):
+        emb_shape = input_shape[0]
+        return emb_shape[: self.axis] + emb_shape[self.axis + 1 :]
+
     def get_config(self):
         cfg = super().get_config()
         cfg["axis"] = self.axis
@@ -132,15 +136,53 @@ class BenchMask(_keras().layers.Layer):
 
 
 @_keras().saving.register_keras_serializable(package="EntityModelV1")
-class ExpandBoolMask(_keras().layers.Layer):
-    """[B, K] float → [B, 1, K] bool for MHA attention_mask."""
+class HistoryAttention(_keras().layers.Layer):
+    """Single-head scaled dot-product attention over history turns.
+
+    Takes [query [B,1,D], keys [B,K,D], values [B,K,D], mask [B,K] float]
+    and returns (context [B,1,out_dim], attn_weights [B,1,K]).
+
+    This avoids Keras 3's MultiHeadAttention shape-inference bug where
+    attention_scores always get key_steps=1 when return_attention_scores=True
+    is used in a functional-API graph.
+    """
+
+    def __init__(self, key_dim: int, output_dim: int, **kwargs):
+        super().__init__(**kwargs)
+        self.key_dim = key_dim
+        self.output_dim = output_dim
+
+    def build(self, input_shape):
+        q_dim  = input_shape[0][-1]
+        kv_dim = input_shape[1][-1]
+        self.Wq = self.add_weight(shape=(q_dim,  self.key_dim),    initializer="glorot_uniform", name="Wq")
+        self.Wk = self.add_weight(shape=(kv_dim, self.key_dim),    initializer="glorot_uniform", name="Wk")
+        self.Wv = self.add_weight(shape=(kv_dim, self.output_dim), initializer="glorot_uniform", name="Wv")
+        self.scale = self.key_dim ** -0.5
 
     def call(self, inputs):
         tf = _tf()
-        return tf.cast(inputs[:, tf.newaxis, :], tf.bool)
+        q, k, v, mask = inputs
+        q_p = tf.matmul(q, self.Wq)                                        # [B,1,key_dim]
+        k_p = tf.matmul(k, self.Wk)                                        # [B,K,key_dim]
+        v_p = tf.matmul(v, self.Wv)                                        # [B,K,out_dim]
+        scores = tf.matmul(q_p, tf.transpose(k_p, [0, 2, 1])) * self.scale # [B,1,K]
+        scores += (1.0 - tf.cast(mask[:, tf.newaxis, :], scores.dtype)) * -1e9
+        weights = tf.nn.softmax(scores, axis=-1)                            # [B,1,K]
+        context = tf.matmul(weights, v_p)                                   # [B,1,out_dim]
+        return context, weights
 
     def compute_output_shape(self, input_shape):
-        return (input_shape[0], 1, input_shape[1])
+        q_shape, kv_shape = input_shape[0], input_shape[1]
+        return (
+            (q_shape[0], q_shape[1], self.output_dim),
+            (q_shape[0], q_shape[1], kv_shape[1]),
+        )
+
+    def get_config(self):
+        cfg = super().get_config()
+        cfg.update({"key_dim": self.key_dim, "output_dim": self.output_dim})
+        return cfg
 
 
 
@@ -386,23 +428,20 @@ def build_entity_action_models(
             name="history_bilstm",
         )(hist_pooled)
 
-        # hist_mask_input [B,K] float → [B,1,K] bool for MHA attention_mask.
-        # ExpandBoolMask is registered and implements compute_output_shape.
+        # HistoryAttention replaces MultiHeadAttention+return_attention_scores.
+        # Keras 3 MHA has a shape-inference bug: attention_scores always get
+        # key_steps=1 when called in a functional graph, breaking downstream
+        # Reshape. HistoryAttention declares compute_output_shape explicitly.
         shared_q = layers.Reshape((1, hidden_dim), name="shared_query")(shared)
-        hist_attn_mask = ExpandBoolMask(name="history_attn_mask")(hist_mask_input)
-        hist_context_seq, hist_attn_scores = layers.MultiHeadAttention(
-            num_heads=1,
-            key_dim=_attn_dim,
-            output_shape=_attn_dim,
-            name="history_attention_layer",
-        )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out,
-          attention_mask=hist_attn_mask, return_attention_scores=True)
-        # [B, 1, _attn_dim] → [B, _attn_dim]; Reshape is safe here since dim-1 is fixed.
+        hist_context_seq, hist_attn_weights = HistoryAttention(
+            key_dim=_attn_dim, output_dim=_attn_dim, name="history_attention_layer"
+        )([shared_q, hist_lstm_out, hist_lstm_out, hist_mask_input])
+        # [B, 1, _attn_dim] → [B, _attn_dim]
         history_context = layers.Reshape((_attn_dim,), name="history_context")(hist_context_seq)
-        # hist_attn_scores: [B, 1, 1, K] → [B, K] for the attention extractor model.
+        # [B, 1, K] → [B, K] for the attention extractor model
         history_attention_weights = layers.Reshape(
             (history_turns,), name="history_attention_weights"
-        )(hist_attn_scores)
+        )(hist_attn_weights)
 
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
