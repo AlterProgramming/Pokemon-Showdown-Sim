@@ -852,7 +852,7 @@ def main() -> None:
     try:
         # Import TensorFlow lazily so this script can still be inspected, linted, and
         # partially exercised in environments that do not have the training stack.
-        model, policy_model, policy_value_model = build_entity_action_models(
+        model, policy_model, policy_value_model, _ = build_entity_action_models(
             vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
             num_policy_classes=len(policy_vocab),
             hidden_dim=args.hidden_dim,

@@ -392,16 +392,20 @@ def build_entity_action_models(
             lambda x: tf.cast(x[:, None, :], tf.bool),
             name="history_attn_mask",
         )(hist_mask_input)
-        hist_context_seq = layers.MultiHeadAttention(
+        hist_context_seq, hist_attn_scores = layers.MultiHeadAttention(
             num_heads=1,
             key_dim=_attn_dim,
             output_shape=_attn_dim,
             name="history_attention_layer",
         )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out,
-          attention_mask=hist_attn_mask)
+          attention_mask=hist_attn_mask, return_attention_scores=True)
         history_context = layers.Lambda(
             lambda x: x[:, 0, :], name="history_context"
         )(hist_context_seq)
+        # hist_attn_scores: [B, num_heads=1, query=1, K] → [B, K] for analysis
+        history_attention_weights = layers.Lambda(
+            lambda x: x[:, 0, 0, :], name="history_attention_weights"
+        )(hist_attn_scores)
 
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
@@ -430,7 +434,7 @@ def build_entity_action_models(
             loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
             metrics=policy_metrics,
         )
-        return policy_model, policy_model, None
+        return policy_model, policy_model, None, None
 
     outputs: Dict[str, Any] = {"policy": policy_logits}
     losses: Dict[str, Any] = {
@@ -443,8 +447,9 @@ def build_entity_action_models(
     if predict_value:
         # Keep value state-only and conservative: it estimates eventual win probability.
         value_x = layers.Dense(value_hidden_dim or max(64, hidden_dim // 2), activation="relu", name="value_dense")(shared_with_history)
-        if dropout > 0:
-            value_x = layers.Dropout(dropout, name="value_dropout")(value_x)
+        _value_dropout = max(dropout, 0.25)
+        if _value_dropout > 0:
+            value_x = layers.Dropout(_value_dropout, name="value_dropout")(value_x)
         value_out = layers.Dense(1, activation="sigmoid", name="value")(value_x)
         outputs["value"] = value_out
         losses["value"] = keras.losses.BinaryCrossentropy()
@@ -524,8 +529,17 @@ def build_entity_action_models(
         loss_weights["sequence"] = sequence_weight
         metrics["sequence"] = [masked_token_accuracy]
 
-    # history_attention weights are NOT added to outputs — they are extracted
-    # post-hoc via history_attention_layer.compute_weights() for analysis.
+    # Attention extractor: separate model sharing the same graph, no training targets needed.
+    # Excludes action inputs (not reachable from history_attention_weights).
+    if history_context is not None:
+        _attn_inputs = {k: v for k, v in model_inputs.items()
+                        if k not in {"my_action", "opp_action"}}
+        history_attention_model = keras.Model(
+            _attn_inputs, history_attention_weights,
+            name="entity_history_attention_model",
+        )
+    else:
+        history_attention_model = None
 
     # The training artifact is the richest object because it includes every enabled
     # auxiliary head. The policy and policy+value artifacts stay serving-friendly.
@@ -536,4 +550,4 @@ def build_entity_action_models(
         loss_weights=loss_weights,
         metrics=metrics,
     )
-    return training_model, policy_model, policy_value_model
+    return training_model, policy_model, policy_value_model, history_attention_model
