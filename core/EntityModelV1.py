@@ -45,8 +45,9 @@ class MaskedAverage(_keras().layers.Layer):
     def __init__(self, axis: int, **kwargs):
         super().__init__(**kwargs)
         self.axis = axis
+        self.supports_masking = True
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         ops = _keras().ops
         embeddings, token_ids = inputs
         mask = ops.cast(ops.not_equal(token_ids, 0), "float32")
@@ -71,7 +72,9 @@ class MaskedAverage(_keras().layers.Layer):
 class MaskedPool(_keras().layers.Layer):
     """Average-pool slot embeddings over axis=1 using a float mask."""
 
-    def call(self, inputs):
+    supports_masking = True
+
+    def call(self, inputs, mask=None):
         ops = _keras().ops
         values, mask = inputs
         mask = ops.cast(mask, "float32")
@@ -86,12 +89,14 @@ class MaskedPool(_keras().layers.Layer):
 class SlotSlice(_keras().layers.Layer):
     """Slice `inputs[:, start:end, :]` — replaces non-serialisable slice Lambdas."""
 
+    supports_masking = True
+
     def __init__(self, start: int, end: int, **kwargs):
         super().__init__(**kwargs)
         self.start = start
         self.end = end
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         return inputs[:, self.start:self.end, :]
 
     def get_config(self):
@@ -104,7 +109,9 @@ class SlotSlice(_keras().layers.Layer):
 class ReduceMean1(_keras().layers.Layer):
     """Mean over axis=1 — replaces the all_slot_pool Lambda."""
 
-    def call(self, inputs):
+    supports_masking = True
+
+    def call(self, inputs, mask=None):
         return _keras().ops.mean(inputs, axis=1)
 
 
@@ -112,11 +119,13 @@ class ReduceMean1(_keras().layers.Layer):
 class ExtractColumn(_keras().layers.Layer):
     """Extract one column from a 3-D tensor: (batch, slots, features) -> (batch, slots)."""
 
+    supports_masking = True
+
     def __init__(self, col_idx: int, **kwargs):
         super().__init__(**kwargs)
         self.col_idx = col_idx
 
-    def call(self, inputs):
+    def call(self, inputs, mask=None):
         return inputs[:, :, self.col_idx]
 
     def get_config(self):
@@ -129,7 +138,9 @@ class ExtractColumn(_keras().layers.Layer):
 class BenchMask(_keras().layers.Layer):
     """Bench mask: slots that are neither active (col 3) nor fainted (col 4)."""
 
-    def call(self, inputs):
+    supports_masking = True
+
+    def call(self, inputs, mask=None):
         numeric = inputs  # shape (batch, slots, POKEMON_NUMERIC_DIM)
         active  = numeric[:, :, 3]
         fainted = numeric[:, :, 4]
@@ -161,14 +172,16 @@ class HistoryAttention(_keras().layers.Layer):
         self.Wv = self.add_weight(shape=(kv_dim, self.output_dim), initializer="glorot_uniform", name="Wv")
         self.scale = self.key_dim ** -0.5
 
-    def call(self, inputs):
+    supports_masking = True
+
+    def call(self, inputs, mask=None):
         ops = _keras().ops
-        q, k, v, mask = inputs
+        q, k, v, float_mask = inputs  # float_mask is the explicit turn mask; mask kwarg is Keras propagated mask (ignored)
         q_p = ops.matmul(q, self.Wq)                                              # [B,1,key_dim]
         k_p = ops.matmul(k, self.Wk)                                              # [B,K,key_dim]
         v_p = ops.matmul(v, self.Wv)                                              # [B,K,out_dim]
-        scores = ops.matmul(q_p, ops.transpose(k_p, axes=(0, 2, 1))) * self.scale # [B,1,K]
-        scores = scores + (1.0 - ops.cast(ops.expand_dims(mask, axis=1), q_p.dtype)) * -1e9
+        scores = ops.matmul(q_p, ops.transpose(k_p, axes=(0, 2, 1))) * self.scale    # [B,1,K]
+        scores = scores + (1.0 - ops.cast(ops.expand_dims(float_mask, axis=1), q_p.dtype)) * -1e9
         weights = ops.softmax(scores, axis=-1)                                     # [B,1,K]
         context = ops.matmul(weights, v_p)                                         # [B,1,out_dim]
         return context, weights
