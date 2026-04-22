@@ -131,6 +131,18 @@ class BenchMask(_keras().layers.Layer):
         return (1.0 - active) * (1.0 - fainted)
 
 
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class ExpandBoolMask(_keras().layers.Layer):
+    """[B, K] float → [B, 1, K] bool for MHA attention_mask."""
+
+    def call(self, inputs):
+        tf = _tf()
+        return tf.cast(inputs[:, tf.newaxis, :], tf.bool)
+
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], 1, input_shape[1])
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -342,7 +354,6 @@ def build_entity_action_models(
 
     if use_history and history_vocab_size is not None:
         _attn_dim = history_lstm_dim * 2
-        tf = _tf()
         hist_tokens_input = layers.Input(
             shape=(history_turns, history_events_per_turn),
             dtype="int32",
@@ -363,19 +374,11 @@ def build_entity_action_models(
         )
         hist_embedded = history_event_embedding(hist_tokens_input)
 
-        # PAD-masked mean pool over the event axis in a single Lambda.
-        # Lambda keeps all ops in one traced graph node; four separate nodes
-        # would add serialization overhead with no correctness benefit.
-        hist_pooled = layers.Lambda(
-            lambda args: (
-                lambda emb, ids: tf.reduce_sum(
-                    emb * tf.cast(tf.not_equal(ids, 0), emb.dtype)[..., None], axis=2
-                ) / tf.maximum(
-                    tf.reduce_sum(tf.cast(tf.not_equal(ids, 0), emb.dtype), axis=2, keepdims=True), 1.0
-                )
-            )(args[0], args[1]),
-            name="history_turn_pool",
-        )([hist_embedded, hist_tokens_input])
+        # PAD-masked mean pool over the event axis.
+        # MaskedAverage is a registered serialisable layer (no Lambda needed).
+        hist_pooled = MaskedAverage(axis=2, name="history_turn_pool")(
+            [hist_embedded, hist_tokens_input]
+        )
 
         # recurrent_dropout=0.0 is explicit — any non-zero value disables cuDNN path.
         hist_lstm_out = layers.Bidirectional(
@@ -383,15 +386,10 @@ def build_entity_action_models(
             name="history_bilstm",
         )(hist_pooled)
 
-        # hist_mask_input [B,K] float (1=real turn, 0=pad) → [B,1,K] bool.
-        # Passed as attention_mask so padded turns are ignored AND the input
-        # is connected to the output graph (Keras requires every model_input
-        # to reach at least one output).
+        # hist_mask_input [B,K] float → [B,1,K] bool for MHA attention_mask.
+        # ExpandBoolMask is registered and implements compute_output_shape.
         shared_q = layers.Reshape((1, hidden_dim), name="shared_query")(shared)
-        hist_attn_mask = layers.Lambda(
-            lambda x: tf.cast(x[:, None, :], tf.bool),
-            name="history_attn_mask",
-        )(hist_mask_input)
+        hist_attn_mask = ExpandBoolMask(name="history_attn_mask")(hist_mask_input)
         hist_context_seq, hist_attn_scores = layers.MultiHeadAttention(
             num_heads=1,
             key_dim=_attn_dim,
@@ -399,12 +397,11 @@ def build_entity_action_models(
             name="history_attention_layer",
         )(query=shared_q, key=hist_lstm_out, value=hist_lstm_out,
           attention_mask=hist_attn_mask, return_attention_scores=True)
-        history_context = layers.Lambda(
-            lambda x: x[:, 0, :], name="history_context"
-        )(hist_context_seq)
-        # hist_attn_scores: [B, num_heads=1, query=1, K] → [B, K] for analysis
-        history_attention_weights = layers.Lambda(
-            lambda x: x[:, 0, 0, :], name="history_attention_weights"
+        # [B, 1, _attn_dim] → [B, _attn_dim]; Reshape is safe here since dim-1 is fixed.
+        history_context = layers.Reshape((_attn_dim,), name="history_context")(hist_context_seq)
+        # hist_attn_scores: [B, 1, 1, K] → [B, K] for the attention extractor model.
+        history_attention_weights = layers.Reshape(
+            (history_turns,), name="history_attention_weights"
         )(hist_attn_scores)
 
     # Build shared_with_history for auxiliary heads
