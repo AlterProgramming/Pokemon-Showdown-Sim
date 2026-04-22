@@ -451,11 +451,15 @@ def build_entity_action_models(
         )
         hist_embedded = history_event_embedding(hist_tokens_input)
 
-        # PAD-masked mean pool over the event axis.
-        # MaskedAverage is a registered serialisable layer (no Lambda needed).
-        hist_pooled = MaskedAverage(axis=2, name="history_turn_pool")(
-            [hist_embedded, hist_tokens_input]
-        )
+        # PAD-masked mean pool over the event axis using inline keras.ops.
+        # A list-input custom layer triggers GPU graph-tracing Lambdas in all
+        # Keras 3.x versions; inline ops have unambiguous shapes and no Lambdas.
+        _ops = _keras().ops
+        _pad_mask   = _ops.cast(_ops.not_equal(hist_tokens_input, 0), "float32")  # [B,K,E]
+        _pad_mask4d = _ops.expand_dims(_pad_mask, axis=-1)                          # [B,K,E,1]
+        _numer      = _ops.sum(hist_embedded * _pad_mask4d, axis=2)                 # [B,K,D]
+        _denom      = _ops.maximum(_ops.sum(_pad_mask, axis=2, keepdims=True), 1.0) # [B,K,1]
+        hist_pooled = _numer / _denom                                                # [B,K,D]
 
         # recurrent_dropout=0.0 is explicit — any non-zero value disables cuDNN path.
         hist_lstm_out = layers.Bidirectional(
