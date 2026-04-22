@@ -47,13 +47,14 @@ class MaskedAverage(_keras().layers.Layer):
         self.axis = axis
 
     def call(self, inputs):
-        tf = _tf()
+        ops = _keras().ops
         embeddings, token_ids = inputs
-        mask = tf.cast(tf.not_equal(token_ids, 0), tf.float32)
-        while len(mask.shape) < len(embeddings.shape):
-            mask = tf.expand_dims(mask, axis=-1)
-        numer = tf.reduce_sum(embeddings * mask, axis=self.axis)
-        denom = tf.maximum(tf.reduce_sum(mask, axis=self.axis), 1.0)
+        mask = ops.cast(ops.not_equal(token_ids, 0), "float32")
+        # Expand mask to match embeddings rank (e.g. [B,K,E] → [B,K,E,1])
+        for _ in range(len(embeddings.shape) - len(mask.shape)):
+            mask = ops.expand_dims(mask, axis=-1)
+        numer = ops.sum(embeddings * mask, axis=self.axis)
+        denom = ops.maximum(ops.sum(mask, axis=self.axis), 1.0)
         return numer / denom
 
     def compute_output_shape(self, input_shape):
@@ -71,13 +72,13 @@ class MaskedPool(_keras().layers.Layer):
     """Average-pool slot embeddings over axis=1 using a float mask."""
 
     def call(self, inputs):
-        tf = _tf()
+        ops = _keras().ops
         values, mask = inputs
-        mask = tf.cast(mask, tf.float32)
+        mask = ops.cast(mask, "float32")
         if len(mask.shape) < len(values.shape):
-            mask = tf.expand_dims(mask, axis=-1)
-        numer = tf.reduce_sum(values * mask, axis=1)
-        denom = tf.maximum(tf.reduce_sum(mask, axis=1), 1.0)
+            mask = ops.expand_dims(mask, axis=-1)
+        numer = ops.sum(values * mask, axis=1)
+        denom = ops.maximum(ops.sum(mask, axis=1), 1.0)
         return numer / denom
 
 
@@ -101,10 +102,10 @@ class SlotSlice(_keras().layers.Layer):
 
 @_keras().saving.register_keras_serializable(package="EntityModelV1")
 class ReduceMean1(_keras().layers.Layer):
-    """tf.reduce_mean(x, axis=1) — replaces the all_slot_pool Lambda."""
+    """Mean over axis=1 — replaces the all_slot_pool Lambda."""
 
     def call(self, inputs):
-        return _tf().reduce_mean(inputs, axis=1)
+        return _keras().ops.mean(inputs, axis=1)
 
 
 @_keras().saving.register_keras_serializable(package="EntityModelV1")
@@ -161,15 +162,15 @@ class HistoryAttention(_keras().layers.Layer):
         self.scale = self.key_dim ** -0.5
 
     def call(self, inputs):
-        tf = _tf()
+        ops = _keras().ops
         q, k, v, mask = inputs
-        q_p = tf.matmul(q, self.Wq)                                        # [B,1,key_dim]
-        k_p = tf.matmul(k, self.Wk)                                        # [B,K,key_dim]
-        v_p = tf.matmul(v, self.Wv)                                        # [B,K,out_dim]
-        scores = tf.matmul(q_p, tf.transpose(k_p, [0, 2, 1])) * self.scale # [B,1,K]
-        scores += (1.0 - tf.cast(mask[:, tf.newaxis, :], scores.dtype)) * -1e9
-        weights = tf.nn.softmax(scores, axis=-1)                            # [B,1,K]
-        context = tf.matmul(weights, v_p)                                   # [B,1,out_dim]
+        q_p = ops.matmul(q, self.Wq)                                              # [B,1,key_dim]
+        k_p = ops.matmul(k, self.Wk)                                              # [B,K,key_dim]
+        v_p = ops.matmul(v, self.Wv)                                              # [B,K,out_dim]
+        scores = ops.matmul(q_p, ops.transpose(k_p, axes=(0, 2, 1))) * self.scale # [B,1,K]
+        scores = scores + (1.0 - ops.cast(ops.expand_dims(mask, axis=1), q_p.dtype)) * -1e9
+        weights = ops.softmax(scores, axis=-1)                                     # [B,1,K]
+        context = ops.matmul(weights, v_p)                                         # [B,1,out_dim]
         return context, weights
 
     def compute_output_shape(self, input_shape):
