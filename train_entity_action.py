@@ -17,6 +17,7 @@ future belief-aware entity generations.
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
+import gc
 import json
 import sys
 from pathlib import Path
@@ -761,6 +762,7 @@ def main() -> None:
         history_events_per_turn=args.history_events_per_turn,
     )
     X_np = to_numpy_entity_inputs(X_raw)
+    del X_raw  # pre-numpy lists no longer needed
 
     # Policy is sparse categorical, transition is dense regression, value is a
     # scalar binary target in [0, 1], and sequence is an integer token matrix.
@@ -780,6 +782,9 @@ def main() -> None:
         if "sequence" not in targets_raw
         else np.asarray(targets_raw["sequence"], dtype=np.int64)
     )
+    # Free the raw Python examples and target lists — numpy arrays now own the data.
+    del examples, targets_raw
+    gc.collect()
 
     X_train = slice_entity_inputs(X_np, train_idx)
     X_val = slice_entity_inputs(X_np, val_idx) if len(val_idx) else None
@@ -791,6 +796,9 @@ def main() -> None:
     y_val_value = y_value_np[val_idx] if y_value_np is not None and len(val_idx) else None
     y_train_sequence = y_sequence_np[train_idx] if y_sequence_np is not None else None
     y_val_sequence = y_sequence_np[val_idx] if y_sequence_np is not None and len(val_idx) else None
+    # Full arrays are now split into train/val; free the originals.
+    del X_np, y_policy_np, y_transition_np, y_value_np, y_sequence_np
+    gc.collect()
 
     policy_train_weights = build_policy_training_sample_weights(
         train_examples,
@@ -806,6 +814,7 @@ def main() -> None:
             "policy sample weights length does not match the policy training targets; "
             "example filtering and vectorization fell out of sync"
         )
+    del train_examples  # vocab + weights built; raw examples no longer needed
     policy_weight_stats = None
     if policy_train_weights is not None:
         policy_weight_stats = {
