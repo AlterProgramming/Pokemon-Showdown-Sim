@@ -62,6 +62,9 @@ class MaskedAverage(_keras().layers.Layer):
         emb_shape = input_shape[0]
         return emb_shape[: self.axis] + emb_shape[self.axis + 1 :]
 
+    def compute_mask(self, inputs, mask=None):
+        return None  # absorbs upstream mask; does not propagate one
+
     def get_config(self):
         cfg = super().get_config()
         cfg["axis"] = self.axis
@@ -76,13 +79,16 @@ class MaskedPool(_keras().layers.Layer):
 
     def call(self, inputs, mask=None):
         ops = _keras().ops
-        values, mask = inputs
-        mask = ops.cast(mask, "float32")
-        if len(mask.shape) < len(values.shape):
-            mask = ops.expand_dims(mask, axis=-1)
-        numer = ops.sum(values * mask, axis=1)
-        denom = ops.maximum(ops.sum(mask, axis=1), 1.0)
+        values, float_mask = inputs
+        float_mask = ops.cast(float_mask, "float32")
+        if len(float_mask.shape) < len(values.shape):
+            float_mask = ops.expand_dims(float_mask, axis=-1)
+        numer = ops.sum(values * float_mask, axis=1)
+        denom = ops.maximum(ops.sum(float_mask, axis=1), 1.0)
         return numer / denom
+
+    def compute_mask(self, inputs, mask=None):
+        return None
 
 
 @_keras().saving.register_keras_serializable(package="EntityModelV1")
@@ -99,6 +105,9 @@ class SlotSlice(_keras().layers.Layer):
     def call(self, inputs, mask=None):
         return inputs[:, self.start:self.end, :]
 
+    def compute_mask(self, inputs, mask=None):
+        return None
+
     def get_config(self):
         cfg = super().get_config()
         cfg.update({"start": self.start, "end": self.end})
@@ -114,6 +123,9 @@ class ReduceMean1(_keras().layers.Layer):
     def call(self, inputs, mask=None):
         return _keras().ops.mean(inputs, axis=1)
 
+    def compute_mask(self, inputs, mask=None):
+        return None
+
 
 @_keras().saving.register_keras_serializable(package="EntityModelV1")
 class ExtractColumn(_keras().layers.Layer):
@@ -127,6 +139,9 @@ class ExtractColumn(_keras().layers.Layer):
 
     def call(self, inputs, mask=None):
         return inputs[:, :, self.col_idx]
+
+    def compute_mask(self, inputs, mask=None):
+        return None
 
     def get_config(self):
         cfg = super().get_config()
@@ -145,6 +160,9 @@ class BenchMask(_keras().layers.Layer):
         active  = numeric[:, :, 3]
         fainted = numeric[:, :, 4]
         return (1.0 - active) * (1.0 - fainted)
+
+    def compute_mask(self, inputs, mask=None):
+        return None
 
 
 @_keras().saving.register_keras_serializable(package="EntityModelV1")
@@ -192,6 +210,9 @@ class HistoryAttention(_keras().layers.Layer):
             (q_shape[0], q_shape[1], self.output_dim),
             (q_shape[0], q_shape[1], kv_shape[1]),
         )
+
+    def compute_mask(self, inputs, mask=None):
+        return None  # returns two tensors; neither carries a mask forward
 
     def get_config(self):
         cfg = super().get_config()
