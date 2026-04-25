@@ -122,6 +122,7 @@ from ModelWorkers import (  # noqa: E402
     parse_worker_count_overrides,
     softmax,
 )
+from core.StateVectorization import opponent_team_composition_features  # noqa: E402
 
 
 def vocab_uses_action_tokens(action_vocab: dict[str, int]) -> bool:
@@ -1001,6 +1002,47 @@ def health():
     )
 
 
+def enrich_state_vector_with_team(state_vector, observed_opponent_team, perspective_player):
+    """
+    Augment state vector with opponent team composition if team info is provided.
+
+    Args:
+        state_vector: 582-dim base vector (numpy array or list)
+        observed_opponent_team: list of {species: "..."} dicts or None
+        perspective_player: "p1" or "p2"
+
+    Returns:
+        Augmented vector (678 dims if team provided, else 582 dims)
+    """
+    if not observed_opponent_team:
+        return state_vector
+
+    # Convert observed team to list of dicts expected by opponent_team_composition_features
+    team_list = []
+    for entry in observed_opponent_team:
+        if isinstance(entry, dict):
+            species = entry.get("species", "")
+        else:
+            species = ""
+        mon_dict = {"species": species}
+        team_list.append(mon_dict)
+
+    # Ensure we have exactly 6 slots (pad if needed)
+    while len(team_list) < 6:
+        team_list.append({"species": ""})
+    team_list = team_list[:6]
+
+    # Compute 96-dim opponent team composition features
+    features = opponent_team_composition_features(team_list, perspective_player, species_hash_dim=16)
+
+    # Concatenate to base vector
+    if isinstance(state_vector, list):
+        return state_vector + features
+    else:
+        # If numpy array, convert to list, concatenate, convert back
+        return list(state_vector) + features
+
+
 @APP.route("/predict", methods=["POST"])
 def predict():
     model_artifacts: dict[str, Any] | None = None
@@ -1020,6 +1062,13 @@ def predict():
             data.get("legal_revives", []) or data.get("legal_switches", []) or [],
         )
         legal_switches, switch_reason = filter_legal_switches(data, data.get("legal_switches", []) or [])
+
+        # Extract opponent team and perspective player from request
+        observed_opponent_team = data.get("observed_opponent_team")
+        perspective_player = data.get("perspective_player", "p1")
+
+        # Enrich state vector with opponent team features if available
+        state_vector = enrich_state_vector_with_team(state_vector, observed_opponent_team, perspective_player)
 
         started_at = time.perf_counter()
         logits, worker_metrics = predict_logits(model_artifacts, state_vector)
