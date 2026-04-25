@@ -35,8 +35,8 @@ def _softmax(logits: np.ndarray) -> np.ndarray:
     return exp / denom
 
 
-def _entity_dummy_inputs() -> dict[str, np.ndarray]:
-    return {
+def _entity_dummy_inputs(metadata: dict | None = None) -> dict[str, np.ndarray]:
+    dummy = {
         "global_conditions":      np.zeros((1, 5),      dtype=np.int32),
         "global_numeric":         np.zeros((1, 17),     dtype=np.float32),
         "pokemon_ability":        np.zeros((1, 12),     dtype=np.int32),
@@ -50,6 +50,12 @@ def _entity_dummy_inputs() -> dict[str, np.ndarray]:
         "pokemon_tera":           np.zeros((1, 12),     dtype=np.int32),
         "weather":                np.zeros((1, 1),      dtype=np.int32),
     }
+    if metadata and metadata.get("use_history"):
+        K = int(metadata.get("history_turns", 8))
+        E = int(metadata.get("history_events_per_turn", 24))
+        dummy["event_history_tokens"] = np.zeros((1, K, E), dtype=np.int32)
+        dummy["event_history_mask"]   = np.zeros((1, K),    dtype=np.float32)
+    return dummy
 
 
 def _entity_v2_dummy_inputs(max_candidates: int) -> dict[str, np.ndarray]:
@@ -78,7 +84,14 @@ def _cast_for_onnx_input(spec: Any, arr: Any) -> np.ndarray:
 
 def _run_onnx_outputs(onnx_session: Any, batched_inputs: dict[str, np.ndarray]) -> dict[str, Any]:
     onnx_inputs = {i.name: _cast_for_onnx_input(i, batched_inputs[i.name]) for i in onnx_session.get_inputs()}
-    onnx_outputs = onnx_session.run(None, onnx_inputs)
+    try:
+        onnx_outputs = onnx_session.run(None, onnx_inputs)
+    except Exception:
+        # Log problematic inputs before re-raising to diagnose out-of-range indices.
+        for key in ("candidate_switch_slot", "pokemon_slot", "candidate_type"):
+            if key in onnx_inputs:
+                print(f"[ONNX-DEBUG] {key}: {onnx_inputs[key].tolist()}", flush=True)
+        raise
     output_names = [o.name for o in onnx_session.get_outputs()]
     return dict(zip(output_names, onnx_outputs))
 
@@ -110,11 +123,13 @@ def _extract_policy_and_value(
         value_estimate = float(np.asarray(raw_output[1]).reshape(-1)[0])
         raw_output = raw_output[0]
     elif isinstance(raw_output, dict):
-        raw_output = raw_output.get("policy")
+        # Prefer canonical "policy" key; fall back to first value for ONNX outputs
+        # whose output node names (e.g. "Identity:0") differ from the training key.
+        raw_output = raw_output.get("policy") or next(iter(raw_output.values()), None)
     elif isinstance(raw_output, (list, tuple)):
         raw_output = raw_output[0]
 
-    policy = np.asarray(raw_output, dtype=np.float32)
+    policy = np.atleast_1d(np.asarray(raw_output, dtype=np.float32))
     if policy.ndim > 1 and policy.shape[0] == 1:
         policy = policy[0]
     return policy, value_estimate
@@ -161,7 +176,7 @@ def _build_entity_training_model(
     if num_action_context_classes is not None:
         num_action_context_classes = int(num_action_context_classes)
 
-    training_model, _, _ = build_entity_action_models(
+    training_model, _, _, history_attention_model = build_entity_action_models(
         vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
         num_policy_classes=int(metadata["num_action_classes"]),
         hidden_dim=int(metadata["hidden_dim"]),
@@ -189,7 +204,7 @@ def _build_entity_training_model(
         history_turns=int(metadata.get("history_turns", 8)),
         history_events_per_turn=int(metadata.get("history_events_per_turn", 24)),
     )
-    return training_model
+    return training_model, history_attention_model
 
 
 def _action_context_id(
@@ -249,9 +264,11 @@ def load_entity_runtime_artifacts(
             # Rebuild the model architecture from metadata, handling both policy-only and policy-value variants.
             # The first entity family uses Lambda helpers that are unreliable to deserialize directly.
             # Instead, we rebuild the known family architecture and load weights into it.
+            _onnx_path_candidate = model_path.parent / (model_path.stem + ".onnx") if isinstance(model_path, Path) else None
+            _onnx_exists = _ORT_AVAILABLE and _onnx_path_candidate is not None and _onnx_path_candidate.exists()
             if model_path_key == "policy_value_model_path":
                 # Policy-value model: rebuild with value head enabled
-                _, policy_only_model, policy_value_model = build_entity_action_models(
+                _, policy_only_model, policy_value_model, _ = build_entity_action_models(
                     vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
                     num_policy_classes=int(metadata["num_action_classes"]),
                     hidden_dim=int(metadata["hidden_dim"]),
@@ -263,13 +280,14 @@ def load_entity_runtime_artifacts(
                     value_hidden_dim=int(metadata.get("value_hidden_dim", 128)),
                     value_weight=float(metadata.get("value_weight", 0.25)),
                 )
-                policy_value_model.load_weights(model_path)
+                if not _onnx_exists:
+                    policy_value_model.load_weights(model_path)
                 model = policy_value_model
                 has_value_head = True
                 input_mode = "entity_action"
             else:
                 # Policy-only model: rebuild without value head
-                _, model, _ = build_entity_action_models(
+                _, model, _, _ = build_entity_action_models(
                     vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
                     num_policy_classes=int(metadata["num_action_classes"]),
                     hidden_dim=int(metadata["hidden_dim"]),
@@ -278,7 +296,8 @@ def load_entity_runtime_artifacts(
                     learning_rate=float(metadata["learning_rate"]),
                     token_embed_dim=int(metadata.get("token_embed_dim", 24)),
                 )
-                model.load_weights(model_path)
+                if not _onnx_exists:
+                    model.load_weights(model_path)
                 input_mode = "entity_action"
         elif family_id == "entity_action_v2":
             global build_entity_action_v2_models
@@ -333,8 +352,9 @@ def load_entity_runtime_artifacts(
     except ModuleNotFoundError as exc:
         raise SystemExit("TensorFlow is required to serve entity models.") from exc
     # Attempt ONNX export for fast inference, including the legal-candidate v2 family.
+    # GCS model paths are strings, not Path objects — skip ONNX for remote models.
     onnx_session = None
-    if _ORT_AVAILABLE:
+    if _ORT_AVAILABLE and isinstance(model_path, Path):
         onnx_path = model_path.parent / (model_path.stem + ".onnx")
         if not onnx_path.exists():
             try:
@@ -344,7 +364,7 @@ def load_entity_runtime_artifacts(
                 dummy = (
                     _entity_v2_dummy_inputs(int(metadata.get("max_candidates", 10)))
                     if family_id == "entity_action_v2"
-                    else _entity_dummy_inputs()
+                    else _entity_dummy_inputs(metadata)
                 )
                 input_signature = {k: tf.TensorSpec(v.shape, dtype=v.dtype, name=k) for k, v in dummy.items()}
 
@@ -365,7 +385,7 @@ def load_entity_runtime_artifacts(
                 dummy = (
                     _entity_v2_dummy_inputs(int(metadata.get("max_candidates", 10)))
                     if family_id == "entity_action_v2"
-                    else _entity_dummy_inputs()
+                    else _entity_dummy_inputs(metadata)
                 )
                 _ = _run_onnx_outputs(onnx_session, dummy)
                 print(f"[runtime] ONNX session loaded — fast inference enabled (~0.4ms/request)")
@@ -373,27 +393,66 @@ def load_entity_runtime_artifacts(
                 print(f"[runtime] ONNX session load failed: {exc}")
     if onnx_session is None:
         try:
-            _ = model(_entity_dummy_inputs(), training=False)
+            _ = model(_entity_dummy_inputs(metadata), training=False)
         except Exception as exc:
             print(f"[runtime] Keras warmup failed: {exc}")
 
-    model.load_weights(model_path)
+    if onnx_session is None:
+        model.load_weights(model_path)
     training_model = None
-    if family_id == "entity_action_bc" and training_model_path is not None and training_model_path.exists():
-        training_model = _build_entity_training_model(
+    _training_model_loadable = (
+        family_id == "entity_action_bc"
+        and training_model_path is not None
+        and (
+            (isinstance(training_model_path, Path) and training_model_path.exists())
+            or (isinstance(training_model_path, str) and str(training_model_path).startswith("gs://"))
+        )
+    )
+    training_model_fn = None
+    history_attention_model = None
+    history_attention_fn = None
+    if _training_model_loadable:
+        training_model, history_attention_model = _build_entity_training_model(
             metadata,
             token_vocabs=token_vocabs,
             action_context_vocab=action_context_vocab,
             sequence_vocab=sequence_vocab,
         )
-        training_model.load_weights(training_model_path)
+        training_model.load_weights(str(training_model_path))
+        # history_attention_model shares layer objects with training_model, so
+        # load_weights above also populates the attention extractor.
         has_value_head = has_value_head or bool(metadata.get("predict_value"))
-    model_id = str(metadata.get("model_release_id") or metadata.get("model_name") or model_path.stem)
+        # Wrap the training-model call in a retraced tf.function so each /predict
+        # reuses a compiled graph instead of re-dispatching eager Python ops.
+        # On CPU this drops rerank latency from ~350ms → ~15-30ms per call.
+        try:
+            import tensorflow as _tf
+
+            @_tf.function(reduce_retracing=True)
+            def _training_model_fn(inputs):
+                return training_model(inputs, training=False)
+
+            training_model_fn = _training_model_fn
+
+            if history_attention_model is not None:
+                @_tf.function(reduce_retracing=True)
+                def _history_attention_fn(inputs):
+                    return history_attention_model(inputs, training=False)
+
+                history_attention_fn = _history_attention_fn
+        except Exception as _exc:
+            print(f"[runtime] tf.function wrap failed: {_exc}")
+            training_model_fn = None
+            history_attention_fn = None
+    model_id = str(metadata.get("model_release_id") or metadata.get("model_name") or Path(str(model_path)).stem)
     family_default_switch_bias = 0.20 if family_id == "entity_action_bc" else 0.0
     return {
         "kind": "entity",
         "model": model,
         "training_model": training_model,
+        "training_model_fn": training_model_fn,
+        "history_attention_model": history_attention_model,
+        "history_attention_fn": history_attention_fn,
         "onnx_session": onnx_session,
         "model_id": model_id,
         "model_name": metadata.get("model_name"),
@@ -563,8 +622,17 @@ def predict_entity_auxiliary_outputs_batch(
             )
             raw_inputs["event_history_tokens"] = [hist_tokens] * batch_size
             raw_inputs["event_history_mask"] = [hist_mask] * batch_size
+    import time as _t
+    _t0 = _t.perf_counter()
     batched_inputs = to_numpy_entity_inputs(raw_inputs)
-    raw_output = _normalize_runtime_outputs(training_model(batched_inputs, training=False))
+    _t1 = _t.perf_counter()
+    _training_fn = runtime.get("training_model_fn")
+    if _training_fn is not None:
+        raw_output = _normalize_runtime_outputs(_training_fn(batched_inputs))
+    else:
+        raw_output = _normalize_runtime_outputs(training_model(batched_inputs, training=False))
+    _t2 = _t.perf_counter()
+    print(f"[rerank] prep={((_t1-_t0)*1000):.1f}ms  model={((_t2-_t1)*1000):.1f}ms  batch={batch_size}", flush=True)
     if not isinstance(raw_output, dict):
         return [None for _ in my_action_tokens]
 
@@ -572,6 +640,23 @@ def predict_entity_auxiliary_outputs_batch(
     value = raw_output.get("value")
     sequence = raw_output.get("sequence")
     transition = raw_output.get("transition")
+    # Attention weights live on a separate model that shares layers with
+    # training_model. Per-decision quantity, identical across candidates,
+    # so we run it with batch_size=1 on the first slice.
+    history_attention = None
+    attn_fn = runtime.get("history_attention_fn") or runtime.get("history_attention_model")
+    if attn_fn is not None and "event_history_tokens" in batched_inputs:
+        attn_inputs = {
+            k: v[:1] for k, v in batched_inputs.items()
+            if k not in ("my_action", "opp_action")
+        }
+        try:
+            attn_out = attn_fn(attn_inputs)
+            attn_array = np.asarray(attn_out, dtype=np.float32)
+            if attn_array.ndim == 2 and attn_array.shape[0] == 1:
+                history_attention = attn_array[0]  # [K]
+        except Exception as _exc:
+            print(f"[rerank] history_attention call failed: {_exc}", flush=True)
     reverse_vocab = runtime.get("sequence_reverse_vocab") or {}
 
     outputs_by_action: list[dict[str, Any] | None] = []
@@ -590,8 +675,9 @@ def predict_entity_auxiliary_outputs_batch(
             )
         if transition is not None:
             outputs["transition_prediction"] = np.asarray(transition[index], dtype=np.float32)
-        # history_attention weights are computed post-hoc in the notebook via
-        # history_attention_layer.compute_weights() — not extracted at serve time.
+        if history_attention is not None:
+            # Identical per-decision vector; replicate into each candidate.
+            outputs["history_attention"] = history_attention
         outputs_by_action.append(outputs)
 
     return outputs_by_action

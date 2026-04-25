@@ -39,3 +39,11 @@ artifacts/*_summary*.json
 artifacts/*_vocab*.json
 artifacts/*.keras
 artifacts/*.h5
+
+# entity/RL artifact subdirectories (models + vocab + metadata, all in GCS)
+artifacts/entity_*/
+artifacts/legacy/
+
+# local-only metadata overrides (contain machine-local paths, never commit)
+*.local.json
+*.local.json.bak

@@ -279,6 +279,7 @@ def build_entity_action_models(
     history_lstm_dim: int = 64,
     history_turns: int = 8,
     history_events_per_turn: int = 24,
+    policy_reads_history: bool = False,
 ):
     """Build the multitask entity-action models.
 
@@ -511,9 +512,35 @@ def build_entity_action_models(
 
     # v1 still predicts the global action vocabulary because offline logs do not contain
     # the per-turn legal request objects needed for true action-wise legal scoring.
-    # Policy head uses `shared` (not shared_with_history) for backward compatibility.
-    policy_logits = layers.Dense(num_policy_classes, name="policy")(shared)
-    policy_model = keras.Model(inputs, policy_logits, name="entity_action_policy_model")
+    #
+    # Policy head variants:
+    #   - default (policy_reads_history=False): reads `shared` (history-free, backward
+    #     compatible). The policy-only artifact then takes only the state inputs.
+    #   - policy_reads_history=True + use_history=True: reads a raw
+    #     Concatenate([shared, history_context]) of shape [hidden_dim + attn_dim].
+    #     This is the "decoder" variant — the policy head actually consumes the
+    #     history encoding, not just the aux heads. The policy-only artifact is
+    #     NO LONGER history-free: it needs event_history_tokens/event_history_mask.
+    decoder_variant = bool(policy_reads_history and history_context is not None)
+    if decoder_variant:
+        policy_input_features = layers.Concatenate(name="policy_history_concat")(
+            [shared, history_context]
+        )
+    else:
+        policy_input_features = shared
+    policy_logits = layers.Dense(num_policy_classes, name="policy")(policy_input_features)
+
+    # Policy-only inference artifact. If the decoder variant is active, include the
+    # history inputs — they are now reachable (and required) from policy_logits.
+    if decoder_variant:
+        policy_model_inputs = dict(inputs)
+        policy_model_inputs["event_history_tokens"] = hist_tokens_input
+        policy_model_inputs["event_history_mask"] = hist_mask_input
+        policy_model = keras.Model(
+            policy_model_inputs, policy_logits, name="entity_action_policy_model"
+        )
+    else:
+        policy_model = keras.Model(inputs, policy_logits, name="entity_action_policy_model")
 
     policy_metrics: List[Any] = [keras.metrics.SparseCategoricalAccuracy(name="top1")]
     if num_policy_classes >= 3:

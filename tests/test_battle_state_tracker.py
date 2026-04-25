@@ -18,7 +18,7 @@ from StateVectorization import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLE_BATTLE_PATH = ROOT / "gen9randombattle-2390494424.json"
+SAMPLE_BATTLE_PATH = ROOT / "data" / "gen9randombattle-2390494424.json"
 
 
 class BattleStateTrackerTests(unittest.TestCase):

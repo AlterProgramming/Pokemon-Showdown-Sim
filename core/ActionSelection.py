@@ -89,7 +89,7 @@ def adjust_logits_for_switch_bias(
     if legal_switches is None or len(legal_switches) == 0:
         return np.asarray(logits, dtype=np.float32)
 
-    adjusted = np.asarray(logits, dtype=np.float32).copy()
+    adjusted = np.atleast_1d(np.asarray(logits, dtype=np.float32).copy())
     switch_indices = [
         idx
         for token, idx in action_vocab.items()
@@ -115,7 +115,7 @@ def pick_best_slot_target(
     if not action_vocab:
         return {"type": target_type, "payload": slot_targets[0], "token": None}, None
 
-    probs = softmax(logits)
+    probs = softmax(np.atleast_1d(np.asarray(logits, dtype=np.float32)))
     best_target = None
     best_prob = -1.0
 

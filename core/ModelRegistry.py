@@ -267,7 +267,7 @@ def build_model_registry(repo_path: Path) -> dict[str, Any]:
 
         resolved_model_path = resolve_artifact_path(repo_path, metadata_path, str(policy_model_path))
         resolved_vocab_path = resolve_artifact_path(repo_path, metadata_path, str(policy_vocab_path))
-        if not resolved_model_path.exists() or not resolved_vocab_path.exists():
+        if not isinstance(resolved_model_path, str) and (not resolved_model_path.exists() or not resolved_vocab_path.exists()):
             continue
 
         model_name = metadata.get("model_name") or Path(str(policy_model_path)).stem

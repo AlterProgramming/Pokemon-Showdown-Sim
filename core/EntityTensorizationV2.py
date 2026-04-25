@@ -114,7 +114,7 @@ def encode_entity_candidates(
             candidate_move[idx] = vocab_lookup(token_vocabs["move"], move_id)
         elif action_type == "switch":
             candidate_type[idx] = ACTION_TYPE_SWITCH
-            candidate_switch_slot[idx] = _switch_slot_from_candidate(candidate)
+            candidate_switch_slot[idx] = min(_switch_slot_from_candidate(candidate), 6)
         if candidate.get("is_chosen"):
             chosen_candidate_index = idx
 

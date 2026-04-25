@@ -97,6 +97,12 @@ def parse_args() -> argparse.Namespace:
         metavar="PATH",
         help="If set, write one JSONL record per /predict call to this file.",
     )
+    parser.add_argument(
+        "--disable-history-buffer",
+        action="store_true",
+        help="Force past_turn_events=[] for aux-head rerank. Ablation: isolates "
+             "live-history contribution while keeping the rest of the rerank pipeline.",
+    )
     return parser.parse_args()
 
 
@@ -176,7 +182,9 @@ def select_best_v2_candidate(
     switch_reason: str | None,
     switch_logit_bias: float,
 ) -> tuple[dict[str, Any] | None, float]:
-    adjusted = np.asarray(logits, dtype=np.float32).copy()
+    adjusted = np.atleast_1d(np.asarray(logits, dtype=np.float32).copy())
+    # Guard: model may return fewer logits than candidates (e.g. scalar squeeze).
+    candidate_tokens = candidate_tokens[:len(adjusted)]
     if (
         switch_logit_bias > 0
         and switch_reason not in FORCED_SWITCH_REASONS
@@ -428,7 +436,7 @@ def predict():
         last_turn_events = data.get("last_turn_events")  # list of event dicts, optional
         past_turn_events: list = []
 
-        if SERVER_STATE.get("use_history") and battle_id:
+        if SERVER_STATE.get("use_history") and battle_id and not SERVER_STATE.get("_disable_history_buffer"):
             K = int(SERVER_STATE.get("history_turns", 8))
             buf = _get_history_buffer(battle_id, K)
             if last_turn_events is not None:
@@ -699,6 +707,9 @@ def main() -> None:
     SERVER_STATE = load_server_state(metadata_path)
     SERVER_STATE["_capture_aux_log_path"] = getattr(args, "capture_aux_log", None)
     SERVER_STATE["_capture_aux_log_lock"] = threading.Lock()
+    SERVER_STATE["_disable_history_buffer"] = bool(getattr(args, "disable_history_buffer", False))
+    if SERVER_STATE["_disable_history_buffer"]:
+        print("[entity-server] --disable-history-buffer: past_turn_events will be forced empty")
     reset_server_metrics()
     print(f"[entity-server] model_id={SERVER_STATE['model_id']}")
     print(f"[entity-server] metadata_path={metadata_path}")
