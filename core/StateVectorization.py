@@ -170,6 +170,43 @@ def field_features(state: Dict[str, Any]) -> List[float]:
     return weather_vec + global_vec
 
 
+def opponent_team_composition_features(
+    team: Optional[List[Dict[str, Any]]],
+    perspective_player: str,
+    species_hash_dim: int = 16,
+) -> List[float]:
+    """
+    Encodes all 6 visible opponent team member species using hashed encoding.
+
+    For each of the 6 team slots (active + 5 bench), uses visible_species() to determine
+    if the opponent's mon is visible from the perspective_player's viewpoint, then hashes
+    the species into a species_hash_dim vector using stable_hash.
+
+    Returns a flat vector: [6 * species_hash_dim] = 96 dimensions (by default)
+
+    Args:
+        team: List of up to 6 team member dicts, or None/empty for unknown team
+        perspective_player: Player ID for visibility checks (e.g., 'p1', 'p2')
+        species_hash_dim: Hash dimensionality per species (default 16)
+
+    Returns:
+        Flat list of floats with length 6 * species_hash_dim
+    """
+    feats: List[float] = []
+
+    if team is None:
+        team = []
+
+    # Iterate through 6 team slots (active + 5 bench)
+    for i in range(6):
+        mon = team[i] if i < len(team) else None
+        species = visible_species(mon, perspective_player)
+        species_vec = hashed_species(species, species_hash_dim)
+        feats.extend(species_vec)
+
+    return feats
+
+
 def side_condition_features(side_state: Dict[str, Any]) -> List[float]:
     conditions = side_state.get("side_conditions", {}) or {}
     feats: List[float] = []
