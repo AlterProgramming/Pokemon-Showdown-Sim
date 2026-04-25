@@ -253,6 +253,11 @@ def state_vector_layout() -> List[Dict[str, Any]]:
             "description": "Opponent bench slots with the same bench template, masked to public information.",
         },
         {
+            "name": "opponent_team_composition",
+            "size": 6 * 16,
+            "description": "Opponent team composition: 6 pokémon × 16-dim hashed species = 96 dims.",
+        },
+        {
             "name": "field",
             "size": field_feature_dim(),
             "description": "Weather plus global field conditions such as terrain or Trick Room.",
@@ -425,6 +430,14 @@ def encode_state_v0(state: Dict[str, Any], perspective_player: str) -> List[floa
 
     for uid in opp_slots:
         vec += bench_slot_features(mons.get(uid) if uid else None, perspective_player)
+
+    # Encode opponent team composition: active + bench slots as a list
+    opp_team = []
+    if opp_active_uid:
+        opp_team.append(mons.get(opp_active_uid))
+    for uid in opp_slots:
+        opp_team.append(mons.get(uid) if uid else None)
+    vec += opponent_team_composition_features(opp_team, perspective_player, species_hash_dim=16)
 
     vec += field_features(state)
     vec += side_condition_features(state[perspective_player])
