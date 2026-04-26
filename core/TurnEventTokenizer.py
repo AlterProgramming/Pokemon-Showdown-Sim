@@ -308,3 +308,41 @@ def encode_event_history(
         mask.append(1.0)
 
     return tokens, mask
+
+
+def encode_action_history(
+    past_actions: List[str],
+    action_vocab: Dict[str, int],
+    max_turns: int,
+) -> Tuple[List[int], List[float]]:
+    """Encode past action tokens to IDs and left-pad to max_turns.
+
+    Parameters
+    ----------
+    past_actions : list of str
+        List of action strings, e.g., ["move tackle", "switch pikachu", ...].
+    action_vocab : dict
+        Mapping from action string to integer ID.
+    max_turns : int
+        K — pad to this length.
+
+    Returns
+    -------
+    action_ids : list of int
+        Shape [max_turns]. Token IDs, left-padded with 0 (PAD).
+    action_mask : list of float
+        Shape [max_turns]. 1.0 for real turns, 0.0 for padded.
+    """
+    # Tokenize each action using vocab.get with UNK fallback
+    action_ids = [action_vocab.get(act, action_vocab.get("UNK", 0)) for act in past_actions]
+
+    # Left-pad with zeros to length max_turns
+    padded_ids = [0] * (max_turns - len(action_ids)) + action_ids
+    padded_ids = padded_ids[-max_turns:]  # Clip to max_turns if too long
+
+    # Create mask: 1.0 for real, 0.0 for padded
+    num_real = min(len(action_ids), max_turns)
+    num_padded = max_turns - num_real
+    mask = [0.0] * num_padded + [1.0] * num_real
+
+    return padded_ids, mask
