@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -203,6 +204,9 @@ def _build_entity_training_model(
         history_lstm_dim=int(metadata.get("history_lstm_dim", 64)),
         history_turns=int(metadata.get("history_turns", 8)),
         history_events_per_turn=int(metadata.get("history_events_per_turn", 24)),
+        use_history_decoding=bool(metadata.get("use_history_decoding", False)),
+        action_vocab_size=int(metadata.get("action_vocab_size", 0)),
+        decoded_action_weight=float(metadata.get("decoded_action_weight", 0.15)),
     )
     return training_model, history_attention_model
 
@@ -233,7 +237,7 @@ def load_entity_runtime_artifacts(
     if family_id == "entity_action_v2":
         model_path_key = "training_model_path" if bool(metadata.get("predict_value")) and metadata.get("training_model_path") else "policy_model_path"
     else:
-        model_path_key = "policy_value_model_path" if "policy_value_model_path" in metadata else "policy_model_path"
+        model_path_key = "policy_value_model_path" if metadata.get("policy_value_model_path") else "policy_model_path"
 
     model_path = resolve_artifact_path(repo_path, metadata_path, str(metadata[model_path_key]))
     policy_vocab_path = None
@@ -444,6 +448,20 @@ def load_entity_runtime_artifacts(
             print(f"[runtime] tf.function wrap failed: {_exc}")
             training_model_fn = None
             history_attention_fn = None
+    use_history_decoding = bool(metadata.get("use_history_decoding", False))
+    action_vocab_size = int(metadata.get("action_vocab_size", 0))
+    history_decoding_action_vocab: dict[str, int] = {}
+    history_decoding_action_id_to_string: dict[int, str] = {}
+    if use_history_decoding:
+        action_vocab_path = os.path.join(os.path.dirname(str(model_path)), "action_vocab.json")
+        if os.path.exists(action_vocab_path):
+            with open(action_vocab_path, "r") as f:
+                history_decoding_action_vocab = json.load(f)
+            history_decoding_action_id_to_string = {v: k for k, v in history_decoding_action_vocab.items()}
+        else:
+            import logging as _logging
+            _logging.getLogger(__name__).warning(f"Action vocab not found at {action_vocab_path}")
+
     model_id = str(metadata.get("model_release_id") or metadata.get("model_name") or Path(str(model_path)).stem)
     family_default_switch_bias = 0.20 if family_id == "entity_action_bc" else 0.0
     return {
@@ -479,6 +497,11 @@ def load_entity_runtime_artifacts(
         "use_history": bool(metadata.get("use_history", False)),
         "history_turns": int(metadata.get("history_turns", 8)),
         "history_events_per_turn": int(metadata.get("history_events_per_turn", 24)),
+        "use_history_decoding": use_history_decoding,
+        "action_vocab_size": action_vocab_size,
+        "action_vocab": history_decoding_action_vocab,
+        "action_id_to_string": history_decoding_action_id_to_string,
+        "decoded_action_weight": float(metadata.get("decoded_action_weight", 0.15)),
     }
 
 
@@ -612,6 +635,7 @@ def predict_entity_auxiliary_outputs_batch(
         for _ in range(batch_size)
     ]
     use_history = bool(runtime.get("use_history"))
+    use_history_decoding = bool(runtime.get("use_history_decoding"))
     if use_history and past_turn_events is not None:
         sequence_vocab = runtime.get("sequence_vocab")
         if sequence_vocab:
@@ -622,6 +646,23 @@ def predict_entity_auxiliary_outputs_batch(
             )
             raw_inputs["event_history_tokens"] = [hist_tokens] * batch_size
             raw_inputs["event_history_mask"] = [hist_mask] * batch_size
+    if use_history_decoding and past_turn_events is not None:
+        sequence_vocab = runtime.get("sequence_vocab")
+        if sequence_vocab:
+            history_turns = int(runtime.get("history_turns", 8))
+            history_events_per_turn = int(runtime.get("history_events_per_turn", 24))
+            hist_tokens, hist_mask = encode_event_history(
+                past_turn_events, sequence_vocab, history_turns, history_events_per_turn
+            )
+            if "event_history_tokens" not in raw_inputs:
+                raw_inputs["event_history_tokens"] = [hist_tokens] * batch_size
+                raw_inputs["event_history_mask"] = [hist_mask] * batch_size
+            # At inference there is no ground-truth past action; use zeros with the
+            # same mask shape so the decoder attends to the event history only.
+            raw_inputs["past_action_ids"] = [
+                np.zeros(history_turns, dtype=np.int32) for _ in range(batch_size)
+            ]
+            raw_inputs["past_action_mask"] = [hist_mask] * batch_size
     import time as _t
     _t0 = _t.perf_counter()
     batched_inputs = to_numpy_entity_inputs(raw_inputs)
@@ -640,6 +681,18 @@ def predict_entity_auxiliary_outputs_batch(
     value = raw_output.get("value")
     sequence = raw_output.get("sequence")
     transition = raw_output.get("transition")
+    decoded_action_logits_raw = raw_output.get("decoded_actions") if use_history_decoding else None
+    decoded_actions_batch: list[list[str]] | None = None
+    if decoded_action_logits_raw is not None:
+        action_id_to_string = runtime.get("action_id_to_string") or {}
+        decoded_action_ids = np.argmax(np.asarray(decoded_action_logits_raw, dtype=np.float32), axis=-1)  # [batch, K]
+        decoded_actions_batch = [
+            [
+                action_id_to_string.get(int(aid), f"ACTION_{aid}")
+                for aid in batch_ids
+            ]
+            for batch_ids in decoded_action_ids
+        ]
     # Attention weights live on a separate model that shares layers with
     # training_model. Per-decision quantity, identical across candidates,
     # so we run it with batch_size=1 on the first slice.
@@ -678,6 +731,8 @@ def predict_entity_auxiliary_outputs_batch(
         if history_attention is not None:
             # Identical per-decision vector; replicate into each candidate.
             outputs["history_attention"] = history_attention
+        if decoded_actions_batch is not None and index < len(decoded_actions_batch):
+            outputs["decoded_actions"] = decoded_actions_batch[index]
         outputs_by_action.append(outputs)
 
     return outputs_by_action
