@@ -103,6 +103,11 @@ def parse_args() -> argparse.Namespace:
         help="Force past_turn_events=[] for aux-head rerank. Ablation: isolates "
              "live-history contribution while keeping the rest of the rerank pipeline.",
     )
+    parser.add_argument(
+        "--capture-decoded-actions",
+        action="store_true",
+        help="Include decoded action predictions in auxiliary log when --capture-aux-log is set",
+    )
     return parser.parse_args()
 
 
@@ -280,7 +285,7 @@ def _select_best_action_with_auxiliary(
     sequence_scale: float,
     voluntary_switch_penalty: float,
     past_turn_events: list[list[dict]] | None = None,
-) -> tuple[dict[str, Any] | None, float | None, list[dict[str, Any]]]:
+) -> tuple[dict[str, Any] | None, float | None, list[dict[str, Any]], list[str] | None]:
     action_vocab = SERVER_STATE["action_vocab"]
     adjusted_logits = adjust_logits_for_switch_bias(
         logits,
@@ -299,6 +304,7 @@ def _select_best_action_with_auxiliary(
     combined_scores: list[float] = []
     best_candidate = None
     best_score = None
+    decoded_actions_this_turn = None
     auxiliary_outputs = predict_entity_auxiliary_outputs_batch(
         SERVER_STATE,
         battle_state,
@@ -307,6 +313,12 @@ def _select_best_action_with_auxiliary(
         opp_action_token=opponent_action_token,
         past_turn_events=past_turn_events,
     )
+
+    # Extract decoded actions from the first auxiliary output (if available)
+    if auxiliary_outputs and len(auxiliary_outputs) > 0:
+        first_output = auxiliary_outputs[0]
+        if first_output and "decoded_actions" in first_output:
+            decoded_actions_this_turn = first_output["decoded_actions"]
 
     for index, candidate in enumerate(candidates):
         base_logit = float(adjusted_logits[candidate["index"]])
@@ -396,7 +408,7 @@ def _select_best_action_with_auxiliary(
             del analysis["_candidate_index"]
 
     analyses.sort(key=lambda entry: float(entry["combined_score"]), reverse=True)
-    return best_candidate, best_score, analyses
+    return best_candidate, best_score, analyses, decoded_actions_this_turn
 
 
 @APP.route("/health", methods=["GET"])
@@ -550,8 +562,9 @@ def predict():
             )
         else:
             auxiliary_analysis = None
+            decoded_actions_this_turn = None
             if auxiliary_mode == "rerank":
-                best_action, best_prob, auxiliary_analysis = _select_best_action_with_auxiliary(
+                best_action, best_prob, auxiliary_analysis, decoded_actions_this_turn = _select_best_action_with_auxiliary(
                     battle_state=battle_state,
                     perspective_player=perspective_player,
                     logits=logits,
@@ -566,14 +579,18 @@ def predict():
                     voluntary_switch_penalty=voluntary_switch_penalty,
                     past_turn_events=past_turn_events,
                 )
-                _append_aux_log({
+
+                jsonl_record = {
                     "battle_id": battle_id,
                     "turn_number": battle_state.get("turn_index"),
                     "perspective_player": perspective_player,
                     "past_turns_in_buffer": len(past_turn_events),
                     "selected_action_token": best_action.get("token") if best_action else None,
                     "analyses": auxiliary_analysis,
-                })
+                }
+                if SERVER_STATE.get("_capture_decoded_actions") and decoded_actions_this_turn is not None:
+                    jsonl_record["decoded_actions_this_turn"] = decoded_actions_this_turn
+                _append_aux_log(jsonl_record)
             else:
                 best_action, best_prob = select_best_action(
                     SERVER_STATE["action_vocab"],
@@ -708,8 +725,11 @@ def main() -> None:
     SERVER_STATE["_capture_aux_log_path"] = getattr(args, "capture_aux_log", None)
     SERVER_STATE["_capture_aux_log_lock"] = threading.Lock()
     SERVER_STATE["_disable_history_buffer"] = bool(getattr(args, "disable_history_buffer", False))
+    SERVER_STATE["_capture_decoded_actions"] = bool(getattr(args, "capture_decoded_actions", False))
     if SERVER_STATE["_disable_history_buffer"]:
         print("[entity-server] --disable-history-buffer: past_turn_events will be forced empty")
+    if SERVER_STATE["_capture_decoded_actions"]:
+        print("[entity-server] --capture-decoded-actions: decoded action predictions will be included in aux log")
     reset_server_metrics()
     print(f"[entity-server] model_id={SERVER_STATE['model_id']}")
     print(f"[entity-server] metadata_path={metadata_path}")
