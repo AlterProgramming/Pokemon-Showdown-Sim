@@ -28,7 +28,8 @@ from .StateVectorization import (
     build_action_vocab,
     encode_turn_outcome,
 )
-from .TurnEventTokenizer import build_sequence_vocab, encode_turn_event_sequence
+from .TurnEventTokenizer import build_sequence_vocab, encode_turn_event_sequence, encode_action_history
+from .StateVectorization import build_action_vocab as build_policy_vocab
 
 
 PAD_TOKEN = "<PAD>"
@@ -49,6 +50,7 @@ ENTITY_INT_INPUT_KEYS = {
     "my_action",
     "opp_action",
     "event_history_tokens",
+    "past_action_ids",
 }
 
 
@@ -169,6 +171,29 @@ def build_entity_token_vocabs(examples: Sequence[Dict[str, Any]]) -> Dict[str, D
             tokens_by_field["global_condition"].add(str(cond))
 
     return {field: make_token_vocab(tokens) for field, tokens in tokens_by_field.items()}
+
+
+def build_action_vocab(examples: List[dict]) -> Dict[str, int]:
+    """
+    Build vocabulary of action tokens from all examples.
+
+    Returns:
+        {action_string: action_id, ...}
+        Special tokens: 0 = PAD, 1 = UNK
+    """
+    vocab = {
+        "PAD": 0,
+        "UNK": 1,
+    }
+    next_id = 2
+
+    for ex in examples:
+        for action in ex.get("past_turn_actions", []):
+            if action not in vocab:
+                vocab[action] = next_id
+                next_id += 1
+
+    return vocab
 
 
 def _pad_or_trim_ids(
@@ -323,6 +348,8 @@ def vectorize_entity_multitask_dataset(
     include_history: bool = False,
     history_turns: int = 8,
     history_events_per_turn: int = 24,
+    include_history_decoding: bool = False,
+    action_vocab: Dict[str, int] | None = None,
 ) -> Tuple[Dict[str, List[Any]], Dict[str, List[Any]]]:
     """Convert entity examples into raw tensor lists for supervised multitask training.
 
@@ -347,6 +374,9 @@ def vectorize_entity_multitask_dataset(
         "global_conditions": [],
         "global_numeric": [],
     }
+    if include_history_decoding:
+        X["past_action_ids"] = []
+        X["past_action_mask"] = []
     y_policy: List[int] = []
     y_transition: List[List[float]] = []
     y_value: List[float] = []
@@ -431,6 +461,18 @@ def vectorize_entity_multitask_dataset(
             X_history_tokens.append(hist_tokens)
             X_history_mask.append(hist_mask)
 
+        if include_history_decoding:
+            if action_vocab is None:
+                raise ValueError("action_vocab required when include_history_decoding=True")
+
+            action_ids, action_mask = encode_action_history(
+                ex.get("past_turn_actions", []),
+                action_vocab,
+                history_turns,
+            )
+            X["past_action_ids"].append(action_ids)
+            X["past_action_mask"].append(action_mask)
+
     if include_history:
         X["event_history_tokens"] = X_history_tokens
         X["event_history_mask"] = X_history_mask
@@ -438,6 +480,13 @@ def vectorize_entity_multitask_dataset(
     if include_transition or include_sequence:
         X["my_action"] = X_my_action
         X["opp_action"] = X_opp_action
+
+    # Validation guard for history decoding
+    if include_history_decoding:
+        if not action_vocab or len(action_vocab) == 0:
+            raise ValueError(
+                "Cannot vectorize with history decoding: action_vocab is empty or None"
+            )
 
     targets: Dict[str, List[Any]] = {"policy": y_policy}
     if include_transition:
@@ -461,9 +510,11 @@ def build_entity_training_bundle(
     include_history: bool = False,
     history_turns: int = 8,
     history_events_per_turn: int = 24,
+    include_history_decoding: bool = False,
 ) -> Dict[str, Any]:
     """Build the vocabulary bundle that defines a concrete entity-family release."""
-    policy_vocab = build_action_vocab(
+    # Policy vocab: uses StateVectorization's build_action_vocab with frequency filtering
+    policy_vocab = build_policy_vocab(
         examples,
         min_count=min_move_count,
         include_switches=include_switches,
@@ -478,10 +529,19 @@ def build_entity_training_bundle(
         "token_vocabs": token_vocabs,
         "entity_tensor_layout": entity_tensor_layout(),
     }
-    need_sequence_vocab = include_sequence or include_history
+    need_sequence_vocab = include_sequence or include_history or include_history_decoding
     if need_sequence_vocab:
         bundle["sequence_vocab"] = build_sequence_vocab(examples)
+
+    # Build action vocab for history decoding: simple token→id mapping without filtering
+    if include_history_decoding:
+        bundle["action_vocab"] = build_action_vocab(examples)
+
     if include_history:
         bundle["history_turns"] = history_turns
         bundle["history_events_per_turn"] = history_events_per_turn
-    return bundle
+
+    return {
+        **bundle,
+        "action_vocab": bundle.get("action_vocab", {}),
+    }
