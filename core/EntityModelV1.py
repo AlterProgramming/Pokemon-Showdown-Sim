@@ -220,6 +220,133 @@ class HistoryAttention(_keras().layers.Layer):
         return cfg
 
 
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class ActionDecoder(_keras().layers.Layer):
+    """Decode LSTM hidden states back into action logits.
+
+    Reconstructs what actions were taken in the past by projecting LSTM output
+    through a dense layer to produce per-turn action logits. Padded positions
+    are masked out with large negative values.
+    """
+
+    def __init__(self, action_vocab_size: int, hidden_dim: int = 64, **kwargs):
+        super().__init__(**kwargs)
+        self.action_vocab_size = action_vocab_size
+        self.hidden_dim = hidden_dim
+        self.supports_masking = True
+
+    def build(self, input_shape):
+        # input_shape = (lstm_output_shape, action_mask_shape)
+        lstm_output_shape = input_shape[0]
+        lstm_dim = lstm_output_shape[-1]
+
+        self.dense = _keras().layers.Dense(
+            self.hidden_dim, activation="relu", name=f"{self.name}_dense"
+        )
+        self.logits = _keras().layers.Dense(
+            self.action_vocab_size, name=f"{self.name}_logits"
+        )
+
+    def call(self, inputs, mask=None):
+        tf = _tf()
+        lstm_output, action_mask = inputs
+
+        # Project and decode
+        hidden = self.dense(lstm_output)  # [batch, K, hidden_dim]
+        logits = self.logits(hidden)      # [batch, K, action_vocab_size]
+
+        # Mask: set logits to large negative for padded positions
+        if action_mask is not None:
+            mask_expanded = tf.expand_dims(action_mask, axis=-1)  # [batch, K, 1]
+            logits = logits + (1.0 - mask_expanded) * -1e9
+
+        return logits
+
+    def compute_output_shape(self, input_shape):
+        lstm_output_shape = input_shape[0]
+        return (lstm_output_shape[0], lstm_output_shape[1], self.action_vocab_size)
+
+    def compute_mask(self, inputs, mask=None):
+        return None
+
+    def get_config(self):
+        cfg = super().get_config()
+        cfg.update({
+            "action_vocab_size": self.action_vocab_size,
+            "hidden_dim": self.hidden_dim,
+        })
+        return cfg
+
+
+@_keras().saving.register_keras_serializable(package="EntityModelV1")
+class PastActionContext(_keras().layers.Layer):
+    """Extract context from decoded past actions via cross-attention.
+
+    Attends over decoded action embeddings using the shared state as query
+    to produce a context vector that captures which past actions are relevant.
+    """
+
+    def __init__(self, attn_dim: int, **kwargs):
+        super().__init__(**kwargs)
+        self.attn_dim = attn_dim
+        self.supports_masking = True
+
+    def build(self, input_shape):
+        # input_shape = (shared_shape, action_logits_shape, action_mask_shape)
+        self.action_embed_dense = _keras().layers.Dense(
+            self.attn_dim, activation="relu", name=f"{self.name}_action_embed"
+        )
+        self.attn_Wq = _keras().layers.Dense(
+            self.attn_dim, use_bias=False, name=f"{self.name}_attn_Wq"
+        )
+        self.attn_Wk = _keras().layers.Dense(
+            self.attn_dim, use_bias=False, name=f"{self.name}_attn_Wk"
+        )
+        self.attn_Wv = _keras().layers.Dense(
+            self.attn_dim, use_bias=False, name=f"{self.name}_attn_Wv"
+        )
+
+    def call(self, inputs, mask=None):
+        ops = _keras().ops
+        shared, action_logits, action_mask = inputs
+
+        # Embed the action logits: [batch, K, action_vocab_size] → [batch, K, attn_dim]
+        action_embed = self.action_embed_dense(action_logits)
+
+        # Attend: shared as query [batch, shared_dim] → [batch, 1, shared_dim]
+        shared_q = ops.reshape(shared, (ops.shape(shared)[0], 1, ops.shape(shared)[-1]))
+
+        # Project query and keys
+        _q_p = self.attn_Wq(shared_q)  # [batch, 1, attn_dim]
+        _k_p = self.attn_Wk(action_embed)  # [batch, K, attn_dim]
+        _v_p = self.attn_Wv(action_embed)  # [batch, K, attn_dim]
+
+        # Scaled dot-product attention
+        _scale = self.attn_dim ** -0.5
+        _scores = ops.matmul(_q_p, ops.transpose(_k_p, axes=(0, 2, 1))) * _scale  # [batch, 1, K]
+        _fmask = ops.cast(ops.expand_dims(action_mask, axis=1), _q_p.dtype)  # [batch, 1, K]
+        _scores = _scores + (1.0 - _fmask) * -1e9
+        _attn_w = ops.softmax(_scores, axis=-1)  # [batch, 1, K]
+        context_seq = ops.matmul(_attn_w, _v_p)  # [batch, 1, attn_dim]
+
+        # Reshape to [batch, attn_dim]
+        context = ops.reshape(context_seq, (ops.shape(context_seq)[0], self.attn_dim))
+
+        return context
+
+    def compute_output_shape(self, input_shape):
+        shared_shape = input_shape[0]
+        return (shared_shape[0], self.attn_dim)
+
+    def compute_mask(self, inputs, mask=None):
+        return None
+
+    def get_config(self):
+        cfg = super().get_config()
+        cfg.update({"attn_dim": self.attn_dim})
+        return cfg
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -280,6 +407,9 @@ def build_entity_action_models(
     history_turns: int = 8,
     history_events_per_turn: int = 24,
     policy_reads_history: bool = False,
+    use_history_decoding: bool = False,
+    action_vocab_size: int | None = None,
+    decoded_action_weight: float = 0.15,
 ):
     """Build the multitask entity-action models.
 
@@ -440,6 +570,13 @@ def build_entity_action_models(
 
     # --- Optional event history encoder ---
     history_context = None
+    history_attention_weights = None
+    hist_tokens_input = None
+    hist_mask_input = None
+    past_action_context = None
+    action_logits_decoded = None
+    past_action_ids_input = None
+    past_action_mask_input = None
 
     if use_history and history_vocab_size is not None:
         _attn_dim = history_lstm_dim * 2
@@ -501,6 +638,44 @@ def build_entity_action_models(
             (history_turns,), name="history_attention_weights"
         )(_attn_w)
 
+        # --- NEW: Optional action decoder sub-graph ---
+        # Decode past actions from LSTM hidden states, then extract context.
+        # Note: use_history_decoding REQUIRES use_history to be True (hist_lstm_out dependency)
+        if use_history_decoding:
+            if action_vocab_size is None or action_vocab_size == 0:
+                raise ValueError("action_vocab_size required for history decoding")
+            if not use_history:
+                raise ValueError("use_history_decoding requires use_history=True")
+
+            # Add action sequence inputs to model_inputs
+            past_action_ids_input = layers.Input(
+                shape=(history_turns,),
+                dtype="int32",
+                name="past_action_ids"
+            )
+            past_action_mask_input = layers.Input(
+                shape=(history_turns,),
+                dtype="float32",
+                name="past_action_mask"
+            )
+            model_inputs["past_action_ids"] = past_action_ids_input
+            model_inputs["past_action_mask"] = past_action_mask_input
+
+            # Action decoder: reconstruct what actions were taken
+            action_logits_decoded = ActionDecoder(
+                action_vocab_size,
+                hidden_dim=64,
+                name="action_decoder"
+            )([hist_lstm_out, past_action_mask_input])
+            # Output: [batch, K, action_vocab_size]
+
+            # Extract context from decoded actions (what actions matter?)
+            past_action_context = PastActionContext(
+                _attn_dim,
+                name="past_action_context"
+            )([shared, action_logits_decoded, past_action_mask_input])
+            # Output: [batch, attn_dim]
+
     # Build shared_with_history for auxiliary heads
     if history_context is not None:
         _fused = layers.Concatenate(name="shared_history_fuse")([shared, history_context])
@@ -521,18 +696,40 @@ def build_entity_action_models(
     #     This is the "decoder" variant — the policy head actually consumes the
     #     history encoding, not just the aux heads. The policy-only artifact is
     #     NO LONGER history-free: it needs event_history_tokens/event_history_mask.
-    decoder_variant = bool(policy_reads_history and history_context is not None)
-    if decoder_variant:
+    #   - use_history_decoding=True: policy head fuses [shared + event_context + action_context]
+    #     and is trained jointly with action decoder reconstruction loss.
+
+    # NEW: Handle action decoding variant
+    if use_history_decoding and past_action_context is not None:
+        # Policy head attends to: current state + event history + decoded actions
+        policy_input_features = layers.Concatenate(name="policy_all_context")(
+            [shared, history_context, past_action_context]
+        )
+        policy_hidden = layers.Dense(hidden_dim, activation="relu", name="policy_fusion_dense")(policy_input_features)
+        policy_logits = layers.Dense(num_policy_classes, name="policy")(policy_hidden)
+    elif policy_reads_history and history_context is not None:
+        # Event history only: fuse into policy
         policy_input_features = layers.Concatenate(name="policy_history_concat")(
             [shared, history_context]
         )
+        policy_logits = layers.Dense(num_policy_classes, name="policy")(policy_input_features)
     else:
-        policy_input_features = shared
-    policy_logits = layers.Dense(num_policy_classes, name="policy")(policy_input_features)
+        # No history
+        policy_logits = layers.Dense(num_policy_classes, name="policy")(shared)
 
-    # Policy-only inference artifact. If the decoder variant is active, include the
-    # history inputs — they are now reachable (and required) from policy_logits.
-    if decoder_variant:
+    # Policy-only inference artifact.
+    if use_history_decoding:
+        # Action decoding variant: include both event and action inputs
+        policy_model_inputs = dict(inputs)
+        policy_model_inputs["event_history_tokens"] = hist_tokens_input
+        policy_model_inputs["event_history_mask"] = hist_mask_input
+        policy_model_inputs["past_action_ids"] = past_action_ids_input
+        policy_model_inputs["past_action_mask"] = past_action_mask_input
+        policy_model = keras.Model(
+            policy_model_inputs, policy_logits, name="entity_action_policy_model"
+        )
+    elif policy_reads_history and history_context is not None:
+        # Event history only: include event inputs
         policy_model_inputs = dict(inputs)
         policy_model_inputs["event_history_tokens"] = hist_tokens_input
         policy_model_inputs["event_history_mask"] = hist_mask_input
@@ -540,6 +737,7 @@ def build_entity_action_models(
             policy_model_inputs, policy_logits, name="entity_action_policy_model"
         )
     else:
+        # State only
         policy_model = keras.Model(inputs, policy_logits, name="entity_action_policy_model")
 
     policy_metrics: List[Any] = [keras.metrics.SparseCategoricalAccuracy(name="top1")]
@@ -548,7 +746,7 @@ def build_entity_action_models(
 
     use_transition = transition_dim is not None and action_context_vocab_size is not None
     use_sequence = predict_sequence and sequence_vocab_size is not None
-    if not use_transition and not predict_value and not use_sequence:
+    if not use_transition and not predict_value and not use_sequence and not use_history_decoding:
         policy_model.compile(
             optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
             loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -648,6 +846,13 @@ def build_entity_action_models(
         losses["sequence"] = masked_sequence_loss
         loss_weights["sequence"] = sequence_weight
         metrics["sequence"] = [masked_token_accuracy]
+
+    # NEW: Action decoder losses (if history decoding is enabled)
+    if use_history_decoding and action_logits_decoded is not None:
+        outputs["decoded_actions"] = action_logits_decoded  # [batch, K, action_vocab_size]
+        losses["decoded_actions"] = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        loss_weights["decoded_actions"] = decoded_action_weight
+        metrics["decoded_actions"] = [keras.metrics.SparseCategoricalAccuracy(name="acc")]
 
     # Attention extractor: separate model sharing the same graph, no training targets needed.
     # Excludes action inputs (not reachable from history_attention_weights).
