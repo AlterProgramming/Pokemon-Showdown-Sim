@@ -15,6 +15,12 @@ from typing import Any
 import numpy as np
 from flask import Flask, jsonify, request
 
+try:
+	import onnxruntime as ort
+	HAS_ONNXRUNTIME = True
+except ImportError:
+	HAS_ONNXRUNTIME = False
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Serve one or more Pokemon Showdown policy models.")
@@ -280,6 +286,23 @@ def load_models(mode: str) -> tuple[dict[str, dict[str, Any]], str]:
         artifact["effective_worker_count"] = int(worker_count)
         artifact["max_requests_before_recycle"] = int(max_requests_before_recycle)
         artifact["max_worker_age_seconds"] = float(max_worker_age_seconds)
+
+        # Try to load ONNX model for faster inference
+        if HAS_ONNXRUNTIME:
+            try:
+                model_path = artifact.get("model_path")
+                if model_path:
+                    onnx_path = model_path.replace(".keras", ".onnx")
+                    if Path(onnx_path).exists():
+                        onnx_session = ort.InferenceSession(onnx_path)
+                        artifact["onnx_session"] = onnx_session
+                        print(f"[onnx] Loaded ONNX model for {model_id}: {onnx_path}")
+            except Exception as e:
+                print(f"[onnx] Failed to load ONNX model for {model_id}: {e}")
+                artifact["onnx_session"] = None
+        else:
+            artifact["onnx_session"] = None
+
         if ARGS.batch_max_size > 1:
             artifact["batcher"] = InferenceBatcher(
                 worker_pool,
@@ -851,10 +874,31 @@ def choose_model_artifacts(request_data: dict[str, Any]) -> dict[str, Any]:
     return artifacts
 
 
+def predict_logits_onnx(
+    onnx_session,
+    state_vector: list[float],
+) -> np.ndarray:
+	"""Fast inference using ONNX runtime."""
+	input_array = np.array([state_vector], dtype='float32')
+	input_name = onnx_session.get_inputs()[0].name
+	output_name = onnx_session.get_outputs()[0].name
+	result = onnx_session.run([output_name], {input_name: input_array})
+	return result[0][0]
+
+
 def predict_logits(
     model_artifacts: dict[str, Any],
     state_vector: list[float],
 ) -> tuple[np.ndarray, dict[str, Any]]:
+    # Try ONNX first if available (faster)
+    onnx_session = model_artifacts.get("onnx_session")
+    if onnx_session is not None:
+        try:
+            logits = predict_logits_onnx(onnx_session, state_vector)
+            return logits, {}
+        except Exception as e:
+            print(f"[onnx] Inference failed, falling back to Keras: {e}")
+
     batcher = model_artifacts.get("batcher")
     if batcher is not None:
         return batcher.predict_with_metadata(state_vector)
@@ -935,16 +979,23 @@ def pick_best_action(
     return best_action, best_prob
 
 
-def validate_state_vector(model_artifacts: dict[str, Any], state_vector: Any) -> list[float]:
+def validate_state_vector(model_artifacts: dict[str, Any], state_vector: Any, is_augmented_request: bool = False) -> list[float]:
     if state_vector is None:
         raise ValueError("missing state_vector")
     if not isinstance(state_vector, list):
         raise ValueError("state_vector must be a list")
 
     expected_input_dim = model_artifacts["expected_input_dim"]
-    if expected_input_dim is not None and len(state_vector) != expected_input_dim:
+    sv_len = len(state_vector)
+
+    # For augmented models with team features, accept 582-dim base vectors (will be enriched to expected_input_dim)
+    if is_augmented_request and sv_len == 582 and expected_input_dim == 678:
+        return state_vector
+
+    # Otherwise, validate against expected dimension
+    if expected_input_dim is not None and sv_len != expected_input_dim:
         raise ValueError(
-            f"state_vector has length {len(state_vector)} but model '{model_artifacts['model_id']}' "
+            f"state_vector has length {sv_len} but model '{model_artifacts['model_id']}' "
             f"expects {expected_input_dim}."
         )
     return state_vector
@@ -1054,7 +1105,15 @@ def predict():
 
         model_artifacts = choose_model_artifacts(data)
         context = build_response_context(model_artifacts)
-        state_vector = validate_state_vector(model_artifacts, data.get("state_vector"))
+
+        # Extract opponent team and perspective player from request
+        observed_opponent_team = data.get("observed_opponent_team")
+        perspective_player = data.get("perspective_player", "p1")
+
+        # Flag if this is an augmented model request with team features
+        is_augmented_request = bool(observed_opponent_team)
+
+        state_vector = validate_state_vector(model_artifacts, data.get("state_vector"), is_augmented_request=is_augmented_request)
 
         legal_moves = data.get("legal_moves") or []
         revive_targets, revive_reason = filter_legal_revive_targets(
@@ -1062,10 +1121,6 @@ def predict():
             data.get("legal_revives", []) or data.get("legal_switches", []) or [],
         )
         legal_switches, switch_reason = filter_legal_switches(data, data.get("legal_switches", []) or [])
-
-        # Extract opponent team and perspective player from request
-        observed_opponent_team = data.get("observed_opponent_team")
-        perspective_player = data.get("perspective_player", "p1")
 
         # Enrich state vector with opponent team features if available
         state_vector = enrich_state_vector_with_team(state_vector, observed_opponent_team, perspective_player)

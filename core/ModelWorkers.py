@@ -152,6 +152,10 @@ def inference_worker_main(
         import tensorflow as tf
         import keras
         keras.config.enable_unsafe_deserialization()
+        try:
+            from core import EntityModelV1 as _emv1  # noqa: F401 — registers @register_keras_serializable layers
+        except ImportError:
+            pass
         tensorflow_import_seconds = time.perf_counter() - tensorflow_import_started
 
         metadata_path = repo_path / str(model_entry["metadata_path"])

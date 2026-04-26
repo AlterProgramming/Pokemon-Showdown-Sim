@@ -1,0 +1,92 @@
+{
+  "manifest_version": "1.0",
+  "created_at_utc": "2026-04-25T16:46:11.865192+00:00",
+  "model_release_id": "model2_augmented",
+  "family_id": "vector_move_bc",
+  "family_version": 1,
+  "family_name": "vector_move_bc_v1",
+  "training_regime": "offline_bc_weighted",
+  "registry_visibility": "runnable_policy",
+  "metadata_path": "artifacts/model_2_augmented_20260425_114023/training_metadata_2_augmented.json",
+  "evaluation_summary_path": "artifacts/model_2_augmented_20260425_114023/evaluation_summary_2_augmented.json",
+  "registry_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Agents-Go-Brrrr/artifacts/model_registry.json",
+  "artifacts": {
+    "evaluation_summary": {
+      "path": "artifacts/model_2_augmented_20260425_114023/evaluation_summary_2_augmented.json",
+      "exists": true
+    },
+    "metadata": {
+      "path": "artifacts/model_2_augmented_20260425_114023/training_metadata_2_augmented.json",
+      "exists": true
+    },
+    "policy_model": {
+      "path": "artifacts/model_2_augmented_20260425_114023/model_2_augmented.keras",
+      "exists": true
+    },
+    "policy_vocab": {
+      "path": "artifacts/model_2_augmented_20260425_114023/move_vocab_2_augmented.json",
+      "exists": true
+    },
+    "reward_profile": {
+      "path": "artifacts/model_2_augmented_20260425_114023/move_reward_profile_2_augmented.json",
+      "exists": true
+    },
+    "run_manifest": {
+      "path": "artifacts/model_2_augmented_20260425_114023/run_manifest_2_augmented.json",
+      "exists": false
+    }
+  },
+  "evaluation_snapshot": {
+    "epochs_completed": 11,
+    "metrics": {
+      "loss": {
+        "direction": "min",
+        "first": 3.8092141151428223,
+        "last": 2.028719425201416,
+        "best": 2.028719425201416,
+        "best_epoch": 11,
+        "count": 11
+      },
+      "top1": {
+        "direction": "max",
+        "first": 0.17903441190719604,
+        "last": 0.37099742889404297,
+        "best": 0.37099742889404297,
+        "best_epoch": 11,
+        "count": 11
+      },
+      "top3": {
+        "direction": "max",
+        "first": 0.3467842936515808,
+        "last": 0.6496897339820862,
+        "best": 0.6496897339820862,
+        "best_epoch": 11,
+        "count": 11
+      },
+      "val_loss": {
+        "direction": "min",
+        "first": 3.202296018600464,
+        "last": 2.799248218536377,
+        "best": 2.7226531505584717,
+        "best_epoch": 6,
+        "count": 11
+      },
+      "val_top1": {
+        "direction": "max",
+        "first": 0.23814105987548828,
+        "last": 0.2655666172504425,
+        "best": 0.27312350273132324,
+        "best_epoch": 5,
+        "count": 11
+      },
+      "val_top3": {
+        "direction": "max",
+        "first": 0.45830973982810974,
+        "last": 0.5292935371398926,
+        "best": 0.5387184619903564,
+        "best_epoch": 8,
+        "count": 11
+      }
+    }
+  }
+}

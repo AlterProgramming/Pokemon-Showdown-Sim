@@ -58,6 +58,8 @@ def stable_hash(s: str) -> int:
 
 
 def hashed_move_bag(move_ids: List[str], dim: int = 64) -> List[float]:
+    if dim == 0:
+        return []
     v = [0.0] * dim
     for move_id in move_ids:
         j = stable_hash(move_id) % dim
@@ -449,6 +451,56 @@ def encode_state_v0(state: Dict[str, Any], perspective_player: str) -> List[floa
     return vec
 
 
+def encode_state_mini(state: Dict[str, Any], perspective_player: str) -> List[float]:
+    """
+    Compact 262-dim state vector: drops move_hash, reduces species hash dims,
+    and drops opponent_team_composition_features entirely.
+    Layout: active×2 (28 each) + bench×12 (15 each) + field (9) + side×2 (8 each) + turn (1)
+    """
+    if perspective_player not in ("p1", "p2"):
+        raise ValueError("perspective_player must be 'p1' or 'p2'")
+
+    other = "p2" if perspective_player == "p1" else "p1"
+    mons = state["mons"]
+    my_active_uid = state[perspective_player]["active_uid"]
+    opp_active_uid = state[other]["active_uid"]
+
+    my_active = mons.get(my_active_uid) if my_active_uid else None
+    opp_active = mons.get(opp_active_uid) if opp_active_uid else None
+
+    vec: List[float] = []
+    vec += mon_features(my_active, perspective_player, move_hash_dim=0, species_hash_dim=8)
+    vec += mon_features(opp_active, perspective_player, move_hash_dim=0, species_hash_dim=8)
+
+    my_slots = state[perspective_player]["slots"]
+    opp_slots = state[other]["slots"]
+
+    for uid in my_slots:
+        vec += bench_slot_features(mons.get(uid) if uid else None, perspective_player, species_hash_dim=4)
+
+    for uid in opp_slots:
+        vec += bench_slot_features(mons.get(uid) if uid else None, perspective_player, species_hash_dim=4)
+
+    vec += field_features(state)
+    vec += side_condition_features(state[perspective_player])
+    vec += side_condition_features(state[other])
+
+    t = float(state.get("turn_index", 0))
+    vec.append(min(t, 50.0) / 50.0)
+
+    return vec
+
+
+def mini_state_dim() -> int:
+    """Analytical dimension of encode_state_mini output."""
+    # active: 7 + len(STAT_ORDER)=7 + len(STATUS_ORDER)=6 + 0 moves + 8 species = 28, ×2 = 56
+    # bench:  5 + len(STATUS_ORDER)=6 + 4 species = 15, ×12 = 180
+    # field:  len(WEATHER_ORDER) + len(GLOBAL_CONDITION_ORDER) = 4 + 5 = 9
+    # side:   len(SIDE_CONDITION_ORDER) = 8, ×2 = 16
+    # turn:   1
+    return 28 * 2 + 15 * 12 + 9 + 16 + 1  # = 262
+
+
 def encode_state_with_static(
     state: Dict[str, Any],
     perspective_player: str,
@@ -561,6 +613,7 @@ def iter_turn_examples_both_players(
                 "terminal_result": ex.get("terminal_result"),
                 "turn_events_v1": ex.get("turn_events_v1", []),
                 "past_turn_events": ex.get("past_turn_events", []),
+                "past_turn_actions": ex.get("past_turn_actions", []),
             }
 
 
@@ -704,7 +757,12 @@ def vectorize_multitask_dataset(
     include_sequence: bool = False,
     sequence_vocab: Dict[str, int] | None = None,
     max_seq_len: int = 32,
+    include_history: bool = False,
+    history_turns: int = 8,
+    history_events_per_turn: int = 24,
 ) -> Tuple[List[List[float]] | Dict[str, List[List[float]] | List[int]], Dict[str, List[Any]]]:
+    if include_history and sequence_vocab is None:
+        raise ValueError("sequence_vocab required when include_history=True")
     X_state: List[List[float]] = []
     X_my_action: List[int] = []
     X_opp_action: List[int] = []
@@ -712,6 +770,8 @@ def vectorize_multitask_dataset(
     y_transition: List[List[float]] = []
     y_value: List[float] = []
     y_sequence: List[List[int]] = []
+    X_event_history_tokens: List[List[List[int]]] = []
+    X_event_history_mask: List[List[float]] = []
 
     policy_unk = policy_vocab.get("<UNK>", 0)
     ctx_none = action_context_vocab.get(ACTION_CONTEXT_NONE, 0) if action_context_vocab else 0
@@ -765,6 +825,17 @@ def vectorize_multitask_dataset(
             else:
                 y_sequence.append([0] * max_seq_len)  # all PAD if no events
 
+        if include_history:
+            from core.TurnEventTokenizer import encode_event_history
+            hist_tokens, hist_mask = encode_event_history(
+                ex.get("past_turn_events") or [],
+                sequence_vocab,
+                history_turns,
+                history_events_per_turn,
+            )
+            X_event_history_tokens.append(hist_tokens)
+            X_event_history_mask.append(hist_mask)
+
     X: List[List[float]] | Dict[str, List[List[float]] | List[int]]
     if include_transition:
         X = {
@@ -774,6 +845,12 @@ def vectorize_multitask_dataset(
         }
     else:
         X = X_state
+
+    if include_history:
+        if isinstance(X, list):
+            X = {"state": X}
+        X["event_history_tokens"] = X_event_history_tokens
+        X["event_history_mask"] = X_event_history_mask
 
     targets: Dict[str, List[Any]] = {"policy": y_policy}
     if include_transition:

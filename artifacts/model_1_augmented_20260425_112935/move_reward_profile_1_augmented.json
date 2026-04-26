@@ -1,0 +1,161 @@
+{
+  "bravebird": {
+    "uses": 3,
+    "damage_turns": 2,
+    "damage_turn_rate": 0.6666666666666666,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "bulkup": {
+    "uses": 6,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "self_boost_turns": 6,
+    "setup_turns": 6,
+    "setup_stats": [
+      "atk",
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "closecombat": {
+    "uses": 1,
+    "damage_turns": 1,
+    "damage_turn_rate": 1.0,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "coil": {
+    "uses": 6,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "self_boost_turns": 6,
+    "setup_turns": 6,
+    "setup_stats": [
+      "accuracy",
+      "atk",
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "double-edge": {
+    "uses": 2,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.5,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "drainpunch": {
+    "uses": 3,
+    "damage_turns": 2,
+    "damage_turn_rate": 0.6666666666666666,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "earthquake": {
+    "uses": 3,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.3333333333333333,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "glare": {
+    "uses": 2,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "gunkshot": {
+    "uses": 2,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.5,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "heavyslam": {
+    "uses": 1,
+    "damage_turns": 1,
+    "damage_turn_rate": 1.0,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "lowkick": {
+    "uses": 2,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.5,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "moonblast": {
+    "uses": 2,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.5,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "nastyplot": {
+    "uses": 1,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "terablast": {
+    "uses": 1,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "thunderwave": {
+    "uses": 2,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  }
+}

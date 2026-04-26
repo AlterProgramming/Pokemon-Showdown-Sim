@@ -1,0 +1,53 @@
+{
+  "epochs_completed": 11,
+  "metrics": {
+    "loss": {
+      "direction": "min",
+      "first": 3.8092141151428223,
+      "last": 2.028719425201416,
+      "best": 2.028719425201416,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "top1": {
+      "direction": "max",
+      "first": 0.17903441190719604,
+      "last": 0.37099742889404297,
+      "best": 0.37099742889404297,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "top3": {
+      "direction": "max",
+      "first": 0.3467842936515808,
+      "last": 0.6496897339820862,
+      "best": 0.6496897339820862,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "val_loss": {
+      "direction": "min",
+      "first": 3.202296018600464,
+      "last": 2.799248218536377,
+      "best": 2.7226531505584717,
+      "best_epoch": 6,
+      "count": 11
+    },
+    "val_top1": {
+      "direction": "max",
+      "first": 0.23814105987548828,
+      "last": 0.2655666172504425,
+      "best": 0.27312350273132324,
+      "best_epoch": 5,
+      "count": 11
+    },
+    "val_top3": {
+      "direction": "max",
+      "first": 0.45830973982810974,
+      "last": 0.5292935371398926,
+      "best": 0.5387184619903564,
+      "best_epoch": 8,
+      "count": 11
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "manifest_version": "1.0",
+  "created_at_utc": "2026-04-25T16:29:42.412575+00:00",
+  "model_release_id": "model1_augmented",
+  "family_id": "vector_move_bc",
+  "family_version": 1,
+  "family_name": "vector_move_bc_v1",
+  "training_regime": "offline_bc_weighted",
+  "registry_visibility": "runnable_policy",
+  "metadata_path": "artifacts/model_1_augmented_20260425_112935/training_metadata_1_augmented.json",
+  "evaluation_summary_path": "artifacts/model_1_augmented_20260425_112935/evaluation_summary_1_augmented.json",
+  "registry_path": "/Users/AI-CCORE/alter-programming/Pokemon-Showdown-Agents-Go-Brrrr/artifacts/model_registry.json",
+  "artifacts": {
+    "evaluation_summary": {
+      "path": "artifacts/model_1_augmented_20260425_112935/evaluation_summary_1_augmented.json",
+      "exists": true
+    },
+    "metadata": {
+      "path": "artifacts/model_1_augmented_20260425_112935/training_metadata_1_augmented.json",
+      "exists": true
+    },
+    "policy_model": {
+      "path": "artifacts/model_1_augmented_20260425_112935/model_1_augmented.keras",
+      "exists": true
+    },
+    "policy_vocab": {
+      "path": "artifacts/model_1_augmented_20260425_112935/move_vocab_1_augmented.json",
+      "exists": true
+    },
+    "reward_profile": {
+      "path": "artifacts/model_1_augmented_20260425_112935/move_reward_profile_1_augmented.json",
+      "exists": true
+    },
+    "run_manifest": {
+      "path": "artifacts/model_1_augmented_20260425_112935/run_manifest_1_augmented.json",
+      "exists": false
+    }
+  },
+  "evaluation_snapshot": {
+    "epochs_completed": 30,
+    "metrics": {
+      "loss": {
+        "direction": "min",
+        "first": 2.8014650344848633,
+        "last": 0.30933746695518494,
+        "best": 0.30380570888519287,
+        "best_epoch": 29,
+        "count": 30
+      },
+      "top1": {
+        "direction": "max",
+        "first": 0.054054055362939835,
+        "last": 0.8648648858070374,
+        "best": 0.8648648858070374,
+        "best_epoch": 28,
+        "count": 30
+      },
+      "top3": {
+        "direction": "max",
+        "first": 0.21621622145175934,
+        "last": 0.9729729890823364,
+        "best": 0.9729729890823364,
+        "best_epoch": 26,
+        "count": 30
+      }
+    }
+  }
+}

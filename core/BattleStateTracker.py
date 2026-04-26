@@ -94,12 +94,15 @@ class BattleStateTracker:
     This module intentionally contains NO model / vocab logic.
     """
 
-    def __init__(self, form_change_species: Optional[Set[str]] = None, history_turns: int = 0):
+    def __init__(self, form_change_species: Optional[Set[str]] = None, history_turns: int = 0, capture_actions: bool = False):
         # Species that can appear under multiple battle UIDs but should share a slot.
         self.form_change_species: Set[str] = form_change_species or {"Palafin"}
         self._history_turns: int = history_turns
         self._past_turn_events: deque = deque(maxlen=history_turns) if history_turns > 0 else deque(maxlen=0)
+        self._past_turn_actions: deque = deque(maxlen=history_turns) if history_turns > 0 else deque(maxlen=0)
         self._current_turn_events: list = []
+        self._capture_actions: bool = capture_actions
+        self._current_turn_action: Optional[str] = None
         self.reset()
 
     def reset(self) -> None:
@@ -114,6 +117,7 @@ class BattleStateTracker:
         self.weather: Optional[str] = None
         self.global_conditions: Set[str] = set()
         self._past_turn_events.clear()
+        self._past_turn_actions.clear()
 
     # ---------- Loading ----------
     def load_battle(self, battle: Dict[str, Any]) -> None:
@@ -398,6 +402,17 @@ class BattleStateTracker:
         self._current_turn_events.append(TurnEventV1(event_type=EVENT_TURN_END))
         if self._history_turns > 0:
             self._past_turn_events.append([ev.to_dict() for ev in self._current_turn_events])
+            if self._capture_actions and self._current_turn_action:
+                self._past_turn_actions.append(self._current_turn_action)
+            elif self._capture_actions:
+                self._past_turn_actions.append("UNKNOWN")
+
+        self._current_turn_events = []
+        self._current_turn_action = None
+
+    def record_action(self, action_token: str) -> None:
+        """Record the action selected for this turn."""
+        self._current_turn_action = action_token
 
     def _apply_move(self, ev: Dict[str, Any]) -> None:
         uid = ev.get("pokemon_uid")
@@ -808,4 +823,5 @@ class BattleStateTracker:
                 "terminal_result": terminal_result,
                 "turn_events_v1": [ev.to_dict() for ev in self._current_turn_events],
                 "past_turn_events": past_events_snapshot,
+                "past_turn_actions": list(self._past_turn_actions),
             }

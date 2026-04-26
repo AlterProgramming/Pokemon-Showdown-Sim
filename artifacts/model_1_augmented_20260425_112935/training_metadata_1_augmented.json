@@ -1,0 +1,160 @@
+{
+  "policy_model_path": "artifacts/model_1_augmented_20260425_112935/model_1_augmented.keras",
+  "policy_vocab_path": "artifacts/model_1_augmented_20260425_112935/move_vocab_1_augmented.json",
+  "metadata_path": "artifacts/model_1_augmented_20260425_112935/training_metadata_1_augmented.json",
+  "reward_profile_path": "artifacts/model_1_augmented_20260425_112935/move_reward_profile_1_augmented.json",
+  "evaluation_summary_path": "artifacts/model_1_augmented_20260425_112935/evaluation_summary_1_augmented.json",
+  "run_manifest_path": "artifacts/model_1_augmented_20260425_112935/run_manifest_1_augmented.json",
+  "parent_release_id": null,
+  "feature_dim": 678,
+  "feature_layout": [
+    {
+      "name": "my_active",
+      "size": 116,
+      "description": "My active mon: hp, knowledge flags, boosts, status, tera/item/ability flags, revealed moves hash, visible species hash."
+    },
+    {
+      "name": "opponent_active",
+      "size": 116,
+      "description": "Opponent active mon with the same feature template, masked to public information."
+    },
+    {
+      "name": "my_bench",
+      "size": 162,
+      "description": "Six bench slots: revealed flag, hp/fainted/tera, bench status, visible species hash."
+    },
+    {
+      "name": "opponent_bench",
+      "size": 162,
+      "description": "Opponent bench slots with the same bench template, masked to public information."
+    },
+    {
+      "name": "opponent_team_composition",
+      "size": 96,
+      "description": "Opponent team composition: 6 pok\u00e9mon \u00d7 16-dim hashed species = 96 dims."
+    },
+    {
+      "name": "field",
+      "size": 9,
+      "description": "Weather plus global field conditions such as terrain or Trick Room."
+    },
+    {
+      "name": "my_side_conditions",
+      "size": 8,
+      "description": "My side's public side conditions such as rocks, spikes, screens, veil, and Tailwind."
+    },
+    {
+      "name": "opponent_side_conditions",
+      "size": 8,
+      "description": "Opponent side's public side conditions."
+    },
+    {
+      "name": "turn_index",
+      "size": 1,
+      "description": "Normalized capped turn number."
+    }
+  ],
+  "information_policy": "public_only",
+  "state_schema_version": "flat_public_v1",
+  "entity_schema_version": null,
+  "history_schema_version": null,
+  "num_action_classes": 16,
+  "policy_label_format": "move_ids",
+  "action_space": "move_only",
+  "action_parameterization": "move_vocab",
+  "objective_set": [
+    "policy"
+  ],
+  "train_examples": 37,
+  "val_examples": 0,
+  "epochs_requested": 30,
+  "epochs_completed": 30,
+  "batch_size": 64,
+  "learning_rate": 0.001,
+  "hidden_dim": 256,
+  "depth": 3,
+  "dropout": 0.1,
+  "min_move_count": 1,
+  "max_battles": 5000,
+  "val_ratio": 0.2,
+  "seed": 42,
+  "include_switches": false,
+  "predict_turn_outcome": false,
+  "predict_value": false,
+  "transition_weight": 0.25,
+  "value_weight": 0.25,
+  "value_hidden_dim": 128,
+  "value_target": "discounted_return_to_go",
+  "value_target_definition": "discounted_return_to_go",
+  "value_head_activation": "linear",
+  "action_embed_dim": 32,
+  "transition_hidden_dim": 256,
+  "model_variant": "model_1_augmented",
+  "model_name": "model_1_augmented",
+  "reward_config": {
+    "hp_weight": 0.25,
+    "ko_weight": 0.5,
+    "wasted_move_penalty": 0.1,
+    "redundant_setup_penalty": 0.25,
+    "wasted_setup_penalty": 1.0,
+    "terminal_weight": 1.0,
+    "return_discount": 1.0,
+    "offensive_move_min_uses": 20,
+    "offensive_move_min_damage_rate": 0.5
+  },
+  "reward_definition_id": "dense_reward_v2",
+  "policy_return_weighting": "exp",
+  "policy_return_weight_scale": 0.75,
+  "policy_return_weight_min": 0.25,
+  "policy_return_weight_max": 4.0,
+  "policy_weighting_definition": {
+    "mode": "exp",
+    "scale": 0.75,
+    "min_weight": 0.25,
+    "max_weight": 4.0
+  },
+  "training_regime": "offline_bc_weighted",
+  "data_source_id": "explicit_paths",
+  "data_source_details": {
+    "used_default_kaggle_dataset": false,
+    "default_kaggle_dataset": null,
+    "raw_data_paths": [
+      "data/gen9randombattle-2390494424.json"
+    ],
+    "resolved_data_paths": [
+      "data/gen9randombattle-2390494424.json"
+    ],
+    "json_path_count": 1
+  },
+  "split_definition": {
+    "method": "group_split_by_battle_id",
+    "val_ratio": 0.2,
+    "seed": 42
+  },
+  "environment_definition": {
+    "battle_log_source": "pokemon_showdown_json",
+    "observation_scope": "public_only",
+    "format_hint": "gen9randombattle"
+  },
+  "initialization_source": {
+    "type": "scratch",
+    "checkpoint": null
+  },
+  "evaluation_bundle_id": "offline_validation_v1",
+  "registry_visibility": "runnable_policy",
+  "trace_schema_version": "1.1",
+  "num_reward_profiled_moves": 15,
+  "num_offensive_reward_moves": 0,
+  "policy_param_count": 309520,
+  "training_param_count": 309520,
+  "policy_weight_stats": {
+    "count": 37,
+    "mean": 0.9999998807907104,
+    "min": 0.29050660133361816,
+    "max": 2.0769245624542236
+  },
+  "family_id": "vector_move_bc",
+  "family_version": 1,
+  "family_name": "vector_move_bc_v1",
+  "model_release_id": "model1_augmented"
+}
