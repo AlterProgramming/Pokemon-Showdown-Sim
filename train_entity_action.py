@@ -122,6 +122,7 @@ def make_training_metadata(
     action_context_vocab: Dict[str, int] | None,
     token_vocabs: Dict[str, Dict[str, int]],
     sequence_vocab: Dict[str, int] | None = None,
+    action_vocab: Dict[str, int] | None = None,
     reward_config,
     move_reward_profile: Dict[str, Any],
     policy_weight_stats: Dict[str, Any] | None,
@@ -145,6 +146,8 @@ def make_training_metadata(
         objective_set.append("sequence_auxiliary")
     if getattr(args, "predict_from_history", False):
         objective_set.append("history_encoder")
+    if getattr(args, "predict_from_history_decoded", False):
+        objective_set.append("history_decoder")
     training_regime = "offline_entity_bc"
     if len(objective_set) > 1:
         training_regime = "offline_entity_bc_aux"
@@ -286,6 +289,11 @@ def make_training_metadata(
         metadata["history_events_per_turn"] = int(args.history_events_per_turn)
         metadata["history_embed_dim"] = int(args.history_embed_dim)
         metadata["history_lstm_dim"] = int(args.history_lstm_dim)
+
+    predict_from_history_decoded = getattr(args, "predict_from_history_decoded", False)
+    metadata["use_history_decoding"] = bool(predict_from_history_decoded)
+    metadata["action_vocab_size"] = len(action_vocab) if (predict_from_history_decoded and action_vocab) else None
+    metadata["decoded_action_weight"] = float(getattr(args, "decoded_action_weight", 0.15)) if predict_from_history_decoded else None
 
     if policy_weight_stats is not None:
         metadata["policy_weight_stats"] = policy_weight_stats
@@ -569,6 +577,22 @@ def parse_args() -> argparse.Namespace:
         default=64,
         help="LSTM hidden width for the history Bi-LSTM encoder.",
     )
+    parser.add_argument(
+        "--predict-from-history-decoded",
+        action="store_true",
+        help="Enable history decoding (encoder + action decoder + policy fusion)",
+    )
+    parser.add_argument(
+        "--decode-past-actions",
+        action="store_true",
+        help="Enable action decoder as auxiliary task",
+    )
+    parser.add_argument(
+        "--decoded-action-weight",
+        type=float,
+        default=0.15,
+        help="Loss weight for decoded action reconstruction",
+    )
     parser.add_argument("--value-hidden-dim", type=int, default=0, help="Hidden width for the value head block.")
     parser.add_argument("--action-embed-dim", type=int, default=16, help="Embedding width for action-conditioned transition inputs.")
     parser.add_argument("--transition-hidden-dim", type=int, default=256, help="Hidden width for the transition head block.")
@@ -628,7 +652,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--reward-offensive-move-min-uses", type=int, default=20)
     parser.add_argument("--reward-offensive-move-min-damage-rate", type=float, default=0.5)
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.decode_past_actions and not args.predict_from_history_decoded:
+        parser.error("--decode-past-actions requires --predict-from-history-decoded")
+    return args
 
 
 def main() -> None:
@@ -692,7 +719,8 @@ def main() -> None:
 
     tracker = BattleStateTracker(
         form_change_species={"Palafin"},
-        history_turns=args.history_turns if args.predict_from_history else 0,
+        history_turns=args.history_turns if (args.predict_from_history or args.predict_from_history_decoded) else 0,
+        capture_actions=args.decode_past_actions,
     )
     # Reuse the battle ingester so the entity family stays comparable to the older
     # vector families at the data-loading layer.
@@ -740,11 +768,13 @@ def main() -> None:
         include_history=args.predict_from_history,
         history_turns=args.history_turns,
         history_events_per_turn=args.history_events_per_turn,
+        include_history_decoding=args.predict_from_history_decoded,
     )
     policy_vocab = bundle["policy_vocab"]
     action_context_vocab = bundle["action_context_vocab"]
     token_vocabs = bundle["token_vocabs"]
     sequence_vocab = bundle.get("sequence_vocab")
+    action_vocab = bundle.get("action_vocab", {})
 
     X_raw, targets_raw = vectorize_entity_multitask_dataset(
         examples,
@@ -760,6 +790,8 @@ def main() -> None:
         include_history=args.predict_from_history,
         history_turns=args.history_turns,
         history_events_per_turn=args.history_events_per_turn,
+        include_history_decoding=args.predict_from_history_decoded,
+        action_vocab=action_vocab,
     )
     X_np = to_numpy_entity_inputs(X_raw)
     del X_raw  # pre-numpy lists no longer needed
@@ -888,6 +920,9 @@ def main() -> None:
             history_lstm_dim=args.history_lstm_dim,
             history_turns=args.history_turns,
             history_events_per_turn=args.history_events_per_turn,
+            use_history_decoding=args.predict_from_history_decoded,
+            action_vocab_size=len(action_vocab) if args.predict_from_history_decoded else None,
+            decoded_action_weight=args.decoded_action_weight,
         )
         from tensorflow import keras
     except ModuleNotFoundError as exc:
@@ -1007,6 +1042,11 @@ def main() -> None:
         save_json(artifact_paths["action_context_vocab"], action_context_vocab)
     if (args.predict_turn_sequence or args.predict_from_history) and sequence_vocab is not None:
         save_json(artifact_paths["sequence_vocab"], sequence_vocab)
+    if args.predict_from_history_decoded and action_vocab:
+        action_vocab_path = str(output_dir / f"action_vocab_{args.model_name}.json")
+        with open(action_vocab_path, "w") as _f:
+            json.dump(action_vocab, _f, indent=2)
+        print(f"saved_action_vocab={action_vocab_path}", flush=True)
     save_json(artifact_paths["reward_profile"], move_reward_profile)
 
     metadata = make_training_metadata(
@@ -1020,6 +1060,7 @@ def main() -> None:
         action_context_vocab=action_context_vocab,
         token_vocabs=token_vocabs,
         sequence_vocab=sequence_vocab,
+        action_vocab=action_vocab,
         reward_config=reward_config,
         move_reward_profile=move_reward_profile,
         policy_weight_stats=policy_weight_stats,
