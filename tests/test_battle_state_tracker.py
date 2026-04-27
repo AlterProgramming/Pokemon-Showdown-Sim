@@ -271,5 +271,50 @@ class BattleStateTrackerTests(unittest.TestCase):
         self.assertIn(0.0, targets["value"])
 
 
+class TurnEventsV1YieldTests(unittest.TestCase):
+    """Regression: iter_turn_examples must yield populated turn_events_v1.
+
+    Bug 4f00715: apply_turn cleared self._current_turn_events at its tail,
+    so the yield read an emptied list. Effect downstream:
+    build_sequence_vocab — which keys off turn_events_v1 — produced a
+    specials-only vocab, silently degrading any history-decoded model
+    trained from this pipeline.
+    """
+
+    def setUp(self) -> None:
+        self.tracker = BattleStateTracker(form_change_species={"Palafin"})
+        self.sample_battle = json.loads(SAMPLE_BATTLE_PATH.read_text(encoding="utf-8"))
+
+    def test_turn_events_v1_is_populated_on_yielded_examples(self) -> None:
+        examples = list(self.tracker.iter_turn_examples(self.sample_battle, player="p1"))
+        self.assertGreater(len(examples), 0)
+        nonempty = sum(1 for ex in examples if ex.get("turn_events_v1"))
+        self.assertGreater(
+            nonempty,
+            0,
+            "iter_turn_examples yielded zero examples with turn_events_v1 populated; "
+            "apply_turn likely cleared _current_turn_events before the yield could read it.",
+        )
+
+    def test_build_sequence_vocab_finds_real_event_keys(self) -> None:
+        from TurnEventTokenizer import build_sequence_vocab
+
+        examples = list(
+            iter_turn_examples_both_players(
+                self.tracker,
+                self.sample_battle,
+                include_switches=True,
+            )
+        )
+        vocab = build_sequence_vocab(examples)
+        # 4 specials are always present; we want at least a few real event keys.
+        self.assertGreater(
+            len(vocab),
+            4,
+            f"sequence_vocab built from a real battle has only specials (size={len(vocab)}); "
+            "history-decoded models trained from this pipeline would see all-UNK history tokens.",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

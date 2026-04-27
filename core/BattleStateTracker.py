@@ -407,7 +407,9 @@ class BattleStateTracker:
             elif self._capture_actions:
                 self._past_turn_actions.append("UNKNOWN")
 
-        self._current_turn_events = []
+        # NOTE: do not clear self._current_turn_events here. iter_turn_examples
+        # reads it after apply_turn to populate "turn_events_v1" on the yielded
+        # example. The next apply_turn call clears it at line 380.
         self._current_turn_action = None
 
     def record_action(self, action_token: str) -> None:
