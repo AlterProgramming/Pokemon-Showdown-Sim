@@ -752,7 +752,7 @@ def build_entity_action_models(
 
     use_transition = transition_dim is not None and action_context_vocab_size is not None
     use_sequence = predict_sequence and sequence_vocab_size is not None
-    if not use_transition and not predict_value and not use_sequence and not use_history_decoding:
+    if not use_transition and not predict_value and not use_sequence and not use_history_decoding and not predict_threat and not predict_type_effectiveness:
         policy_model.compile(
             optimizer=keras.optimizers.Adam(learning_rate=learning_rate),
             loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
