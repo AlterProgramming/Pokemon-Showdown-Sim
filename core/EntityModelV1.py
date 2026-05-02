@@ -877,7 +877,7 @@ def build_entity_action_models(
         )(shared_with_history)
         if dropout > 0:
             type_eff_x = layers.Dropout(dropout, name="type_eff_dropout_0")(type_eff_x)
-        type_eff_out = layers.Dense(num_policy_classes, activation="softmax", name="type_eff")(type_eff_x)
+        type_eff_out = layers.Dense(num_policy_classes, activation="sigmoid", name="type_eff")(type_eff_x)
         outputs["type_eff"] = type_eff_out
         losses["type_eff"] = keras.losses.MeanSquaredError()
         loss_weights["type_eff"] = type_eff_weight

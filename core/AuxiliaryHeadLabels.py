@@ -86,41 +86,40 @@ def attach_auxiliary_labels_to_examples(
 def vectorize_auxiliary_labels(
     examples: List[Dict[str, Any]],
     policy_vocab_size: int,
+    action_indices: Optional[np.ndarray] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Convert threat and type-eff labels to training targets.
 
     Args:
         examples: Training examples with threat_score and action_type_eff fields
         policy_vocab_size: Number of action classes (e.g., 357)
+        action_indices: Optional (N,) int array of chosen action indices (y_policy).
+            When provided, type_eff is assigned only to the chosen action's slot;
+            all other positions remain NaN and are masked in the loss.
+            When None, the scalar is broadcast to all positions (legacy behavior).
 
     Returns:
         (threat_targets, type_eff_targets) where:
         - threat_targets: (batch_size,) float32, raw threat scores
         - type_eff_targets: (batch_size, num_action_classes) float32
-          For legal moves: type-eff multiplier
-          For switches: NaN (masked in loss)
-          For illegal moves: NaN (masked in loss)
-
-    Note:
-        This function does NOT know about legal moves. The caller must mask
-        non-legal actions in the loss function or use sample_weight.
+          action_indices provided: only chosen action slot is set; rest are NaN
+          action_indices None: scalar broadcast to all positions (legacy)
     """
     batch_size = len(examples)
     threat_targets = np.zeros(batch_size, dtype="float32")
     type_eff_targets = np.full((batch_size, policy_vocab_size), np.nan, dtype="float32")
 
     for i, ex in enumerate(examples):
-        # Threat target: always present
         threat_targets[i] = ex.get("threat_score", 0.0)
 
-        # Type-eff target: only for move actions
         action_type_eff = ex.get("action_type_eff")
         if action_type_eff is not None and not np.isnan(float(action_type_eff)):
-            # For moves, set type-eff to the scalar multiplier across all actions
-            # The model will learn which actions are legal via the policy head
-            type_eff_targets[i, :] = float(action_type_eff)
-            # This is a simplification: in production, you'd want per-move type-eff
-            # For now, we're using a scalar that applies uniformly
+            if action_indices is not None:
+                idx = int(action_indices[i])
+                if 0 <= idx < policy_vocab_size:
+                    type_eff_targets[i, idx] = float(action_type_eff)
+            else:
+                type_eff_targets[i, :] = float(action_type_eff)
 
     return threat_targets, type_eff_targets
 
