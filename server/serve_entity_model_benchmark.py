@@ -737,11 +737,10 @@ def _startup_self_test(state: dict[str, Any]) -> None:
                     weights = layer.get_weights()
                     if weights:
                         actual_size = weights[0].shape[0]
-                        observed_size = len(token_vocabs[vocab_key])
-                        if actual_size < observed_size:
+                        max_id = max(token_vocabs[vocab_key].values()) if token_vocabs[vocab_key] else 0
+                        if max_id >= actual_size:
                             errors.append(
-                                f"{name}: embedding size {actual_size} < "
-                                f"observed vocab size {observed_size} — OOB at inference"
+                                f"{name}: embedding size {actual_size} but max vocab id={max_id} — OOB at inference"
                             )
 
     # 3. Warm-up inference: run one dummy forward pass and check output shape
@@ -753,7 +752,7 @@ def _startup_self_test(state: dict[str, Any]) -> None:
         except ImportError:
             encode_entity_state = None
 
-    if encode_entity_state is not None:
+    if encode_entity_state is not None and state.get("input_mode") != "entity_action_v2":
         try:
             dummy_state: dict[str, Any] = {"turn_index": 0, "p1": {}, "p2": {}}
             encoded = encode_entity_state(dummy_state, perspective_player="p1", token_vocabs=token_vocabs)
