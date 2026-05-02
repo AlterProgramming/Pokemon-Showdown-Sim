@@ -410,8 +410,14 @@ def build_entity_action_models(
     use_history_decoding: bool = False,
     action_vocab_size: int | None = None,
     decoded_action_weight: float = 0.15,
+    predict_threat: bool = False,
+    threat_hidden_dim: int | None = None,
+    threat_weight: float = 0.1,
+    predict_type_effectiveness: bool = False,
+    type_eff_hidden_dim: int | None = None,
+    type_eff_weight: float = 0.1,
 ):
-    """Build the multitask entity-action models.
+    """Build the multitask entity-action models with optional β-2 auxiliary heads.
 
     Returns:
         training_model: full multitask model used during fitting
@@ -846,6 +852,36 @@ def build_entity_action_models(
         losses["sequence"] = masked_sequence_loss
         loss_weights["sequence"] = sequence_weight
         metrics["sequence"] = [masked_token_accuracy]
+
+    # β-2: Threat-awareness auxiliary head
+    if predict_threat:
+        threat_x = layers.Dense(
+            threat_hidden_dim or max(64, hidden_dim // 2),
+            activation="relu",
+            name="threat_dense_0"
+        )(shared_with_history)
+        if dropout > 0:
+            threat_x = layers.Dropout(dropout, name="threat_dropout_0")(threat_x)
+        threat_out = layers.Dense(1, activation="relu", name="threat")(threat_x)
+        outputs["threat"] = threat_out
+        losses["threat"] = keras.losses.MeanSquaredError()
+        loss_weights["threat"] = threat_weight
+        metrics["threat"] = [keras.metrics.MeanAbsoluteError(name="mae")]
+
+    # β-2: Type-effectiveness auxiliary head (5-class classification: 0.25, 0.5, 1.0, 2.0, 4.0)
+    if predict_type_effectiveness:
+        type_eff_x = layers.Dense(
+            type_eff_hidden_dim or max(64, hidden_dim // 2),
+            activation="relu",
+            name="type_eff_dense_0"
+        )(shared_with_history)
+        if dropout > 0:
+            type_eff_x = layers.Dropout(dropout, name="type_eff_dropout_0")(type_eff_x)
+        type_eff_out = layers.Dense(num_policy_classes, activation="softmax", name="type_eff")(type_eff_x)
+        outputs["type_eff"] = type_eff_out
+        losses["type_eff"] = keras.losses.MeanSquaredError()
+        loss_weights["type_eff"] = type_eff_weight
+        metrics["type_eff"] = [keras.metrics.MeanAbsoluteError(name="mae")]
 
     # NEW: Action decoder losses (if history decoding is enabled)
     if use_history_decoding and action_logits_decoded is not None:
