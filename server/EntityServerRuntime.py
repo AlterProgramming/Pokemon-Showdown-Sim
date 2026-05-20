@@ -27,6 +27,24 @@ build_entity_action_models = None
 build_entity_action_v2_models = None
 
 
+_ENTITY_TOKEN_CLAMP_MAP = {
+    "pokemon_tera": "tera",
+    "pokemon_status": "status",
+    "pokemon_species": "species",
+    "pokemon_item": "item",
+    "pokemon_ability": "ability",
+}
+
+
+def _clamp_oob_entity_tokens(encoded: dict, vocab_sizes: dict) -> dict:
+    for field_key, vocab_key in _ENTITY_TOKEN_CLAMP_MAP.items():
+        vsize = vocab_sizes.get(vocab_key)
+        if vsize is None or field_key not in encoded:
+            continue
+        encoded[field_key] = [1 if v >= vsize else v for v in encoded[field_key]]
+    return encoded
+
+
 def _softmax(logits: np.ndarray) -> np.ndarray:
     shifted = logits - np.max(logits)
     exp = np.exp(shifted)
@@ -177,8 +195,9 @@ def _build_entity_training_model(
     if num_action_context_classes is not None:
         num_action_context_classes = int(num_action_context_classes)
 
+    _vocab_sizes = metadata.get("entity_token_vocab_sizes") or {key: len(value) for key, value in token_vocabs.items()}
     training_model, _, _, history_attention_model = build_entity_action_models(
-        vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
+        vocab_sizes=_vocab_sizes,
         num_policy_classes=int(metadata["num_action_classes"]),
         hidden_dim=int(metadata["hidden_dim"]),
         depth=int(metadata["depth"]),
@@ -207,6 +226,12 @@ def _build_entity_training_model(
         use_history_decoding=bool(metadata.get("use_history_decoding", False)),
         action_vocab_size=int(metadata.get("action_vocab_size", 0)),
         decoded_action_weight=float(metadata.get("decoded_action_weight", 0.15)),
+        predict_threat=bool(metadata.get("predict_threat", False)),
+        threat_hidden_dim=int(metadata.get("threat_hidden_dim") or max(64, int(metadata["hidden_dim"]) // 2)),
+        threat_weight=float(metadata.get("threat_weight", 0.1)),
+        predict_type_effectiveness=bool(metadata.get("predict_type_effectiveness", False)),
+        type_eff_hidden_dim=int(metadata.get("type_eff_hidden_dim") or max(64, int(metadata["hidden_dim"]) // 2)),
+        type_eff_weight=float(metadata.get("type_eff_weight", 0.1)),
     )
     return training_model, history_attention_model
 
@@ -270,10 +295,11 @@ def load_entity_runtime_artifacts(
             # Instead, we rebuild the known family architecture and load weights into it.
             _onnx_path_candidate = model_path.parent / (model_path.stem + ".onnx") if isinstance(model_path, Path) else None
             _onnx_exists = _ORT_AVAILABLE and _onnx_path_candidate is not None and _onnx_path_candidate.exists()
+            _vocab_sizes = metadata.get("entity_token_vocab_sizes") or {key: len(value) for key, value in token_vocabs.items()}
             if model_path_key == "policy_value_model_path":
                 # Policy-value model: rebuild with value head enabled
                 _, policy_only_model, policy_value_model, _ = build_entity_action_models(
-                    vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
+                    vocab_sizes=_vocab_sizes,
                     num_policy_classes=int(metadata["num_action_classes"]),
                     hidden_dim=int(metadata["hidden_dim"]),
                     depth=int(metadata["depth"]),
@@ -292,7 +318,7 @@ def load_entity_runtime_artifacts(
             else:
                 # Policy-only model: rebuild without value head
                 _, model, _, _ = build_entity_action_models(
-                    vocab_sizes={key: len(value) for key, value in token_vocabs.items()},
+                    vocab_sizes=_vocab_sizes,
                     num_policy_classes=int(metadata["num_action_classes"]),
                     hidden_dim=int(metadata["hidden_dim"]),
                     depth=int(metadata["depth"]),
@@ -499,9 +525,10 @@ def load_entity_runtime_artifacts(
         "history_events_per_turn": int(metadata.get("history_events_per_turn", 24)),
         "use_history_decoding": use_history_decoding,
         "action_vocab_size": action_vocab_size,
-        "action_vocab": history_decoding_action_vocab,
+        "history_decoding_action_vocab": history_decoding_action_vocab,
         "action_id_to_string": history_decoding_action_id_to_string,
         "decoded_action_weight": float(metadata.get("decoded_action_weight", 0.15)),
+        "vocab_sizes": metadata.get("entity_token_vocab_sizes") or {key: len(value) for key, value in token_vocabs.items()},
     }
 
 
@@ -524,6 +551,7 @@ def predict_entity_logits_with_metadata(
         perspective_player=perspective_player,
         token_vocabs=runtime["token_vocabs"],
     )
+    encoded = _clamp_oob_entity_tokens(encoded, runtime.get("vocab_sizes", {}))
     if runtime["input_mode"] == "entity_invariance":
         batched_inputs = to_single_example_invariance_inputs(encoded)
     else:

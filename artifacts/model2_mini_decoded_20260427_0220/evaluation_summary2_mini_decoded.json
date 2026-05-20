@@ -1,0 +1,117 @@
+{
+  "epochs_completed": 11,
+  "metrics": {
+    "hist_decode_loss": {
+      "direction": "min",
+      "first": 1.8251454830169678,
+      "last": 0.8487808108329773,
+      "best": 0.8487808108329773,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "loss": {
+      "direction": "min",
+      "first": 4.615807056427002,
+      "last": 3.2285561561584473,
+      "best": 3.2285561561584473,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "policy_loss": {
+      "direction": "min",
+      "first": 4.42262077331543,
+      "last": 3.1360514163970947,
+      "best": 3.1360514163970947,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "policy_top1": {
+      "direction": "max",
+      "first": 0.12091880291700363,
+      "last": 0.22661226987838745,
+      "best": 0.22661226987838745,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "policy_top3": {
+      "direction": "max",
+      "first": 0.2355426698923111,
+      "last": 0.41029179096221924,
+      "best": 0.41029179096221924,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "transition_loss": {
+      "direction": "min",
+      "first": 0.042210567742586136,
+      "last": 0.03047637641429901,
+      "best": 0.03047637641429901,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "transition_mae": {
+      "direction": "min",
+      "first": 0.09987977892160416,
+      "last": 0.07143677026033401,
+      "best": 0.07143677026033401,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "val_hist_decode_loss": {
+      "direction": "min",
+      "first": 1.3512046337127686,
+      "last": 0.8695837259292603,
+      "best": 0.8695837259292603,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "val_loss": {
+      "direction": "min",
+      "first": 4.257984638214111,
+      "last": 3.9845526218414307,
+      "best": 3.9372103214263916,
+      "best_epoch": 8,
+      "count": 11
+    },
+    "val_policy_loss": {
+      "direction": "min",
+      "first": 4.113677978515625,
+      "last": 3.8905527591705322,
+      "best": 3.8351008892059326,
+      "best_epoch": 8,
+      "count": 11
+    },
+    "val_policy_top1": {
+      "direction": "max",
+      "first": 0.14990434050559998,
+      "last": 0.1646447479724884,
+      "best": 0.1661013960838318,
+      "best_epoch": 10,
+      "count": 11
+    },
+    "val_policy_top3": {
+      "direction": "max",
+      "first": 0.2708931267261505,
+      "last": 0.30539610981941223,
+      "best": 0.3101791441440582,
+      "best_epoch": 8,
+      "count": 11
+    },
+    "val_transition_loss": {
+      "direction": "min",
+      "first": 0.03647281974554062,
+      "last": 0.02900053933262825,
+      "best": 0.02900053933262825,
+      "best_epoch": 11,
+      "count": 11
+    },
+    "val_transition_mae": {
+      "direction": "min",
+      "first": 0.08510090410709381,
+      "last": 0.06841956824064255,
+      "best": 0.06841956824064255,
+      "best_epoch": 11,
+      "count": 11
+    }
+  }
+}

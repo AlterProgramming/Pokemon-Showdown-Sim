@@ -108,10 +108,58 @@ def decode_float32_payload(payload: bytes, shape: tuple[int, ...]) -> np.ndarray
     return arr
 
 
+class _ONNXModelWrapper:
+    """Wraps an ONNX Runtime session to provide a Keras-like __call__ interface."""
+
+    def __init__(self, onnx_path: str | Path) -> None:
+        try:
+            import onnxruntime as ort
+        except ImportError as e:
+            raise RuntimeError("onnxruntime not available") from e
+        self.session = ort.InferenceSession(str(onnx_path))
+        self.input_names = [inp.name for inp in self.session.get_inputs()]
+        self.output_names = [outp.name for outp in self.session.get_outputs()]
+        # Extract input shape for compatibility with expected_input_dim inference
+        # This is a rough approximation; actual shape depends on the model architecture.
+        self.input_shape = None
+
+    def __call__(self, inputs, training=False):
+        """Call the ONNX model and return outputs as a tuple matching Keras convention."""
+        # Handle various input formats: dict, list, or numpy array
+        if isinstance(inputs, dict):
+            onnx_inputs = inputs
+        elif isinstance(inputs, (list, tuple)):
+            onnx_inputs = dict(zip(self.input_names, inputs))
+        else:
+            # Single array input; try to match it to the first input
+            onnx_inputs = {self.input_names[0]: np.asarray(inputs, dtype=np.float32)}
+
+        # Cast inputs to the types expected by ONNX
+        for inp_spec in self.session.get_inputs():
+            if inp_spec.name in onnx_inputs:
+                arr = onnx_inputs[inp_spec.name]
+                if inp_spec.type == "tensor(int32)" and arr.dtype != np.int32:
+                    onnx_inputs[inp_spec.name] = arr.astype(np.int32)
+                elif inp_spec.type == "tensor(int64)" and arr.dtype != np.int64:
+                    onnx_inputs[inp_spec.name] = arr.astype(np.int64)
+                elif inp_spec.type == "tensor(float)" and arr.dtype != np.float32:
+                    onnx_inputs[inp_spec.name] = arr.astype(np.float32)
+
+        outputs = self.session.run(None, onnx_inputs)
+        # Return as tuple for compatibility with Keras output unpacking
+        return tuple(outputs) if len(outputs) > 1 else outputs[0]
+
+
 def load_runtime_artifacts(repo_path: Path, model_entry: dict[str, Any]) -> dict[str, Any]:
     model_id = str(model_entry["model_id"])
     metadata_path = repo_path / str(model_entry["metadata_path"])
-    model_path = resolve_artifact_path(repo_path, metadata_path, str(model_entry["policy_model_path"]))
+
+    # Use policy_value_model if predict_value is true and the path exists
+    policy_model_path_str = str(model_entry["policy_model_path"])
+    if model_entry.get("predict_value") and model_entry.get("policy_value_model_path"):
+        policy_model_path_str = str(model_entry["policy_value_model_path"])
+
+    model_path = resolve_artifact_path(repo_path, metadata_path, policy_model_path_str)
     vocab_path = resolve_artifact_path(repo_path, metadata_path, str(model_entry["policy_vocab_path"]))
 
     action_vocab = _load_json_artifact(vocab_path)
@@ -120,6 +168,16 @@ def load_runtime_artifacts(repo_path: Path, model_entry: dict[str, Any]) -> dict
     if expected_input_dim is not None:
         expected_input_dim = int(expected_input_dim)
 
+    # Surface state_encoder so Flask can transcode 582-dim simulator payloads
+    # to 262-dim mini features when needed.
+    state_encoder = model_entry.get("state_encoder")
+    if state_encoder is None:
+        try:
+            md = _load_json_artifact(metadata_path)
+            state_encoder = md.get("state_encoder")
+        except Exception:
+            state_encoder = None
+
     return {
         "model_id": model_id,
         "model_path": str(model_path),
@@ -127,6 +185,7 @@ def load_runtime_artifacts(repo_path: Path, model_entry: dict[str, Any]) -> dict
         "expected_input_dim": expected_input_dim,
         "action_vocab": action_vocab,
         "metadata_path": str(metadata_path),
+        "state_encoder": state_encoder,
     }
 
 
@@ -159,9 +218,33 @@ def inference_worker_main(
         tensorflow_import_seconds = time.perf_counter() - tensorflow_import_started
 
         metadata_path = repo_path / str(model_entry["metadata_path"])
-        model_path = resolve_artifact_path(repo_path, metadata_path, str(model_entry["policy_model_path"]))
+        # Use policy_value_model if predict_value is true and the path exists
+        policy_model_path_str = str(model_entry["policy_model_path"])
+        if model_entry.get("predict_value") and model_entry.get("policy_value_model_path"):
+            policy_model_path_str = str(model_entry["policy_value_model_path"])
+        model_path = resolve_artifact_path(repo_path, metadata_path, policy_model_path_str)
         model_load_started = time.perf_counter()
-        model = tf.keras.models.load_model(model_path)
+        try:
+            model = tf.keras.models.load_model(model_path)
+        except NotImplementedError as e:
+            # Keras 3 Lambda layer shape inference issue for legacy entity_action_bc_v1 models.
+            # Fall back to ONNX runtime wrapper if available.
+            if "Lambda" in str(e) and "output_shape" in str(e):
+                try:
+                    import onnxruntime as ort
+                    onnx_path = str(model_path).replace(".keras", ".onnx")
+                    if Path(onnx_path).exists():
+                        model = _ONNXModelWrapper(onnx_path)
+                        if MODEL_WORKER_DEBUG:
+                            print(f"[worker] Loaded ONNX fallback for {model_id}: {onnx_path}")
+                    else:
+                        raise FileNotFoundError(f"ONNX model not found at {onnx_path}")
+                except Exception as onnx_error:
+                    raise RuntimeError(
+                        f"Could not load Keras model (Lambda shape issue) or ONNX fallback: {e}; ONNX error: {onnx_error}"
+                    ) from e
+            else:
+                raise
         model_load_seconds = time.perf_counter() - model_load_started
         expected_input_dim = model_entry.get("feature_dim")
         if expected_input_dim is None and getattr(model, "input_shape", None):
@@ -234,6 +317,14 @@ def inference_worker_main(
             if arr.ndim == 1:
                 arr = arr[None, :]
             raw_output = model(arr, training=False)
+            # Multi-head models return a dict; extract the policy head.
+            if isinstance(raw_output, dict):
+                _pol = raw_output.get("policy")
+                if _pol is None:
+                    _pol = raw_output.get("policy_logits")
+                if _pol is None:
+                    _pol = next(iter(raw_output.values()))
+                raw_output = _pol
             if hasattr(raw_output, "numpy"):
                 raw_output = raw_output.numpy()
             logits = np.asarray(raw_output, dtype=np.float32)

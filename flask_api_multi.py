@@ -128,7 +128,7 @@ from ModelWorkers import (  # noqa: E402
     parse_worker_count_overrides,
     softmax,
 )
-from core.StateVectorization import opponent_team_composition_features  # noqa: E402
+from core.StateVectorization import encode_state_mini, opponent_team_composition_features  # noqa: E402
 
 
 def vocab_uses_action_tokens(action_vocab: dict[str, int]) -> bool:
@@ -992,6 +992,11 @@ def validate_state_vector(model_artifacts: dict[str, Any], state_vector: Any, is
     if is_augmented_request and sv_len == 582 and expected_input_dim == 678:
         return state_vector
 
+    # For legacy 582-dim models receiving a 678-dim vector: strip opponent_team_composition block (indices 556:652)
+    # The simulator now always generates 678-dim vectors; old models need the team block removed.
+    if expected_input_dim == 582 and sv_len == 678:
+        return state_vector[:556] + state_vector[652:]
+
     # Otherwise, validate against expected dimension
     if expected_input_dim is not None and sv_len != expected_input_dim:
         raise ValueError(
@@ -1113,7 +1118,31 @@ def predict():
         # Flag if this is an augmented model request with team features
         is_augmented_request = bool(observed_opponent_team)
 
-        state_vector = validate_state_vector(model_artifacts, data.get("state_vector"), is_augmented_request=is_augmented_request)
+        # Mini-encoder transcode: simulator sends 582-dim full state, mini
+        # models expect 262-dim. Recompute server-side from battle_state.
+        request_state_vector = data.get("state_vector")
+        if model_artifacts.get("state_encoder") == "mini":
+            battle_state = data.get("battle_state")
+            if battle_state is None:
+                raise ValueError(
+                    f"model {model_artifacts['model_id']} expects state_encoder=mini but request lacks battle_state"
+                )
+            try:
+                request_state_vector = encode_state_mini(battle_state, perspective_player)
+            except (KeyError, TypeError) as enc_err:
+                print(f"[mini-encode-fail] perspective={perspective_player} err={enc_err!r}", flush=True)
+                print(f"[mini-encode-fail] battle_state.keys={list(battle_state.keys()) if isinstance(battle_state, dict) else type(battle_state)}", flush=True)
+                if isinstance(battle_state, dict):
+                    for who in ("p1", "p2"):
+                        blk = battle_state.get(who)
+                        print(f"[mini-encode-fail] {who}={blk!r}", flush=True)
+                    import traceback as _tb
+                    _tb.print_exc()
+                raise
+            is_augmented_request = False
+            observed_opponent_team = None  # mini doesn't take team-composition features
+
+        state_vector = validate_state_vector(model_artifacts, request_state_vector, is_augmented_request=is_augmented_request)
 
         legal_moves = data.get("legal_moves") or []
         revive_targets, revive_reason = filter_legal_revive_targets(
@@ -1122,8 +1151,10 @@ def predict():
         )
         legal_switches, switch_reason = filter_legal_switches(data, data.get("legal_switches", []) or [])
 
-        # Enrich state vector with opponent team features if available
-        state_vector = enrich_state_vector_with_team(state_vector, observed_opponent_team, perspective_player)
+        # Enrich state vector with opponent team features only when the model expects 678-dim input.
+        # Models that expect 582 (or None/unknown) use the base vector without enrichment.
+        if model_artifacts.get("expected_input_dim") == 678:
+            state_vector = enrich_state_vector_with_team(state_vector, observed_opponent_team, perspective_player)
 
         started_at = time.perf_counter()
         logits, worker_metrics = predict_logits(model_artifacts, state_vector)

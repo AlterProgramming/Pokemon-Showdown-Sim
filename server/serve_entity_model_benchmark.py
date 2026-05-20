@@ -717,6 +717,66 @@ def predict():
         return jsonify(error=f"Server error: {error}"), 500
 
 
+def _startup_self_test(state: dict[str, Any]) -> None:
+    """Fail-fast checks that catch silent misconfiguration before any game request."""
+    errors: list[str] = []
+
+    # 1. Action vocab must be non-empty (duplicate-key bug would leave it {})
+    action_vocab = state.get("action_vocab") or {}
+    if len(action_vocab) == 0:
+        errors.append("action_vocab is empty — policy vocab file missing or key clobbered")
+
+    # 2. Embedding layer input_dims must match entity_token_vocab_sizes in metadata.
+    # These keys have runtime OOB clamping (→ UNK) so a vocab overflow is a warning.
+    _CLAMPED_AT_RUNTIME = {"tera", "status", "species", "item", "ability"}
+    model = state.get("model")
+    token_vocabs = state.get("token_vocabs") or {}
+    if model is not None and token_vocabs:
+        for layer in model.layers:
+            name = layer.name  # e.g. "move_embedding"
+            for vocab_key in token_vocabs:
+                if name == f"{vocab_key}_embedding":
+                    weights = layer.get_weights()
+                    if weights:
+                        actual_size = weights[0].shape[0]
+                        max_id = max(token_vocabs[vocab_key].values()) if token_vocabs[vocab_key] else 0
+                        if max_id >= actual_size:
+                            if vocab_key in _CLAMPED_AT_RUNTIME:
+                                print(f"[entity-server] WARNING {name}: embedding size {actual_size} but max vocab id={max_id} — clamped to UNK at inference")
+                            else:
+                                errors.append(
+                                    f"{name}: embedding size {actual_size} but max vocab id={max_id} — OOB at inference"
+                                )
+
+    # 3. Warm-up inference: run one dummy forward pass and check output shape
+    try:
+        from server.EntityServerRuntime import encode_entity_state, to_single_example_entity_inputs, _run_runtime_outputs, _extract_policy_and_value
+    except ImportError:
+        try:
+            from EntityServerRuntime import encode_entity_state, to_single_example_entity_inputs, _run_runtime_outputs, _extract_policy_and_value
+        except ImportError:
+            encode_entity_state = None
+
+    if encode_entity_state is not None and state.get("input_mode") != "entity_action_v2":
+        try:
+            dummy_state: dict[str, Any] = {"turn_index": 0, "p1": {}, "p2": {}}
+            encoded = encode_entity_state(dummy_state, perspective_player="p1", token_vocabs=token_vocabs)
+            batched = to_single_example_entity_inputs(encoded)
+            raw = _run_runtime_outputs(state, batched)
+            logits, _ = _extract_policy_and_value(raw, has_value_head=bool(state.get("has_value_head")))
+            num_classes = int(state.get("model_name") and 0) or len(action_vocab)
+            if logits.ndim != 1:
+                errors.append(f"warm-up logits shape {logits.shape} — expected 1-D policy vector")
+        except Exception as exc:
+            errors.append(f"warm-up inference failed: {exc}")
+
+    if errors:
+        msg = "\n".join(f"  [STARTUP ERROR] {e}" for e in errors)
+        raise RuntimeError(f"Entity server self-test failed:\n{msg}")
+
+    print(f"[entity-server] self-test passed (action_vocab={len(action_vocab)} entries)")
+
+
 def main() -> None:
     args = parse_args()
     metadata_path = Path(args.metadata_path).resolve()
@@ -731,6 +791,7 @@ def main() -> None:
     if SERVER_STATE["_capture_decoded_actions"]:
         print("[entity-server] --capture-decoded-actions: decoded action predictions will be included in aux log")
     reset_server_metrics()
+    _startup_self_test(SERVER_STATE)
     print(f"[entity-server] model_id={SERVER_STATE['model_id']}")
     print(f"[entity-server] metadata_path={metadata_path}")
     APP.run(host=args.host, port=args.port, debug=False, use_reloader=False, threaded=True)

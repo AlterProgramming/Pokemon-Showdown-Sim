@@ -34,6 +34,12 @@ if __name__ == "__main__":
 
 import numpy as np
 
+from AuxiliaryHeadLabels import (
+    attach_auxiliary_labels_to_examples,
+    load_beta_labels,
+    validate_label_coverage,
+    vectorize_auxiliary_labels,
+)
 from BattleStateTracker import BattleStateTracker
 from EntityModelV1 import build_entity_action_models
 from EntityTensorization import (
@@ -148,6 +154,10 @@ def make_training_metadata(
         objective_set.append("history_encoder")
     if getattr(args, "predict_from_history_decoded", False):
         objective_set.append("history_decoder")
+    if getattr(args, "predict_threat", False):
+        objective_set.append("threat_awareness_distillation")
+    if getattr(args, "predict_type_effectiveness", False):
+        objective_set.append("type_effectiveness_distillation")
     training_regime = "offline_entity_bc"
     if len(objective_set) > 1:
         training_regime = "offline_entity_bc_aux"
@@ -294,6 +304,21 @@ def make_training_metadata(
     metadata["use_history_decoding"] = bool(predict_from_history_decoded)
     metadata["action_vocab_size"] = len(action_vocab) if (predict_from_history_decoded and action_vocab) else None
     metadata["decoded_action_weight"] = float(getattr(args, "decoded_action_weight", 0.15)) if predict_from_history_decoded else None
+
+    # (β-2) Auxiliary head distillation metadata
+    predict_threat = getattr(args, "predict_threat", False)
+    predict_type_effectiveness = getattr(args, "predict_type_effectiveness", False)
+    if predict_threat or predict_type_effectiveness:
+        metadata["auxiliary_head_distillation"] = {
+            "enabled": True,
+            "beta_labels_version": 1,
+            "predict_threat": bool(predict_threat),
+            "threat_hidden_dim": int(args.threat_hidden_dim or max(64, args.hidden_dim // 2)) if predict_threat else None,
+            "threat_weight": float(args.threat_weight) if predict_threat else None,
+            "predict_type_effectiveness": bool(predict_type_effectiveness),
+            "type_eff_hidden_dim": int(args.type_eff_hidden_dim or max(64, args.hidden_dim // 2)) if predict_type_effectiveness else None,
+            "type_eff_weight": float(args.type_eff_weight) if predict_type_effectiveness else None,
+        }
 
     if policy_weight_stats is not None:
         metadata["policy_weight_stats"] = policy_weight_stats
@@ -546,6 +571,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--transition-weight", type=float, default=0.25, help="Loss weight for the transition head.")
     parser.add_argument("--value-weight", type=float, default=0.25, help="Loss weight for the value head.")
     parser.add_argument("--sequence-weight", type=float, default=0.1, help="Loss weight for the sequence head.")
+    parser.add_argument("--predict-threat", action="store_true", help="(β-2) Add threat-awareness auxiliary head supervised by β-1 labels.")
+    parser.add_argument("--threat-weight", type=float, default=0.1, help="(β-2) Loss weight for threat-awareness head.")
+    parser.add_argument("--threat-hidden-dim", type=int, default=None, help="(β-2) Hidden dimension for threat MLP (default: hidden_dim//2).")
+    parser.add_argument("--predict-type-effectiveness", action="store_true", help="(β-2) Add type-effectiveness auxiliary head supervised by β-1 labels.")
+    parser.add_argument("--type-eff-weight", type=float, default=0.1, help="(β-2) Loss weight for type-effectiveness head.")
+    parser.add_argument("--type-eff-hidden-dim", type=int, default=None, help="(β-2) Hidden dimension for type-eff MLP (default: hidden_dim//2).")
+    parser.add_argument("--beta-labels-jsonl", type=str, default=None, help="(β-2) Path to β-1 labels.jsonl for auxiliary head training.")
     parser.add_argument("--sequence-hidden-dim", type=int, default=128, help="LSTM hidden width for the sequence head.")
     parser.add_argument("--max-seq-len", type=int, default=32, help="Maximum token sequence length for the sequence head.")
     parser.add_argument(
@@ -734,6 +766,37 @@ def main() -> None:
     if not examples:
         raise SystemExit("No training examples were produced from the provided battle logs.")
 
+    # (β-2) Load and attach auxiliary labels from β-1 label generation if provided.
+    beta_labels_metadata = None
+    if args.predict_threat or args.predict_type_effectiveness:
+        if not args.beta_labels_jsonl:
+            raise SystemExit(
+                "β-2 auxiliary head training requires --beta-labels-jsonl with path to β-1 labels.jsonl. "
+                "Generate labels first: python3 word_prediction_model/scripts/generate_beta_labels.py"
+            )
+        if not Path(args.beta_labels_jsonl).exists():
+            raise SystemExit(f"β-1 labels file not found: {args.beta_labels_jsonl}")
+        try:
+            labels_by_key = load_beta_labels(args.beta_labels_jsonl)
+            num_matched, num_missing = attach_auxiliary_labels_to_examples(examples, labels_by_key)
+            coverage = validate_label_coverage(examples)
+            beta_labels_metadata = {
+                "labels_jsonl_path": args.beta_labels_jsonl,
+                "num_matched": int(num_matched),
+                "num_missing": int(num_missing),
+                "coverage": coverage,
+            }
+            print(
+                f"entity_auxiliary_labels:"
+                f" matched={num_matched}"
+                f" missing={num_missing}"
+                f" threat_coverage={coverage['coverage_pct_threat']:.1f}%"
+                f" type_eff_coverage={coverage['coverage_pct_type_eff']:.1f}%",
+                flush=True,
+            )
+        except (FileNotFoundError, ValueError) as e:
+            raise SystemExit(f"Failed to load β-1 labels: {e}") from e
+
     if args.predict_value:
         # The current value head is trained only on terminal outcome, so examples
         # without a resolved battle result are removed up front.
@@ -814,6 +877,16 @@ def main() -> None:
         if "sequence" not in targets_raw
         else np.asarray(targets_raw["sequence"], dtype=np.int64)
     )
+
+    # (β-2) Vectorize auxiliary labels if present.
+    y_threat_np = None
+    y_type_eff_np = None
+    if args.predict_threat or args.predict_type_effectiveness:
+        y_threat_np, y_type_eff_np = vectorize_auxiliary_labels(
+            examples,
+            policy_vocab_size=len(policy_vocab),
+        )
+
     # Free the raw Python examples and target lists — numpy arrays now own the data.
     del examples, targets_raw
     gc.collect()
@@ -828,8 +901,12 @@ def main() -> None:
     y_val_value = y_value_np[val_idx] if y_value_np is not None and len(val_idx) else None
     y_train_sequence = y_sequence_np[train_idx] if y_sequence_np is not None else None
     y_val_sequence = y_sequence_np[val_idx] if y_sequence_np is not None and len(val_idx) else None
+    y_train_threat = y_threat_np[train_idx] if y_threat_np is not None else None
+    y_val_threat = y_threat_np[val_idx] if y_threat_np is not None and len(val_idx) else None
+    y_train_type_eff = y_type_eff_np[train_idx] if y_type_eff_np is not None else None
+    y_val_type_eff = y_type_eff_np[val_idx] if y_type_eff_np is not None and len(val_idx) else None
     # Full arrays are now split into train/val; free the originals.
-    del X_np, y_policy_np, y_transition_np, y_value_np, y_sequence_np
+    del X_np, y_policy_np, y_transition_np, y_value_np, y_sequence_np, y_threat_np, y_type_eff_np
     gc.collect()
 
     policy_train_weights = build_policy_training_sample_weights(
@@ -884,6 +961,8 @@ def main() -> None:
             or args.predict_value
             or args.predict_turn_sequence
             or args.predict_from_history
+            or args.predict_threat
+            or args.predict_type_effectiveness
         ),
         save_action_context_vocab=(args.predict_turn_outcome or args.predict_turn_sequence),
         save_policy_value_model=args.predict_value,
@@ -923,6 +1002,12 @@ def main() -> None:
             use_history_decoding=args.predict_from_history_decoded,
             action_vocab_size=len(action_vocab) if args.predict_from_history_decoded else None,
             decoded_action_weight=args.decoded_action_weight,
+            predict_threat=args.predict_threat,
+            threat_hidden_dim=args.threat_hidden_dim,
+            threat_weight=args.threat_weight,
+            predict_type_effectiveness=args.predict_type_effectiveness,
+            type_eff_hidden_dim=args.type_eff_hidden_dim,
+            type_eff_weight=args.type_eff_weight,
         )
         from tensorflow import keras
     except ModuleNotFoundError as exc:
@@ -982,6 +1067,10 @@ def main() -> None:
         train_targets["value"] = y_train_value
     if args.predict_turn_sequence and y_train_sequence is not None:
         train_targets["sequence"] = y_train_sequence
+    if args.predict_threat and y_train_threat is not None:
+        train_targets["threat"] = y_train_threat
+    if args.predict_type_effectiveness and y_train_type_eff is not None:
+        train_targets["type_effectiveness"] = y_train_type_eff
     if list(train_targets.keys()) == ["policy"]:
         train_targets = y_train_policy
 
@@ -994,6 +1083,10 @@ def main() -> None:
             val_targets["value"] = y_val_value
         if args.predict_turn_sequence and y_val_sequence is not None:
             val_targets["sequence"] = y_val_sequence
+        if args.predict_threat and y_val_threat is not None:
+            val_targets["threat"] = y_val_threat
+        if args.predict_type_effectiveness and y_val_type_eff is not None:
+            val_targets["type_effectiveness"] = y_val_type_eff
         if list(val_targets.keys()) == ["policy"]:
             val_targets = y_val_policy
         val_data = (X_val, val_targets)
@@ -1009,8 +1102,61 @@ def main() -> None:
                 sample_weight["value"] = np.ones(len(y_train_policy), dtype=np.float32)
             if args.predict_turn_sequence and y_train_sequence is not None:
                 sample_weight["sequence"] = np.ones(len(y_train_policy), dtype=np.float32)
+            if args.predict_threat and y_train_threat is not None:
+                sample_weight["threat"] = np.ones(len(y_train_policy), dtype=np.float32)
+            if args.predict_type_effectiveness and y_train_type_eff is not None:
+                sample_weight["type_effectiveness"] = np.ones(len(y_train_policy), dtype=np.float32)
         else:
             sample_weight = policy_train_weights
+
+    # Print training summary before starting
+    print("\n" + "=" * 80, flush=True)
+    print("TRAINING SUMMARY", flush=True)
+    print("=" * 80, flush=True)
+    print(
+        f"\nModel:           {args.model_name}\n"
+        f"Family:          entity_action_bc_v1\n"
+        f"Architecture:    {args.depth}-layer trunk, hidden_dim={args.hidden_dim}\n"
+        f"\nData:\n"
+        f"  Battles:       {args.max_battles}\n"
+        f"  Train:         {len(train_idx):,} examples\n"
+        f"  Val:           {len(val_idx):,} examples\n"
+        f"  Policy vocab:  {len(policy_vocab)} classes\n"
+        f"\nTraining:\n"
+        f"  Epochs:        {args.epochs}\n"
+        f"  Batch size:    {args.batch_size}\n"
+        f"  Learning rate: {args.learning_rate}\n"
+        f"  Dropout:       {args.dropout}\n"
+        f"\nObjectives:\n"
+        f"  Primary:       policy (behavior cloning)\n"
+        f"  Transition:    {args.predict_turn_outcome}\n"
+        f"  Value:         {args.predict_value}\n"
+        f"  Sequence:      {args.predict_turn_sequence}\n",
+        flush=True,
+    )
+
+    # Print β-2 auxiliary head configuration if enabled
+    if args.predict_threat or args.predict_type_effectiveness:
+        print(
+            f"β-2 Auxiliary Heads:\n"
+            f"  Threat:        {args.predict_threat} (weight={args.threat_weight})\n"
+            f"  Type-Eff:      {args.predict_type_effectiveness} (weight={args.type_eff_weight})\n"
+            f"  Labels:        {beta_labels_metadata.get('num_matched', 0):,} matched, "
+            f"{beta_labels_metadata.get('num_missing', 0):,} missing\n"
+            f"  Threat cov:    {beta_labels_metadata.get('coverage', {}).get('coverage_pct_threat', 0):.1f}%\n"
+            f"  Type-eff cov:  {beta_labels_metadata.get('coverage', {}).get('coverage_pct_type_eff', 0):.1f}%\n",
+            flush=True,
+        )
+
+    print(
+        f"Output:\n"
+        f"  Directory:     {output_dir}\n"
+        f"  Policy model:  policy_value_model_{args.model_name}.keras\n"
+        f"  Training model: training_model_{args.model_name}.keras\n"
+        f"  Metadata:      training_metadata_{args.model_name}.json\n"
+        f"\n" + "=" * 80 + "\n",
+        flush=True,
+    )
 
     history = model.fit(
         X_train,
@@ -1029,6 +1175,8 @@ def main() -> None:
         or args.predict_value
         or args.predict_turn_sequence
         or args.predict_from_history
+        or args.predict_threat
+        or args.predict_type_effectiveness
     ):
         model.save(artifact_paths["training_model"])
     if args.predict_value and policy_value_model is not None:
@@ -1080,6 +1228,11 @@ def main() -> None:
         metadata["initialization_source"]["transfer_report"] = transfer_report
     if source_metadata is not None and source_metadata.get("metadata_path") is not None:
         metadata["initialization_source"]["source_metadata_path"] = str(source_metadata["metadata_path"])
+    # (β-2) Append β-1 label metadata if auxiliary heads were trained
+    if beta_labels_metadata is not None:
+        if "auxiliary_head_distillation" not in metadata:
+            metadata["auxiliary_head_distillation"] = {}
+        metadata["auxiliary_head_distillation"].update(beta_labels_metadata)
     save_json(artifact_paths["metadata"], metadata)
     save_json(artifact_paths["training_history"], history.history)
 
@@ -1099,7 +1252,7 @@ def main() -> None:
     print(f"saved_entity_policy_model={artifact_paths['policy_model']}")
     if args.predict_value:
         print(f"saved_entity_policy_value_model={artifact_paths['policy_value_model']}")
-    if args.predict_turn_outcome or args.predict_value:
+    if args.predict_turn_outcome or args.predict_value or args.predict_threat or args.predict_type_effectiveness:
         print(f"saved_entity_training_model={artifact_paths['training_model']}")
     print(f"saved_entity_vocab={artifact_paths['entity_token_vocabs']}")
     print(f"saved_policy_vocab={artifact_paths['policy_vocab']}")
