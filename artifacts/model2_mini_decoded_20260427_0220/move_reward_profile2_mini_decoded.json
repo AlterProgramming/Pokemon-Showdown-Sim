@@ -1,0 +1,4369 @@
+{
+  "accelerock": {
+    "uses": 35,
+    "damage_turns": 26,
+    "damage_turn_rate": 0.7428571428571429,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "acidarmor": {
+    "uses": 154,
+    "damage_turns": 14,
+    "damage_turn_rate": 0.09090909090909091,
+    "self_boost_turns": 127,
+    "setup_turns": 115,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "acrobatics": {
+    "uses": 400,
+    "damage_turns": 270,
+    "damage_turn_rate": 0.675,
+    "self_boost_turns": 24,
+    "setup_turns": 7,
+    "setup_stats": [
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "aeroblast": {
+    "uses": 219,
+    "damage_turns": 128,
+    "damage_turn_rate": 0.5844748858447488,
+    "self_boost_turns": 2,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "agility": {
+    "uses": 132,
+    "damage_turns": 14,
+    "damage_turn_rate": 0.10606060606060606,
+    "self_boost_turns": 124,
+    "setup_turns": 112,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "airslash": {
+    "uses": 704,
+    "damage_turns": 450,
+    "damage_turn_rate": 0.6392045454545454,
+    "self_boost_turns": 69,
+    "setup_turns": 26,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "alluringvoice": {
+    "uses": 636,
+    "damage_turns": 437,
+    "damage_turn_rate": 0.6871069182389937,
+    "self_boost_turns": 9,
+    "setup_turns": 4,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "appleacid": {
+    "uses": 125,
+    "damage_turns": 84,
+    "damage_turn_rate": 0.672,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "aquacutter": {
+    "uses": 62,
+    "damage_turns": 38,
+    "damage_turn_rate": 0.6129032258064516,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "aquajet": {
+    "uses": 260,
+    "damage_turns": 190,
+    "damage_turn_rate": 0.7307692307692307,
+    "self_boost_turns": 17,
+    "setup_turns": 8,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "aquastep": {
+    "uses": 104,
+    "damage_turns": 65,
+    "damage_turn_rate": 0.625,
+    "self_boost_turns": 91,
+    "setup_turns": 31,
+    "setup_stats": [
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "armorcannon": {
+    "uses": 63,
+    "damage_turns": 39,
+    "damage_turn_rate": 0.6190476190476191,
+    "self_boost_turns": 15,
+    "setup_turns": 6,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "astralbarrage": {
+    "uses": 53,
+    "damage_turns": 30,
+    "damage_turn_rate": 0.5660377358490566,
+    "self_boost_turns": 17,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "aurasphere": {
+    "uses": 178,
+    "damage_turns": 110,
+    "damage_turn_rate": 0.6179775280898876,
+    "self_boost_turns": 5,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "aurawheel": {
+    "uses": 166,
+    "damage_turns": 98,
+    "damage_turn_rate": 0.5903614457831325,
+    "self_boost_turns": 128,
+    "setup_turns": 51,
+    "setup_stats": [
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "auroraveil": {
+    "uses": 155,
+    "damage_turns": 12,
+    "damage_turn_rate": 0.07741935483870968,
+    "self_boost_turns": 2,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "avalanche": {
+    "uses": 81,
+    "damage_turns": 43,
+    "damage_turn_rate": 0.5308641975308642,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "beakblast": {
+    "uses": 93,
+    "damage_turns": 50,
+    "damage_turn_rate": 0.5376344086021505,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "beatup": {
+    "uses": 39,
+    "damage_turns": 19,
+    "damage_turn_rate": 0.48717948717948717,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "behemothblade": {
+    "uses": 44,
+    "damage_turns": 32,
+    "damage_turn_rate": 0.7272727272727273,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "bellydrum": {
+    "uses": 118,
+    "damage_turns": 8,
+    "damage_turn_rate": 0.06779661016949153,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "bite": {
+    "uses": 52,
+    "damage_turns": 30,
+    "damage_turn_rate": 0.5769230769230769,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "bitterblade": {
+    "uses": 128,
+    "damage_turns": 93,
+    "damage_turn_rate": 0.7265625,
+    "self_boost_turns": 13,
+    "setup_turns": 4,
+    "setup_stats": [
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bittermalice": {
+    "uses": 22,
+    "damage_turns": 15,
+    "damage_turn_rate": 0.6818181818181818,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "bleakwindstorm": {
+    "uses": 165,
+    "damage_turns": 89,
+    "damage_turn_rate": 0.5393939393939394,
+    "self_boost_turns": 4,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "def"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "blizzard": {
+    "uses": 176,
+    "damage_turns": 89,
+    "damage_turn_rate": 0.5056818181818182,
+    "self_boost_turns": 2,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bloodmoon": {
+    "uses": 53,
+    "damage_turns": 37,
+    "damage_turn_rate": 0.6981132075471698,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "blueflare": {
+    "uses": 54,
+    "damage_turns": 35,
+    "damage_turn_rate": 0.6481481481481481,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bodypress": {
+    "uses": 1892,
+    "damage_turns": 1260,
+    "damage_turn_rate": 0.6659619450317125,
+    "self_boost_turns": 23,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bodyslam": {
+    "uses": 1803,
+    "damage_turns": 1142,
+    "damage_turn_rate": 0.6333887964503605,
+    "self_boost_turns": 18,
+    "setup_turns": 6,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "boltstrike": {
+    "uses": 88,
+    "damage_turns": 55,
+    "damage_turn_rate": 0.625,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "boomburst": {
+    "uses": 300,
+    "damage_turns": 193,
+    "damage_turn_rate": 0.6433333333333333,
+    "self_boost_turns": 24,
+    "setup_turns": 11,
+    "setup_stats": [
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bravebird": {
+    "uses": 1611,
+    "damage_turns": 1012,
+    "damage_turn_rate": 0.6281812538795779,
+    "self_boost_turns": 66,
+    "setup_turns": 9,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "brickbreak": {
+    "uses": 36,
+    "damage_turns": 22,
+    "damage_turn_rate": 0.6111111111111112,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bugbite": {
+    "uses": 30,
+    "damage_turns": 16,
+    "damage_turn_rate": 0.5333333333333333,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bugbuzz": {
+    "uses": 812,
+    "damage_turns": 510,
+    "damage_turn_rate": 0.6280788177339901,
+    "self_boost_turns": 51,
+    "setup_turns": 18,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bulkup": {
+    "uses": 1054,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.07400379506641366,
+    "self_boost_turns": 1009,
+    "setup_turns": 935,
+    "setup_stats": [
+      "atk",
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "bulletpunch": {
+    "uses": 197,
+    "damage_turns": 143,
+    "damage_turn_rate": 0.7258883248730964,
+    "self_boost_turns": 13,
+    "setup_turns": 7,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "bulletseed": {
+    "uses": 190,
+    "damage_turns": 130,
+    "damage_turn_rate": 0.6842105263157895,
+    "self_boost_turns": 11,
+    "setup_turns": 7,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "calmmind": {
+    "uses": 4061,
+    "damage_turns": 260,
+    "damage_turn_rate": 0.06402363949766067,
+    "self_boost_turns": 3721,
+    "setup_turns": 3483,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "ceaselessedge": {
+    "uses": 123,
+    "damage_turns": 70,
+    "damage_turn_rate": 0.5691056910569106,
+    "self_boost_turns": 4,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "chillyreception": {
+    "uses": 22,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.18181818181818182,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "circlethrow": {
+    "uses": 91,
+    "damage_turns": 40,
+    "damage_turn_rate": 0.43956043956043955,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "clangingscales": {
+    "uses": 35,
+    "damage_turns": 19,
+    "damage_turn_rate": 0.5428571428571428,
+    "self_boost_turns": 3,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "clangoroussoul": {
+    "uses": 28,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.03571428571428571,
+    "self_boost_turns": 27,
+    "setup_turns": 26,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "clearsmog": {
+    "uses": 15,
+    "damage_turns": 7,
+    "damage_turn_rate": 0.4666666666666667,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "closecombat": {
+    "uses": 2889,
+    "damage_turns": 1949,
+    "damage_turn_rate": 0.6746278989269644,
+    "self_boost_turns": 291,
+    "setup_turns": 68,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "coil": {
+    "uses": 420,
+    "damage_turns": 34,
+    "damage_turn_rate": 0.08095238095238096,
+    "self_boost_turns": 413,
+    "setup_turns": 381,
+    "setup_stats": [
+      "accuracy",
+      "atk",
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "collisioncourse": {
+    "uses": 10,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.4,
+    "self_boost_turns": 3,
+    "setup_turns": 3,
+    "setup_stats": [
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "cosmicpower": {
+    "uses": 373,
+    "damage_turns": 32,
+    "damage_turn_rate": 0.08579088471849866,
+    "self_boost_turns": 304,
+    "setup_turns": 272,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "courtchange": {
+    "uses": 6,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.16666666666666666,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "crabhammer": {
+    "uses": 84,
+    "damage_turns": 42,
+    "damage_turn_rate": 0.5,
+    "self_boost_turns": 5,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "crunch": {
+    "uses": 559,
+    "damage_turns": 340,
+    "damage_turn_rate": 0.6082289803220036,
+    "self_boost_turns": 14,
+    "setup_turns": 6,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "curse": {
+    "uses": 559,
+    "damage_turns": 76,
+    "damage_turn_rate": 0.13595706618962433,
+    "self_boost_turns": 517,
+    "setup_turns": 450,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "darkpulse": {
+    "uses": 1072,
+    "damage_turns": 685,
+    "damage_turn_rate": 0.6389925373134329,
+    "self_boost_turns": 28,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "dazzlinggleam": {
+    "uses": 853,
+    "damage_turns": 587,
+    "damage_turn_rate": 0.6881594372801876,
+    "self_boost_turns": 42,
+    "setup_turns": 16,
+    "setup_stats": [
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "defog": {
+    "uses": 189,
+    "damage_turns": 13,
+    "damage_turn_rate": 0.06878306878306878,
+    "self_boost_turns": 2,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "destinybond": {
+    "uses": 32,
+    "damage_turns": 16,
+    "damage_turn_rate": 0.5,
+    "self_boost_turns": 5,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "diamondstorm": {
+    "uses": 117,
+    "damage_turns": 60,
+    "damage_turn_rate": 0.5128205128205128,
+    "self_boost_turns": 47,
+    "setup_turns": 22,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "direclaw": {
+    "uses": 54,
+    "damage_turns": 33,
+    "damage_turn_rate": 0.6111111111111112,
+    "self_boost_turns": 3,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "disable": {
+    "uses": 16,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.0625,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "discharge": {
+    "uses": 454,
+    "damage_turns": 278,
+    "damage_turn_rate": 0.6123348017621145,
+    "self_boost_turns": 5,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "double-edge": {
+    "uses": 735,
+    "damage_turns": 469,
+    "damage_turn_rate": 0.638095238095238,
+    "self_boost_turns": 23,
+    "setup_turns": 4,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "doubleshock": {
+    "uses": 61,
+    "damage_turns": 29,
+    "damage_turn_rate": 0.47540983606557374,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "dracometeor": {
+    "uses": 984,
+    "damage_turns": 583,
+    "damage_turn_rate": 0.592479674796748,
+    "self_boost_turns": 55,
+    "setup_turns": 19,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "dragonascent": {
+    "uses": 59,
+    "damage_turns": 38,
+    "damage_turn_rate": 0.6440677966101694,
+    "self_boost_turns": 5,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "dragonclaw": {
+    "uses": 38,
+    "damage_turns": 21,
+    "damage_turn_rate": 0.5526315789473685,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "dragondance": {
+    "uses": 1550,
+    "damage_turns": 194,
+    "damage_turn_rate": 0.12516129032258064,
+    "self_boost_turns": 1469,
+    "setup_turns": 1295,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "dragondarts": {
+    "uses": 69,
+    "damage_turns": 47,
+    "damage_turn_rate": 0.6811594202898551,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "dragonenergy": {
+    "uses": 41,
+    "damage_turns": 28,
+    "damage_turn_rate": 0.6829268292682927,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "dragonpulse": {
+    "uses": 342,
+    "damage_turns": 210,
+    "damage_turn_rate": 0.6140350877192983,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "dragontail": {
+    "uses": 432,
+    "damage_turns": 233,
+    "damage_turn_rate": 0.5393518518518519,
+    "self_boost_turns": 15,
+    "setup_turns": 4,
+    "setup_stats": [
+      "def",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "drainingkiss": {
+    "uses": 606,
+    "damage_turns": 437,
+    "damage_turn_rate": 0.7211221122112211,
+    "self_boost_turns": 17,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "drainpunch": {
+    "uses": 1078,
+    "damage_turns": 693,
+    "damage_turn_rate": 0.6428571428571429,
+    "self_boost_turns": 10,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "drillrun": {
+    "uses": 71,
+    "damage_turns": 31,
+    "damage_turn_rate": 0.43661971830985913,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "dualwingbeat": {
+    "uses": 194,
+    "damage_turns": 117,
+    "damage_turn_rate": 0.6030927835051546,
+    "self_boost_turns": 8,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "dynamaxcannon": {
+    "uses": 105,
+    "damage_turns": 70,
+    "damage_turn_rate": 0.6666666666666666,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "dynamicpunch": {
+    "uses": 40,
+    "damage_turns": 20,
+    "damage_turn_rate": 0.5,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "earthpower": {
+    "uses": 1036,
+    "damage_turns": 634,
+    "damage_turn_rate": 0.611969111969112,
+    "self_boost_turns": 27,
+    "setup_turns": 8,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "earthquake": {
+    "uses": 5286,
+    "damage_turns": 3369,
+    "damage_turn_rate": 0.6373439273552781,
+    "self_boost_turns": 197,
+    "setup_turns": 59,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "electrodrift": {
+    "uses": 85,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.6705882352941176,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "encore": {
+    "uses": 1049,
+    "damage_turns": 104,
+    "damage_turn_rate": 0.09914204003813155,
+    "self_boost_turns": 16,
+    "setup_turns": 15,
+    "setup_stats": [
+      "accuracy",
+      "atk",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "endeavor": {
+    "uses": 99,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.45454545454545453,
+    "self_boost_turns": 7,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "energyball": {
+    "uses": 300,
+    "damage_turns": 206,
+    "damage_turn_rate": 0.6866666666666666,
+    "self_boost_turns": 8,
+    "setup_turns": 5,
+    "setup_stats": [
+      "accuracy",
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "eruption": {
+    "uses": 88,
+    "damage_turns": 50,
+    "damage_turn_rate": 0.5681818181818182,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "esperwing": {
+    "uses": 58,
+    "damage_turns": 28,
+    "damage_turn_rate": 0.4827586206896552,
+    "self_boost_turns": 51,
+    "setup_turns": 24,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "expandingforce": {
+    "uses": 51,
+    "damage_turns": 31,
+    "damage_turn_rate": 0.6078431372549019,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "explosion": {
+    "uses": 47,
+    "damage_turns": 22,
+    "damage_turn_rate": 0.46808510638297873,
+    "self_boost_turns": 3,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "extremespeed": {
+    "uses": 233,
+    "damage_turns": 165,
+    "damage_turn_rate": 0.7081545064377682,
+    "self_boost_turns": 16,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "facade": {
+    "uses": 483,
+    "damage_turns": 316,
+    "damage_turn_rate": 0.6542443064182195,
+    "self_boost_turns": 16,
+    "setup_turns": 9,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "fakeout": {
+    "uses": 317,
+    "damage_turns": 169,
+    "damage_turn_rate": 0.5331230283911672,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "ficklebeam": {
+    "uses": 143,
+    "damage_turns": 95,
+    "damage_turn_rate": 0.6643356643356644,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "fierydance": {
+    "uses": 129,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.6046511627906976,
+    "self_boost_turns": 50,
+    "setup_turns": 24,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "fierywrath": {
+    "uses": 84,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.6428571428571429,
+    "self_boost_turns": 11,
+    "setup_turns": 4,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "filletaway": {
+    "uses": 14,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.07142857142857142,
+    "self_boost_turns": 14,
+    "setup_turns": 13,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "fireblast": {
+    "uses": 1342,
+    "damage_turns": 720,
+    "damage_turn_rate": 0.5365126676602087,
+    "self_boost_turns": 28,
+    "setup_turns": 19,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "firefang": {
+    "uses": 7,
+    "damage_turns": 3,
+    "damage_turn_rate": 0.42857142857142855,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "firepunch": {
+    "uses": 49,
+    "damage_turns": 25,
+    "damage_turn_rate": 0.5102040816326531,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "firstimpression": {
+    "uses": 120,
+    "damage_turns": 64,
+    "damage_turn_rate": 0.5333333333333333,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "flamecharge": {
+    "uses": 127,
+    "damage_turns": 77,
+    "damage_turn_rate": 0.6062992125984252,
+    "self_boost_turns": 123,
+    "setup_turns": 48,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "flamethrower": {
+    "uses": 502,
+    "damage_turns": 348,
+    "damage_turn_rate": 0.6932270916334662,
+    "self_boost_turns": 10,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "flareblitz": {
+    "uses": 685,
+    "damage_turns": 457,
+    "damage_turn_rate": 0.6671532846715329,
+    "self_boost_turns": 70,
+    "setup_turns": 13,
+    "setup_stats": [
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "flashcannon": {
+    "uses": 423,
+    "damage_turns": 253,
+    "damage_turn_rate": 0.5981087470449172,
+    "self_boost_turns": 23,
+    "setup_turns": 6,
+    "setup_stats": [
+      "def",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "fleurcannon": {
+    "uses": 74,
+    "damage_turns": 39,
+    "damage_turn_rate": 0.527027027027027,
+    "self_boost_turns": 5,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "flipturn": {
+    "uses": 825,
+    "damage_turns": 346,
+    "damage_turn_rate": 0.4193939393939394,
+    "self_boost_turns": 92,
+    "setup_turns": 43,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "flowertrick": {
+    "uses": 77,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.7012987012987013,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "focusblast": {
+    "uses": 757,
+    "damage_turns": 372,
+    "damage_turn_rate": 0.4914134742404227,
+    "self_boost_turns": 10,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "focuspunch": {
+    "uses": 18,
+    "damage_turns": 10,
+    "damage_turn_rate": 0.5555555555555556,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "foulplay": {
+    "uses": 659,
+    "damage_turns": 431,
+    "damage_turn_rate": 0.65402124430956,
+    "self_boost_turns": 5,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "freeze-dry": {
+    "uses": 874,
+    "damage_turns": 573,
+    "damage_turn_rate": 0.6556064073226545,
+    "self_boost_turns": 14,
+    "setup_turns": 2,
+    "setup_stats": [
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "freezingglare": {
+    "uses": 110,
+    "damage_turns": 69,
+    "damage_turn_rate": 0.6272727272727273,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "fusionbolt": {
+    "uses": 7,
+    "damage_turns": 3,
+    "damage_turn_rate": 0.42857142857142855,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "fusionflare": {
+    "uses": 11,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.36363636363636365,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "futuresight": {
+    "uses": 94,
+    "damage_turns": 13,
+    "damage_turn_rate": 0.13829787234042554,
+    "self_boost_turns": 2,
+    "setup_turns": 2,
+    "setup_stats": [
+      "accuracy",
+      "atk"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "gigadrain": {
+    "uses": 1242,
+    "damage_turns": 838,
+    "damage_turn_rate": 0.6747181964573269,
+    "self_boost_turns": 8,
+    "setup_turns": 4,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "gigaimpact": {
+    "uses": 80,
+    "damage_turns": 51,
+    "damage_turn_rate": 0.6375,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "gigatonhammer": {
+    "uses": 90,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.6,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "glaciallance": {
+    "uses": 40,
+    "damage_turns": 25,
+    "damage_turn_rate": 0.625,
+    "self_boost_turns": 12,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "glaiverush": {
+    "uses": 20,
+    "damage_turns": 14,
+    "damage_turn_rate": 0.7,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "glare": {
+    "uses": 218,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.01834862385321101,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "grassknot": {
+    "uses": 170,
+    "damage_turns": 107,
+    "damage_turn_rate": 0.6294117647058823,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "grassyglide": {
+    "uses": 76,
+    "damage_turns": 53,
+    "damage_turn_rate": 0.6973684210526315,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "gravapple": {
+    "uses": 67,
+    "damage_turns": 30,
+    "damage_turn_rate": 0.44776119402985076,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "gunkshot": {
+    "uses": 1195,
+    "damage_turns": 596,
+    "damage_turn_rate": 0.49874476987447697,
+    "self_boost_turns": 41,
+    "setup_turns": 26,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "haze": {
+    "uses": 285,
+    "damage_turns": 46,
+    "damage_turn_rate": 0.16140350877192983,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "headbutt": {
+    "uses": 156,
+    "damage_turns": 99,
+    "damage_turn_rate": 0.6346153846153846,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "headlongrush": {
+    "uses": 99,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.5757575757575758,
+    "self_boost_turns": 14,
+    "setup_turns": 8,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "headsmash": {
+    "uses": 210,
+    "damage_turns": 113,
+    "damage_turn_rate": 0.5380952380952381,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "healbell": {
+    "uses": 41,
+    "damage_turns": 2,
+    "damage_turn_rate": 0.04878048780487805,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "healingwish": {
+    "uses": 9,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "heatcrash": {
+    "uses": 297,
+    "damage_turns": 193,
+    "damage_turn_rate": 0.6498316498316499,
+    "self_boost_turns": 4,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "heatwave": {
+    "uses": 107,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.5327102803738317,
+    "self_boost_turns": 8,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "heavyslam": {
+    "uses": 524,
+    "damage_turns": 314,
+    "damage_turn_rate": 0.5992366412213741,
+    "self_boost_turns": 56,
+    "setup_turns": 9,
+    "setup_stats": [
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "hex": {
+    "uses": 61,
+    "damage_turns": 51,
+    "damage_turn_rate": 0.8360655737704918,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "highhorsepower": {
+    "uses": 310,
+    "damage_turns": 178,
+    "damage_turn_rate": 0.5741935483870968,
+    "self_boost_turns": 40,
+    "setup_turns": 8,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "highjumpkick": {
+    "uses": 209,
+    "damage_turns": 135,
+    "damage_turn_rate": 0.645933014354067,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "hornleech": {
+    "uses": 322,
+    "damage_turns": 208,
+    "damage_turn_rate": 0.6459627329192547,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "hurricane": {
+    "uses": 1461,
+    "damage_turns": 715,
+    "damage_turn_rate": 0.4893908281998631,
+    "self_boost_turns": 31,
+    "setup_turns": 15,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "hydropump": {
+    "uses": 1464,
+    "damage_turns": 775,
+    "damage_turn_rate": 0.5293715846994536,
+    "self_boost_turns": 47,
+    "setup_turns": 24,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "hydrosteam": {
+    "uses": 42,
+    "damage_turns": 28,
+    "damage_turn_rate": 0.6666666666666666,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "hyperspacefury": {
+    "uses": 54,
+    "damage_turns": 36,
+    "damage_turn_rate": 0.6666666666666666,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "hypervoice": {
+    "uses": 889,
+    "damage_turns": 570,
+    "damage_turn_rate": 0.641169853768279,
+    "self_boost_turns": 11,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "hypnosis": {
+    "uses": 105,
+    "damage_turns": 18,
+    "damage_turn_rate": 0.17142857142857143,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "icebeam": {
+    "uses": 1570,
+    "damage_turns": 975,
+    "damage_turn_rate": 0.6210191082802548,
+    "self_boost_turns": 42,
+    "setup_turns": 10,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "icefang": {
+    "uses": 17,
+    "damage_turns": 11,
+    "damage_turn_rate": 0.6470588235294118,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "icehammer": {
+    "uses": 61,
+    "damage_turns": 35,
+    "damage_turn_rate": 0.5737704918032787,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "icepunch": {
+    "uses": 330,
+    "damage_turns": 194,
+    "damage_turn_rate": 0.5878787878787879,
+    "self_boost_turns": 6,
+    "setup_turns": 2,
+    "setup_stats": [
+      "accuracy",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "iceshard": {
+    "uses": 350,
+    "damage_turns": 235,
+    "damage_turn_rate": 0.6714285714285714,
+    "self_boost_turns": 28,
+    "setup_turns": 9,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "icespinner": {
+    "uses": 228,
+    "damage_turns": 145,
+    "damage_turn_rate": 0.6359649122807017,
+    "self_boost_turns": 7,
+    "setup_turns": 3,
+    "setup_stats": [
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "iciclecrash": {
+    "uses": 465,
+    "damage_turns": 271,
+    "damage_turn_rate": 0.5827956989247312,
+    "self_boost_turns": 37,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "iciclespear": {
+    "uses": 170,
+    "damage_turns": 124,
+    "damage_turn_rate": 0.7294117647058823,
+    "self_boost_turns": 11,
+    "setup_turns": 5,
+    "setup_stats": [
+      "def",
+      "evasion",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "irondefense": {
+    "uses": 896,
+    "damage_turns": 87,
+    "damage_turn_rate": 0.09709821428571429,
+    "self_boost_turns": 776,
+    "setup_turns": 695,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "ironhead": {
+    "uses": 1476,
+    "damage_turns": 967,
+    "damage_turn_rate": 0.6551490514905149,
+    "self_boost_turns": 43,
+    "setup_turns": 12,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "irontail": {
+    "uses": 31,
+    "damage_turns": 20,
+    "damage_turn_rate": 0.6451612903225806,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "ivycudgel": {
+    "uses": 186,
+    "damage_turns": 129,
+    "damage_turn_rate": 0.6935483870967742,
+    "self_boost_turns": 20,
+    "setup_turns": 4,
+    "setup_stats": [
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "jetpunch": {
+    "uses": 112,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.6964285714285714,
+    "self_boost_turns": 4,
+    "setup_turns": 2,
+    "setup_stats": [
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "judgment": {
+    "uses": 272,
+    "damage_turns": 200,
+    "damage_turn_rate": 0.7352941176470589,
+    "self_boost_turns": 3,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "knockoff": {
+    "uses": 6262,
+    "damage_turns": 3404,
+    "damage_turn_rate": 0.5435962951133823,
+    "self_boost_turns": 162,
+    "setup_turns": 58,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "kowtowcleave": {
+    "uses": 69,
+    "damage_turns": 41,
+    "damage_turn_rate": 0.5942028985507246,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "lashout": {
+    "uses": 66,
+    "damage_turns": 34,
+    "damage_turn_rate": 0.5151515151515151,
+    "self_boost_turns": 7,
+    "setup_turns": 2,
+    "setup_stats": [
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "lavaplume": {
+    "uses": 242,
+    "damage_turns": 131,
+    "damage_turn_rate": 0.5413223140495868,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "leafblade": {
+    "uses": 417,
+    "damage_turns": 270,
+    "damage_turn_rate": 0.6474820143884892,
+    "self_boost_turns": 19,
+    "setup_turns": 5,
+    "setup_stats": [
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "leafstorm": {
+    "uses": 363,
+    "damage_turns": 202,
+    "damage_turn_rate": 0.5564738292011019,
+    "self_boost_turns": 175,
+    "setup_turns": 80,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "leechlife": {
+    "uses": 184,
+    "damage_turns": 115,
+    "damage_turn_rate": 0.625,
+    "self_boost_turns": 5,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "leechseed": {
+    "uses": 1074,
+    "damage_turns": 501,
+    "damage_turn_rate": 0.4664804469273743,
+    "self_boost_turns": 8,
+    "setup_turns": 3,
+    "setup_stats": [
+      "accuracy",
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "lightscreen": {
+    "uses": 50,
+    "damage_turns": 6,
+    "damage_turn_rate": 0.12,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "liquidation": {
+    "uses": 939,
+    "damage_turns": 605,
+    "damage_turn_rate": 0.6443024494142705,
+    "self_boost_turns": 24,
+    "setup_turns": 11,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "lowkick": {
+    "uses": 112,
+    "damage_turns": 77,
+    "damage_turn_rate": 0.6875,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "luminacrash": {
+    "uses": 69,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6521739130434783,
+    "self_boost_turns": 51,
+    "setup_turns": 16,
+    "setup_stats": [
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "lunge": {
+    "uses": 140,
+    "damage_turns": 88,
+    "damage_turn_rate": 0.6285714285714286,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "lusterpurge": {
+    "uses": 55,
+    "damage_turns": 37,
+    "damage_turn_rate": 0.6727272727272727,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "machpunch": {
+    "uses": 260,
+    "damage_turns": 182,
+    "damage_turn_rate": 0.7,
+    "self_boost_turns": 21,
+    "setup_turns": 8,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "magmastorm": {
+    "uses": 44,
+    "damage_turns": 24,
+    "damage_turn_rate": 0.5454545454545454,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "magnetrise": {
+    "uses": 19,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.05263157894736842,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "makeitrain": {
+    "uses": 51,
+    "damage_turns": 31,
+    "damage_turn_rate": 0.6078431372549019,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "malignantchain": {
+    "uses": 133,
+    "damage_turns": 69,
+    "damage_turn_rate": 0.518796992481203,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "matchagotcha": {
+    "uses": 138,
+    "damage_turns": 83,
+    "damage_turn_rate": 0.6014492753623188,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "megahorn": {
+    "uses": 217,
+    "damage_turns": 128,
+    "damage_turn_rate": 0.5898617511520737,
+    "self_boost_turns": 11,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "def"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "meteorbeam": {
+    "uses": 136,
+    "damage_turns": 63,
+    "damage_turn_rate": 0.4632352941176471,
+    "self_boost_turns": 122,
+    "setup_turns": 67,
+    "setup_stats": [
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "meteormash": {
+    "uses": 55,
+    "damage_turns": 30,
+    "damage_turn_rate": 0.5454545454545454,
+    "self_boost_turns": 12,
+    "setup_turns": 7,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "mightycleave": {
+    "uses": 65,
+    "damage_turns": 49,
+    "damage_turn_rate": 0.7538461538461538,
+    "self_boost_turns": 3,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "milkdrink": {
+    "uses": 105,
+    "damage_turns": 15,
+    "damage_turn_rate": 0.14285714285714285,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "mirrorcoat": {
+    "uses": 12,
+    "damage_turns": 5,
+    "damage_turn_rate": 0.4166666666666667,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "moonblast": {
+    "uses": 1597,
+    "damage_turns": 1033,
+    "damage_turn_rate": 0.6468378209142142,
+    "self_boost_turns": 21,
+    "setup_turns": 7,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "moongeistbeam": {
+    "uses": 165,
+    "damage_turns": 107,
+    "damage_turn_rate": 0.6484848484848484,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "moonlight": {
+    "uses": 333,
+    "damage_turns": 43,
+    "damage_turn_rate": 0.12912912912912913,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "morningsun": {
+    "uses": 186,
+    "damage_turns": 41,
+    "damage_turn_rate": 0.22043010752688172,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "mortalspin": {
+    "uses": 7,
+    "damage_turns": 3,
+    "damage_turn_rate": 0.42857142857142855,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "muddywater": {
+    "uses": 118,
+    "damage_turns": 68,
+    "damage_turn_rate": 0.576271186440678,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "mudshot": {
+    "uses": 70,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6428571428571429,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "mysticalfire": {
+    "uses": 238,
+    "damage_turns": 148,
+    "damage_turn_rate": 0.6218487394957983,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "nastyplot": {
+    "uses": 1314,
+    "damage_turns": 99,
+    "damage_turn_rate": 0.07534246575342465,
+    "self_boost_turns": 1239,
+    "setup_turns": 1153,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "nightshade": {
+    "uses": 88,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.6477272727272727,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "nightslash": {
+    "uses": 79,
+    "damage_turns": 52,
+    "damage_turn_rate": 0.6582278481012658,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "noretreat": {
+    "uses": 67,
+    "damage_turns": 12,
+    "damage_turn_rate": 0.1791044776119403,
+    "self_boost_turns": 59,
+    "setup_turns": 50,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "nuzzle": {
+    "uses": 237,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.3291139240506329,
+    "self_boost_turns": 4,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "originpulse": {
+    "uses": 84,
+    "damage_turns": 53,
+    "damage_turn_rate": 0.6309523809523809,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "outrage": {
+    "uses": 869,
+    "damage_turns": 536,
+    "damage_turn_rate": 0.616800920598389,
+    "self_boost_turns": 39,
+    "setup_turns": 13,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "overdrive": {
+    "uses": 62,
+    "damage_turns": 40,
+    "damage_turn_rate": 0.6451612903225806,
+    "self_boost_turns": 12,
+    "setup_turns": 4,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "overheat": {
+    "uses": 290,
+    "damage_turns": 163,
+    "damage_turn_rate": 0.5620689655172414,
+    "self_boost_turns": 17,
+    "setup_turns": 8,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "painsplit": {
+    "uses": 141,
+    "damage_turns": 49,
+    "damage_turn_rate": 0.3475177304964539,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "partingshot": {
+    "uses": 282,
+    "damage_turns": 31,
+    "damage_turn_rate": 0.1099290780141844,
+    "self_boost_turns": 50,
+    "setup_turns": 44,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "payback": {
+    "uses": 28,
+    "damage_turns": 20,
+    "damage_turn_rate": 0.7142857142857143,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "petalblizzard": {
+    "uses": 30,
+    "damage_turns": 18,
+    "damage_turn_rate": 0.6,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "petaldance": {
+    "uses": 13,
+    "damage_turns": 9,
+    "damage_turn_rate": 0.6923076923076923,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "photongeyser": {
+    "uses": 61,
+    "damage_turns": 38,
+    "damage_turn_rate": 0.6229508196721312,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "playrough": {
+    "uses": 1245,
+    "damage_turns": 713,
+    "damage_turn_rate": 0.5726907630522088,
+    "self_boost_turns": 21,
+    "setup_turns": 10,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "poisonfang": {
+    "uses": 37,
+    "damage_turns": 15,
+    "damage_turn_rate": 0.40540540540540543,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "poisonjab": {
+    "uses": 371,
+    "damage_turns": 221,
+    "damage_turn_rate": 0.5956873315363881,
+    "self_boost_turns": 7,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "pollenpuff": {
+    "uses": 20,
+    "damage_turns": 13,
+    "damage_turn_rate": 0.65,
+    "self_boost_turns": 5,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "poltergeist": {
+    "uses": 1044,
+    "damage_turns": 551,
+    "damage_turn_rate": 0.5277777777777778,
+    "self_boost_turns": 33,
+    "setup_turns": 14,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "populationbomb": {
+    "uses": 228,
+    "damage_turns": 170,
+    "damage_turn_rate": 0.7456140350877193,
+    "self_boost_turns": 9,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "pounce": {
+    "uses": 84,
+    "damage_turns": 56,
+    "damage_turn_rate": 0.6666666666666666,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "powergem": {
+    "uses": 150,
+    "damage_turns": 93,
+    "damage_turn_rate": 0.62,
+    "self_boost_turns": 13,
+    "setup_turns": 5,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "powertrip": {
+    "uses": 22,
+    "damage_turns": 14,
+    "damage_turn_rate": 0.6363636363636364,
+    "self_boost_turns": 6,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "powerwhip": {
+    "uses": 350,
+    "damage_turns": 192,
+    "damage_turn_rate": 0.5485714285714286,
+    "self_boost_turns": 5,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "precipiceblades": {
+    "uses": 90,
+    "damage_turns": 51,
+    "damage_turn_rate": 0.5666666666666667,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "protect": {
+    "uses": 2537,
+    "damage_turns": 692,
+    "damage_turn_rate": 0.272763106030745,
+    "self_boost_turns": 66,
+    "setup_turns": 59,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "psyblade": {
+    "uses": 47,
+    "damage_turns": 32,
+    "damage_turn_rate": 0.6808510638297872,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "psychic": {
+    "uses": 884,
+    "damage_turns": 561,
+    "damage_turn_rate": 0.6346153846153846,
+    "self_boost_turns": 28,
+    "setup_turns": 9,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "psychicfangs": {
+    "uses": 244,
+    "damage_turns": 169,
+    "damage_turn_rate": 0.6926229508196722,
+    "self_boost_turns": 8,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "psychicnoise": {
+    "uses": 1182,
+    "damage_turns": 830,
+    "damage_turn_rate": 0.7021996615905245,
+    "self_boost_turns": 22,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "psychoboost": {
+    "uses": 95,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.6,
+    "self_boost_turns": 4,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "def"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "psychocut": {
+    "uses": 143,
+    "damage_turns": 99,
+    "damage_turn_rate": 0.6923076923076923,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "psyshock": {
+    "uses": 1243,
+    "damage_turns": 791,
+    "damage_turn_rate": 0.6363636363636364,
+    "self_boost_turns": 38,
+    "setup_turns": 11,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "psystrike": {
+    "uses": 111,
+    "damage_turns": 75,
+    "damage_turn_rate": 0.6756756756756757,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "pyroball": {
+    "uses": 100,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.54,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "quickattack": {
+    "uses": 124,
+    "damage_turns": 82,
+    "damage_turn_rate": 0.6612903225806451,
+    "self_boost_turns": 2,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "quiverdance": {
+    "uses": 1163,
+    "damage_turns": 88,
+    "damage_turn_rate": 0.07566638005159071,
+    "self_boost_turns": 1109,
+    "setup_turns": 1027,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "ragefist": {
+    "uses": 70,
+    "damage_turns": 55,
+    "damage_turn_rate": 0.7857142857142857,
+    "self_boost_turns": 3,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "ragingbull": {
+    "uses": 26,
+    "damage_turns": 17,
+    "damage_turn_rate": 0.6538461538461539,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "raindance": {
+    "uses": 87,
+    "damage_turns": 6,
+    "damage_turn_rate": 0.06896551724137931,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "rapidspin": {
+    "uses": 876,
+    "damage_turns": 458,
+    "damage_turn_rate": 0.5228310502283106,
+    "self_boost_turns": 741,
+    "setup_turns": 325,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "razorshell": {
+    "uses": 24,
+    "damage_turns": 12,
+    "damage_turn_rate": 0.5,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "recover": {
+    "uses": 2283,
+    "damage_turns": 457,
+    "damage_turn_rate": 0.20017520805957073,
+    "self_boost_turns": 13,
+    "setup_turns": 10,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "reflect": {
+    "uses": 66,
+    "damage_turns": 12,
+    "damage_turn_rate": 0.18181818181818182,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "relicsong": {
+    "uses": 30,
+    "damage_turns": 18,
+    "damage_turn_rate": 0.6,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "rest": {
+    "uses": 654,
+    "damage_turns": 112,
+    "damage_turn_rate": 0.1712538226299694,
+    "self_boost_turns": 13,
+    "setup_turns": 10,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "revelationdance": {
+    "uses": 263,
+    "damage_turns": 171,
+    "damage_turn_rate": 0.6501901140684411,
+    "self_boost_turns": 9,
+    "setup_turns": 6,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "revivalblessing": {
+    "uses": 100,
+    "damage_turns": 10,
+    "damage_turn_rate": 0.1,
+    "self_boost_turns": 9,
+    "setup_turns": 8,
+    "setup_stats": [
+      "accuracy",
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "roar": {
+    "uses": 229,
+    "damage_turns": 21,
+    "damage_turn_rate": 0.09170305676855896,
+    "self_boost_turns": 16,
+    "setup_turns": 16,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "rockblast": {
+    "uses": 123,
+    "damage_turns": 76,
+    "damage_turn_rate": 0.6178861788617886,
+    "self_boost_turns": 22,
+    "setup_turns": 15,
+    "setup_stats": [
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "rockpolish": {
+    "uses": 127,
+    "damage_turns": 17,
+    "damage_turn_rate": 0.13385826771653545,
+    "self_boost_turns": 127,
+    "setup_turns": 110,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "rockslide": {
+    "uses": 158,
+    "damage_turns": 84,
+    "damage_turn_rate": 0.5316455696202531,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "rocktomb": {
+    "uses": 33,
+    "damage_turns": 24,
+    "damage_turn_rate": 0.7272727272727273,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "roost": {
+    "uses": 1572,
+    "damage_turns": 230,
+    "damage_turn_rate": 0.14631043256997456,
+    "self_boost_turns": 25,
+    "setup_turns": 21,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "ruination": {
+    "uses": 74,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6081081081081081,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "sacredfire": {
+    "uses": 263,
+    "damage_turns": 148,
+    "damage_turn_rate": 0.5627376425855514,
+    "self_boost_turns": 4,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "sacredsword": {
+    "uses": 126,
+    "damage_turns": 81,
+    "damage_turn_rate": 0.6428571428571429,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "saltcure": {
+    "uses": 288,
+    "damage_turns": 157,
+    "damage_turn_rate": 0.5451388888888888,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "scald": {
+    "uses": 1792,
+    "damage_turns": 1100,
+    "damage_turn_rate": 0.6138392857142857,
+    "self_boost_turns": 22,
+    "setup_turns": 8,
+    "setup_stats": [
+      "atk",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "scaleshot": {
+    "uses": 291,
+    "damage_turns": 183,
+    "damage_turn_rate": 0.6288659793814433,
+    "self_boost_turns": 231,
+    "setup_turns": 71,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "scorchingsands": {
+    "uses": 104,
+    "damage_turns": 58,
+    "damage_turn_rate": 0.5576923076923077,
+    "self_boost_turns": 3,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "secretsword": {
+    "uses": 137,
+    "damage_turns": 76,
+    "damage_turn_rate": 0.5547445255474452,
+    "self_boost_turns": 3,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "seedbomb": {
+    "uses": 99,
+    "damage_turns": 58,
+    "damage_turn_rate": 0.5858585858585859,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "seedflare": {
+    "uses": 181,
+    "damage_turns": 100,
+    "damage_turn_rate": 0.5524861878453039,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "seismictoss": {
+    "uses": 652,
+    "damage_turns": 417,
+    "damage_turn_rate": 0.6395705521472392,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "shadowball": {
+    "uses": 1914,
+    "damage_turns": 1232,
+    "damage_turn_rate": 0.6436781609195402,
+    "self_boost_turns": 90,
+    "setup_turns": 13,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "shadowclaw": {
+    "uses": 52,
+    "damage_turns": 29,
+    "damage_turn_rate": 0.5576923076923077,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "shadowsneak": {
+    "uses": 411,
+    "damage_turns": 283,
+    "damage_turn_rate": 0.6885644768856448,
+    "self_boost_turns": 18,
+    "setup_turns": 6,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "shedtail": {
+    "uses": 103,
+    "damage_turns": 11,
+    "damage_turn_rate": 0.10679611650485436,
+    "self_boost_turns": 20,
+    "setup_turns": 17,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "shellsidearm": {
+    "uses": 92,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.5869565217391305,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "shellsmash": {
+    "uses": 533,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.10694183864915573,
+    "self_boost_turns": 519,
+    "setup_turns": 464,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "shiftgear": {
+    "uses": 158,
+    "damage_turns": 7,
+    "damage_turn_rate": 0.04430379746835443,
+    "self_boost_turns": 152,
+    "setup_turns": 145,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "shoreup": {
+    "uses": 45,
+    "damage_turns": 9,
+    "damage_turn_rate": 0.2,
+    "self_boost_turns": 2,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "slackoff": {
+    "uses": 351,
+    "damage_turns": 78,
+    "damage_turn_rate": 0.2222222222222222,
+    "self_boost_turns": 2,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "sleeppowder": {
+    "uses": 565,
+    "damage_turns": 33,
+    "damage_turn_rate": 0.0584070796460177,
+    "self_boost_turns": 4,
+    "setup_turns": 4,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "sleeptalk": {
+    "uses": 648,
+    "damage_turns": 224,
+    "damage_turn_rate": 0.345679012345679,
+    "self_boost_turns": 115,
+    "setup_turns": 86,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "sludgebomb": {
+    "uses": 1079,
+    "damage_turns": 668,
+    "damage_turn_rate": 0.6190917516218721,
+    "self_boost_turns": 15,
+    "setup_turns": 6,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "sludgewave": {
+    "uses": 594,
+    "damage_turns": 356,
+    "damage_turn_rate": 0.5993265993265994,
+    "self_boost_turns": 12,
+    "setup_turns": 5,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "snowscape": {
+    "uses": 29,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.034482758620689655,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "soft-boiled": {
+    "uses": 191,
+    "damage_turns": 22,
+    "damage_turn_rate": 0.11518324607329843,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "solarbeam": {
+    "uses": 99,
+    "damage_turns": 63,
+    "damage_turn_rate": 0.6363636363636364,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "spacialrend": {
+    "uses": 88,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.6136363636363636,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "sparklingaria": {
+    "uses": 116,
+    "damage_turns": 72,
+    "damage_turn_rate": 0.6206896551724138,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "spikes": {
+    "uses": 997,
+    "damage_turns": 115,
+    "damage_turn_rate": 0.11534603811434303,
+    "self_boost_turns": 14,
+    "setup_turns": 13,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "spiritbreak": {
+    "uses": 150,
+    "damage_turns": 100,
+    "damage_turn_rate": 0.6666666666666666,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "spiritshackle": {
+    "uses": 22,
+    "damage_turns": 16,
+    "damage_turn_rate": 0.7272727272727273,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "spore": {
+    "uses": 328,
+    "damage_turns": 19,
+    "damage_turn_rate": 0.057926829268292686,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "stealthrock": {
+    "uses": 1345,
+    "damage_turns": 91,
+    "damage_turn_rate": 0.06765799256505577,
+    "self_boost_turns": 5,
+    "setup_turns": 5,
+    "setup_stats": [
+      "atk",
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "steameruption": {
+    "uses": 107,
+    "damage_turns": 64,
+    "damage_turn_rate": 0.5981308411214953,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "stickyweb": {
+    "uses": 709,
+    "damage_turns": 58,
+    "damage_turn_rate": 0.08180535966149506,
+    "self_boost_turns": 5,
+    "setup_turns": 5,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "stompingtantrum": {
+    "uses": 185,
+    "damage_turns": 103,
+    "damage_turn_rate": 0.5567567567567567,
+    "self_boost_turns": 4,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "stoneaxe": {
+    "uses": 94,
+    "damage_turns": 52,
+    "damage_turn_rate": 0.5531914893617021,
+    "self_boost_turns": 3,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "stoneedge": {
+    "uses": 1255,
+    "damage_turns": 643,
+    "damage_turn_rate": 0.5123505976095617,
+    "self_boost_turns": 67,
+    "setup_turns": 33,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "storedpower": {
+    "uses": 343,
+    "damage_turns": 218,
+    "damage_turn_rate": 0.6355685131195336,
+    "self_boost_turns": 38,
+    "setup_turns": 17,
+    "setup_stats": [
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "strangesteam": {
+    "uses": 67,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6716417910447762,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "strengthsap": {
+    "uses": 911,
+    "damage_turns": 138,
+    "damage_turn_rate": 0.15148188803512624,
+    "self_boost_turns": 6,
+    "setup_turns": 6,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "struggle": {
+    "uses": 75,
+    "damage_turns": 45,
+    "damage_turn_rate": 0.6,
+    "self_boost_turns": 4,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "stunspore": {
+    "uses": 100,
+    "damage_turns": 9,
+    "damage_turn_rate": 0.09,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "substitute": {
+    "uses": 1747,
+    "damage_turns": 476,
+    "damage_turn_rate": 0.2724670864338867,
+    "self_boost_turns": 22,
+    "setup_turns": 22,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "suckerpunch": {
+    "uses": 958,
+    "damage_turns": 532,
+    "damage_turn_rate": 0.5553235908141962,
+    "self_boost_turns": 62,
+    "setup_turns": 13,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "sunnyday": {
+    "uses": 105,
+    "damage_turns": 10,
+    "damage_turn_rate": 0.09523809523809523,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "sunsteelstrike": {
+    "uses": 137,
+    "damage_turns": 97,
+    "damage_turn_rate": 0.708029197080292,
+    "self_boost_turns": 8,
+    "setup_turns": 2,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "supercellslam": {
+    "uses": 214,
+    "damage_turns": 135,
+    "damage_turn_rate": 0.6308411214953271,
+    "self_boost_turns": 8,
+    "setup_turns": 4,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "superfang": {
+    "uses": 262,
+    "damage_turns": 142,
+    "damage_turn_rate": 0.5419847328244275,
+    "self_boost_turns": 5,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "superpower": {
+    "uses": 389,
+    "damage_turns": 237,
+    "damage_turn_rate": 0.609254498714653,
+    "self_boost_turns": 267,
+    "setup_turns": 96,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "surf": {
+    "uses": 773,
+    "damage_turns": 488,
+    "damage_turn_rate": 0.6313065976714101,
+    "self_boost_turns": 15,
+    "setup_turns": 5,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "surgingstrikes": {
+    "uses": 54,
+    "damage_turns": 34,
+    "damage_turn_rate": 0.6296296296296297,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "switcheroo": {
+    "uses": 15,
+    "damage_turns": 0,
+    "damage_turn_rate": 0.0,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "swordsdance": {
+    "uses": 2157,
+    "damage_turns": 126,
+    "damage_turn_rate": 0.0584144645340751,
+    "self_boost_turns": 1990,
+    "setup_turns": 1875,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "synthesis": {
+    "uses": 308,
+    "damage_turns": 33,
+    "damage_turn_rate": 0.10714285714285714,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "tachyoncutter": {
+    "uses": 70,
+    "damage_turns": 41,
+    "damage_turn_rate": 0.5857142857142857,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "tailglow": {
+    "uses": 83,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.04819277108433735,
+    "self_boost_turns": 77,
+    "setup_turns": 73,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "tailslap": {
+    "uses": 97,
+    "damage_turns": 57,
+    "damage_turn_rate": 0.5876288659793815,
+    "self_boost_turns": 1,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "tailwind": {
+    "uses": 22,
+    "damage_turns": 1,
+    "damage_turn_rate": 0.045454545454545456,
+    "self_boost_turns": 21,
+    "setup_turns": 20,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "takeheart": {
+    "uses": 162,
+    "damage_turns": 25,
+    "damage_turn_rate": 0.15432098765432098,
+    "self_boost_turns": 149,
+    "setup_turns": 129,
+    "setup_stats": [
+      "spa",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "taunt": {
+    "uses": 364,
+    "damage_turns": 22,
+    "damage_turn_rate": 0.06043956043956044,
+    "self_boost_turns": 11,
+    "setup_turns": 10,
+    "setup_stats": [
+      "accuracy",
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "teleport": {
+    "uses": 12,
+    "damage_turns": 2,
+    "damage_turn_rate": 0.16666666666666666,
+    "self_boost_turns": 4,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "temperflare": {
+    "uses": 15,
+    "damage_turns": 10,
+    "damage_turn_rate": 0.6666666666666666,
+    "self_boost_turns": 3,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "terablast": {
+    "uses": 710,
+    "damage_turns": 517,
+    "damage_turn_rate": 0.7281690140845071,
+    "self_boost_turns": 48,
+    "setup_turns": 10,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "terastarstorm": {
+    "uses": 90,
+    "damage_turns": 64,
+    "damage_turn_rate": 0.7111111111111111,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "throatchop": {
+    "uses": 337,
+    "damage_turns": 203,
+    "damage_turn_rate": 0.6023738872403561,
+    "self_boost_turns": 4,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "thunder": {
+    "uses": 179,
+    "damage_turns": 99,
+    "damage_turn_rate": 0.553072625698324,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "thunderbolt": {
+    "uses": 2814,
+    "damage_turns": 1739,
+    "damage_turn_rate": 0.6179815209665956,
+    "self_boost_turns": 44,
+    "setup_turns": 10,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "thunderclap": {
+    "uses": 79,
+    "damage_turns": 42,
+    "damage_turn_rate": 0.5316455696202531,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "thunderpunch": {
+    "uses": 33,
+    "damage_turns": 16,
+    "damage_turn_rate": 0.48484848484848486,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "thunderwave": {
+    "uses": 2043,
+    "damage_turns": 119,
+    "damage_turn_rate": 0.05824767498776309,
+    "self_boost_turns": 32,
+    "setup_turns": 31,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "tidyup": {
+    "uses": 201,
+    "damage_turns": 15,
+    "damage_turn_rate": 0.07462686567164178,
+    "self_boost_turns": 190,
+    "setup_turns": 177,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "torchsong": {
+    "uses": 130,
+    "damage_turns": 100,
+    "damage_turn_rate": 0.7692307692307693,
+    "self_boost_turns": 119,
+    "setup_turns": 24,
+    "setup_stats": [
+      "spa"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "toxic": {
+    "uses": 1052,
+    "damage_turns": 279,
+    "damage_turn_rate": 0.2652091254752852,
+    "self_boost_turns": 4,
+    "setup_turns": 2,
+    "setup_stats": [
+      "evasion",
+      "spa"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "toxicspikes": {
+    "uses": 555,
+    "damage_turns": 59,
+    "damage_turn_rate": 0.1063063063063063,
+    "self_boost_turns": 4,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "trailblaze": {
+    "uses": 392,
+    "damage_turns": 223,
+    "damage_turn_rate": 0.5688775510204082,
+    "self_boost_turns": 303,
+    "setup_turns": 140,
+    "setup_stats": [
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "triattack": {
+    "uses": 177,
+    "damage_turns": 117,
+    "damage_turn_rate": 0.6610169491525424,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "trick": {
+    "uses": 228,
+    "damage_turns": 11,
+    "damage_turn_rate": 0.04824561403508772,
+    "self_boost_turns": 6,
+    "setup_turns": 6,
+    "setup_stats": [
+      "accuracy",
+      "atk",
+      "def",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "trickroom": {
+    "uses": 69,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.057971014492753624,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "triplearrows": {
+    "uses": 62,
+    "damage_turns": 40,
+    "damage_turn_rate": 0.6451612903225806,
+    "self_boost_turns": 2,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "tripleaxel": {
+    "uses": 535,
+    "damage_turns": 327,
+    "damage_turn_rate": 0.611214953271028,
+    "self_boost_turns": 14,
+    "setup_turns": 4,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "u-turn": {
+    "uses": 2437,
+    "damage_turns": 1324,
+    "damage_turn_rate": 0.5432909314731227,
+    "self_boost_turns": 382,
+    "setup_turns": 142,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "vacuumwave": {
+    "uses": 78,
+    "damage_turns": 56,
+    "damage_turn_rate": 0.717948717948718,
+    "self_boost_turns": 2,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "victorydance": {
+    "uses": 55,
+    "damage_turns": 3,
+    "damage_turn_rate": 0.05454545454545454,
+    "self_boost_turns": 52,
+    "setup_turns": 50,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "voltswitch": {
+    "uses": 950,
+    "damage_turns": 433,
+    "damage_turn_rate": 0.4557894736842105,
+    "self_boost_turns": 130,
+    "setup_turns": 58,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "volttackle": {
+    "uses": 54,
+    "damage_turns": 40,
+    "damage_turn_rate": 0.7407407407407407,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "waterfall": {
+    "uses": 234,
+    "damage_turns": 153,
+    "damage_turn_rate": 0.6538461538461539,
+    "self_boost_turns": 18,
+    "setup_turns": 3,
+    "setup_stats": [
+      "def",
+      "evasion",
+      "spa",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "waterpulse": {
+    "uses": 88,
+    "damage_turns": 54,
+    "damage_turn_rate": 0.6136363636363636,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "waterspout": {
+    "uses": 102,
+    "damage_turns": 63,
+    "damage_turn_rate": 0.6176470588235294,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "wavecrash": {
+    "uses": 581,
+    "damage_turns": 351,
+    "damage_turn_rate": 0.6041308089500861,
+    "self_boost_turns": 17,
+    "setup_turns": 3,
+    "setup_stats": [
+      "atk",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "weatherball": {
+    "uses": 178,
+    "damage_turns": 108,
+    "damage_turn_rate": 0.6067415730337079,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "whirlpool": {
+    "uses": 78,
+    "damage_turns": 27,
+    "damage_turn_rate": 0.34615384615384615,
+    "self_boost_turns": 1,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "whirlwind": {
+    "uses": 120,
+    "damage_turns": 29,
+    "damage_turn_rate": 0.24166666666666667,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": false,
+    "is_setup": false
+  },
+  "wickedblow": {
+    "uses": 39,
+    "damage_turns": 23,
+    "damage_turn_rate": 0.5897435897435898,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "def"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "wildcharge": {
+    "uses": 177,
+    "damage_turns": 104,
+    "damage_turn_rate": 0.5875706214689266,
+    "self_boost_turns": 6,
+    "setup_turns": 2,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spd"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "will-o-wisp": {
+    "uses": 941,
+    "damage_turns": 241,
+    "damage_turn_rate": 0.2561105207226355,
+    "self_boost_turns": 11,
+    "setup_turns": 9,
+    "setup_stats": [
+      "atk",
+      "def",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "wish": {
+    "uses": 1585,
+    "damage_turns": 275,
+    "damage_turn_rate": 0.17350157728706625,
+    "self_boost_turns": 17,
+    "setup_turns": 12,
+    "setup_stats": [
+      "atk",
+      "def",
+      "evasion",
+      "spa",
+      "spd",
+      "spe"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "woodhammer": {
+    "uses": 214,
+    "damage_turns": 123,
+    "damage_turn_rate": 0.5747663551401869,
+    "self_boost_turns": 3,
+    "setup_turns": 1,
+    "setup_stats": [
+      "atk",
+      "spa",
+      "spe"
+    ],
+    "is_offensive": true,
+    "is_setup": true
+  },
+  "workup": {
+    "uses": 23,
+    "damage_turns": 4,
+    "damage_turn_rate": 0.17391304347826086,
+    "self_boost_turns": 23,
+    "setup_turns": 19,
+    "setup_stats": [
+      "atk",
+      "spa"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "x-scissor": {
+    "uses": 58,
+    "damage_turns": 46,
+    "damage_turn_rate": 0.7931034482758621,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "yawn": {
+    "uses": 226,
+    "damage_turns": 8,
+    "damage_turn_rate": 0.035398230088495575,
+    "self_boost_turns": 3,
+    "setup_turns": 3,
+    "setup_stats": [
+      "def",
+      "spa"
+    ],
+    "is_offensive": false,
+    "is_setup": true
+  },
+  "zenheadbutt": {
+    "uses": 152,
+    "damage_turns": 90,
+    "damage_turn_rate": 0.5921052631578947,
+    "self_boost_turns": 4,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  },
+  "zingzap": {
+    "uses": 97,
+    "damage_turns": 61,
+    "damage_turn_rate": 0.6288659793814433,
+    "self_boost_turns": 0,
+    "setup_turns": 0,
+    "setup_stats": [],
+    "is_offensive": true,
+    "is_setup": false
+  }
+}

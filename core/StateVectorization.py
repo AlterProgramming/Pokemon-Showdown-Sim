@@ -462,8 +462,10 @@ def encode_state_mini(state: Dict[str, Any], perspective_player: str) -> List[fl
 
     other = "p2" if perspective_player == "p1" else "p1"
     mons = state["mons"]
-    my_active_uid = state[perspective_player]["active_uid"]
-    opp_active_uid = state[other]["active_uid"]
+    # Snapshot omits active_uid when a side has no active (early game, post-faint
+    # before the replacement choice resolves), so use .get() and fall through to None.
+    my_active_uid = state[perspective_player].get("active_uid")
+    opp_active_uid = state[other].get("active_uid")
 
     my_active = mons.get(my_active_uid) if my_active_uid else None
     opp_active = mons.get(opp_active_uid) if opp_active_uid else None
@@ -472,8 +474,8 @@ def encode_state_mini(state: Dict[str, Any], perspective_player: str) -> List[fl
     vec += mon_features(my_active, perspective_player, move_hash_dim=0, species_hash_dim=8)
     vec += mon_features(opp_active, perspective_player, move_hash_dim=0, species_hash_dim=8)
 
-    my_slots = state[perspective_player]["slots"]
-    opp_slots = state[other]["slots"]
+    my_slots = state[perspective_player].get("slots", [])
+    opp_slots = state[other].get("slots", [])
 
     for uid in my_slots:
         vec += bench_slot_features(mons.get(uid) if uid else None, perspective_player, species_hash_dim=4)

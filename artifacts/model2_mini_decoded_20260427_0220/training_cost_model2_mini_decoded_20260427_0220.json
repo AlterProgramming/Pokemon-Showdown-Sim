@@ -1,0 +1,30 @@
+{
+  "gpu_name": "Tesla T4",
+  "gpu_tier": "T4",
+  "cu_rate_per_hr": 1.96,
+  "training_elapsed_sec": 773.0,
+  "training_elapsed_min": 12.88,
+  "estimated_compute_units": 0.421,
+  "epochs_completed": 11,
+  "epoch_times_sec": [
+    65.9,
+    52.8,
+    53.7,
+    53.6,
+    53.4,
+    53.2,
+    53.6,
+    53.8,
+    53.6,
+    53.9,
+    61.2
+  ],
+  "avg_epoch_sec": 55.3,
+  "gpu_snapshot": {
+    "gpu_utilisation": "0 %",
+    "mem_utilisation": "0 %",
+    "mem_used": "3 MiB",
+    "mem_total": "15360 MiB",
+    "power_draw_w": "13.73 W"
+  }
+}
