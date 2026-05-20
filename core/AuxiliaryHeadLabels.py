@@ -42,7 +42,7 @@ def load_beta_labels(labels_jsonl_path: str) -> Dict[Tuple[str, int, str], Dict[
     except FileNotFoundError:
         raise FileNotFoundError(
             f"β-1 labels not found at {labels_jsonl_path}. "
-            "Run: python3.12 word_prediction_model/scripts/generate_beta_labels.py"
+            "Run: python3.12 word_prediction_v2/scripts/generate_beta_labels.py"
         )
     return labels_by_key
 

@@ -726,7 +726,9 @@ def _startup_self_test(state: dict[str, Any]) -> None:
     if len(action_vocab) == 0:
         errors.append("action_vocab is empty — policy vocab file missing or key clobbered")
 
-    # 2. Embedding layer input_dims must match entity_token_vocab_sizes in metadata
+    # 2. Embedding layer input_dims must match entity_token_vocab_sizes in metadata.
+    # These keys have runtime OOB clamping (→ UNK) so a vocab overflow is a warning.
+    _CLAMPED_AT_RUNTIME = {"tera", "status", "species", "item", "ability"}
     model = state.get("model")
     token_vocabs = state.get("token_vocabs") or {}
     if model is not None and token_vocabs:
@@ -739,9 +741,12 @@ def _startup_self_test(state: dict[str, Any]) -> None:
                         actual_size = weights[0].shape[0]
                         max_id = max(token_vocabs[vocab_key].values()) if token_vocabs[vocab_key] else 0
                         if max_id >= actual_size:
-                            errors.append(
-                                f"{name}: embedding size {actual_size} but max vocab id={max_id} — OOB at inference"
-                            )
+                            if vocab_key in _CLAMPED_AT_RUNTIME:
+                                print(f"[entity-server] WARNING {name}: embedding size {actual_size} but max vocab id={max_id} — clamped to UNK at inference")
+                            else:
+                                errors.append(
+                                    f"{name}: embedding size {actual_size} but max vocab id={max_id} — OOB at inference"
+                                )
 
     # 3. Warm-up inference: run one dummy forward pass and check output shape
     try:

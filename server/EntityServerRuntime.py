@@ -27,6 +27,24 @@ build_entity_action_models = None
 build_entity_action_v2_models = None
 
 
+_ENTITY_TOKEN_CLAMP_MAP = {
+    "pokemon_tera": "tera",
+    "pokemon_status": "status",
+    "pokemon_species": "species",
+    "pokemon_item": "item",
+    "pokemon_ability": "ability",
+}
+
+
+def _clamp_oob_entity_tokens(encoded: dict, vocab_sizes: dict) -> dict:
+    for field_key, vocab_key in _ENTITY_TOKEN_CLAMP_MAP.items():
+        vsize = vocab_sizes.get(vocab_key)
+        if vsize is None or field_key not in encoded:
+            continue
+        encoded[field_key] = [1 if v >= vsize else v for v in encoded[field_key]]
+    return encoded
+
+
 def _softmax(logits: np.ndarray) -> np.ndarray:
     shifted = logits - np.max(logits)
     exp = np.exp(shifted)
@@ -510,6 +528,7 @@ def load_entity_runtime_artifacts(
         "history_decoding_action_vocab": history_decoding_action_vocab,
         "action_id_to_string": history_decoding_action_id_to_string,
         "decoded_action_weight": float(metadata.get("decoded_action_weight", 0.15)),
+        "vocab_sizes": metadata.get("entity_token_vocab_sizes") or {key: len(value) for key, value in token_vocabs.items()},
     }
 
 
@@ -532,6 +551,7 @@ def predict_entity_logits_with_metadata(
         perspective_player=perspective_player,
         token_vocabs=runtime["token_vocabs"],
     )
+    encoded = _clamp_oob_entity_tokens(encoded, runtime.get("vocab_sizes", {}))
     if runtime["input_mode"] == "entity_invariance":
         batched_inputs = to_single_example_invariance_inputs(encoded)
     else:
