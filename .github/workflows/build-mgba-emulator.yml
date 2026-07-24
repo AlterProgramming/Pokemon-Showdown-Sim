@@ -1,0 +1,42 @@
+name: Build portable mGBA emulator
+
+on:
+  push:
+    branches:
+      - ops/build-mgba-emulator
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download official mGBA AppImage
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-delay 2 \
+            https://github.com/mgba-emu/mgba/releases/download/0.10.5/mGBA-0.10.5-appimage-x64.appimage \
+            -o mGBA-0.10.5.AppImage
+          chmod +x mGBA-0.10.5.AppImage
+          sha256sum mGBA-0.10.5.AppImage | tee SHA256SUMS
+
+      - name: Extract portable emulator
+        run: |
+          set -euo pipefail
+          ./mGBA-0.10.5.AppImage --appimage-extract
+          mv squashfs-root mgba-portable
+          find mgba-portable -maxdepth 3 -type f | sort | head -200
+          test -x mgba-portable/AppRun
+
+      - name: Upload portable emulator
+        uses: actions/upload-artifact@v4
+        with:
+          name: mgba-0.10.5-linux-x64-portable
+          path: |
+            mgba-portable
+            mGBA-0.10.5.AppImage
+            SHA256SUMS
+          if-no-files-found: error
+          retention-days: 1
