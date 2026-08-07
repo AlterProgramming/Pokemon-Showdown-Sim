@@ -164,6 +164,36 @@ class ModelRegistryTests(unittest.TestCase):
                 "artifacts/entity_action_v2_20260409_1811/training_metadata_entity_action_v2_20260409_1811.json",
             )
 
+    def test_build_registry_preserves_sequence_serving_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_path = Path(tmpdir)
+            artifacts_dir = repo_path / "artifacts"
+            artifacts_dir.mkdir()
+            (artifacts_dir / "model1_not_elman3.keras").write_text("m", encoding="utf-8")
+            (artifacts_dir / "action_vocab_model1_not_elman3.json").write_text("{}", encoding="utf-8")
+            (artifacts_dir / "training_metadata_model1_not_elman3.json").write_text(
+                json.dumps(
+                    {
+                        "model_name": "model1_not_elman3",
+                        "policy_model_path": "artifacts/model1_not_elman3.keras",
+                        "policy_vocab_path": "artifacts/action_vocab_model1_not_elman3.json",
+                        "feature_dim": 9312,
+                        "base_feature_dim": 582,
+                        "sequence_length": 16,
+                        "sequence_model": True,
+                        "sequence_padding": "repeat_first",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            entry = build_model_registry(repo_path)["models"]["model1_not_elman3"]
+
+            self.assertTrue(entry["sequence_model"])
+            self.assertEqual(entry["sequence_length"], 16)
+            self.assertEqual(entry["base_feature_dim"], 582)
+            self.assertEqual(entry["sequence_padding"], "repeat_first")
+
 
 if __name__ == "__main__":
     unittest.main()

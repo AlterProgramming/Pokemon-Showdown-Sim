@@ -129,6 +129,10 @@ from ModelWorkers import (  # noqa: E402
     softmax,
 )
 from core.StateVectorization import encode_state_mini, opponent_team_composition_features  # noqa: E402
+from NoTModel1Elman import (  # noqa: E402
+    normalize_model1_state_vector,
+    prepare_sequence_request_state,
+)
 
 
 def vocab_uses_action_tokens(action_vocab: dict[str, int]) -> bool:
@@ -992,10 +996,11 @@ def validate_state_vector(model_artifacts: dict[str, Any], state_vector: Any, is
     if is_augmented_request and sv_len == 582 and expected_input_dim == 678:
         return state_vector
 
-    # For legacy 582-dim models receiving a 678-dim vector: strip opponent_team_composition block (indices 556:652)
-    # The simulator now always generates 678-dim vectors; old models need the team block removed.
-    if expected_input_dim == 582 and sv_len == 678:
-        return state_vector[:556] + state_vector[652:]
+    # Model1-family artifacts use the original 582-dim public state contract.
+    # Current simulator vectors may carry slot-existence bits and the opponent
+    # team block, so normalize both current and legacy enriched layouts here.
+    if expected_input_dim == 582 and sv_len in {678, 690}:
+        return normalize_model1_state_vector(state_vector)
 
     # Otherwise, validate against expected dimension
     if expected_input_dim is not None and sv_len != expected_input_dim:
@@ -1046,6 +1051,17 @@ def health():
         model_id: artifacts["worker_pool"].health()
         for model_id, artifacts in MODEL_ARTIFACTS.items()
     }
+    model_contracts = {
+        model_id: {
+            "expected_input_dim": artifacts.get("expected_input_dim"),
+            "base_feature_dim": artifacts.get("base_feature_dim"),
+            "sequence_model": bool(artifacts.get("sequence_model")),
+            "sequence_length": artifacts.get("sequence_length"),
+            "sequence_padding": artifacts.get("sequence_padding"),
+            "state_encoder": artifacts.get("state_encoder"),
+        }
+        for model_id, artifacts in MODEL_ARTIFACTS.items()
+    }
     request_metrics = snapshot_request_metrics()
     overall_status = "ok" if all(entry["alive"] for entry in worker_health.values()) else "degraded"
     return jsonify(
@@ -1053,6 +1069,7 @@ def health():
         mode=ARGS.mode,
         default_model_id=DEFAULT_MODEL_ID,
         supported_model_ids=sorted(MODEL_ARTIFACTS.keys()),
+        model_contracts=model_contracts,
         worker_health=worker_health,
         request_metrics=request_metrics,
     )
@@ -1118,10 +1135,18 @@ def predict():
         # Flag if this is an augmented model request with team features
         is_augmented_request = bool(observed_opponent_team)
 
+        # Sequence models receive an explicit bounded history and flatten it for
+        # the serving artifact. This is deliberately request-local so worker
+        # recycling and multi-worker routing cannot leak hidden battle state.
+        request_state_vector = data.get("state_vector")
+        sequence_state_vector = prepare_sequence_request_state(model_artifacts, data)
+        if sequence_state_vector is not None:
+            request_state_vector = sequence_state_vector
+            is_augmented_request = False
+
         # Mini-encoder transcode: simulator sends 582-dim full state, mini
         # models expect 262-dim. Recompute server-side from battle_state.
-        request_state_vector = data.get("state_vector")
-        if model_artifacts.get("state_encoder") == "mini":
+        if sequence_state_vector is None and model_artifacts.get("state_encoder") == "mini":
             battle_state = data.get("battle_state")
             if battle_state is None:
                 raise ValueError(

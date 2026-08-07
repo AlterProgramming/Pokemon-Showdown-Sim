@@ -13,6 +13,7 @@ from ModelWorkers import (
     ModelWorkerSupervisor,
     decode_float32_payload,
     encode_float32_payload,
+    load_runtime_artifacts,
     parse_worker_count_overrides,
     softmax,
 )
@@ -214,6 +215,43 @@ class ModelWorkerSupervisorTests(unittest.TestCase):
         self.assertEqual(health_after_recycle["restart_count"], 1)
         self.assertEqual(health_after_recycle["requests_since_start"], 0)
         self.assertEqual(health_after_recycle["total_completed_requests"], 2)
+
+    def test_load_runtime_artifacts_preserves_sequence_contract(self) -> None:
+        import json
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            repo_path = Path(tmpdir)
+            artifacts_dir = repo_path / "artifacts"
+            artifacts_dir.mkdir()
+            metadata_path = artifacts_dir / "training_metadata_model1_not_elman3.json"
+            model_path = artifacts_dir / "model1_not_elman3.keras"
+            vocab_path = artifacts_dir / "action_vocab_model1_not_elman3.json"
+            model_path.write_text("m", encoding="utf-8")
+            vocab_path.write_text(json.dumps({"<UNK>": 0}), encoding="utf-8")
+            metadata_path.write_text(
+                json.dumps({"state_encoder": None}),
+                encoding="utf-8",
+            )
+
+            entry = {
+                "model_id": "model1_not_elman3",
+                "metadata_path": "artifacts/training_metadata_model1_not_elman3.json",
+                "policy_model_path": "artifacts/model1_not_elman3.keras",
+                "policy_vocab_path": "artifacts/action_vocab_model1_not_elman3.json",
+                "feature_dim": 9312,
+                "base_feature_dim": 582,
+                "sequence_model": True,
+                "sequence_length": 16,
+                "sequence_padding": "repeat_first",
+            }
+
+            runtime = load_runtime_artifacts(repo_path, entry)
+
+            self.assertTrue(runtime["sequence_model"])
+            self.assertEqual(runtime["sequence_length"], 16)
+            self.assertEqual(runtime["base_feature_dim"], 582)
+            self.assertEqual(runtime["sequence_padding"], "repeat_first")
 
 
 class ModelWorkerPoolTests(unittest.TestCase):
